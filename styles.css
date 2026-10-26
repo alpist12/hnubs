@@ -648,7 +648,12 @@ body {
 .hn-brand-mark i:nth-child(4) { height: 8px;  background: #9388E8 }
 .hn-brand strong { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 19px; font-weight: 800; letter-spacing: -0.01em; }
 .hn-brand span { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; font-weight: 600; color: #6E68D8; margin-top: 4px; }
-.hn-nav { flex: 1 1 auto; min-width: 0; display: flex; align-items: center; gap: 2px; }
+/* 좁아지면 탭을 숨기지 말고 가로로 밀어서 보여 준다.
+   예전에는 좁은 폭에서 개인 일정·공지사항·설정을 display:none 으로 감췄는데,
+   그걸 꺼낼 '더보기' 메뉴가 없어서 768~1180px 구간에서는 아예 못 갔다. */
+.hn-nav { flex: 1 1 auto; min-width: 0; display: flex; align-items: center; gap: 2px;
+  overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; }
+.hn-nav::-webkit-scrollbar { display: none; }
 .hn-nav button { flex: 0 0 auto; height: 38px; padding: 0 14px; border: 0; border-radius: 10px; background: transparent; color: #3A4466; font-family: inherit; font-size: 14.5px; font-weight: 600; cursor: pointer; white-space: nowrap; }
 .hn-nav button:hover { background: #F4F6FB; }
 .hn-nav button.active { background: #EEF2FF; color: var(--hn-accent); font-weight: 700; }
@@ -672,7 +677,7 @@ body {
 .hn-spark-art { background: radial-gradient(closest-side, rgba(124,95,216,0.35), rgba(124,95,216,0)); }
 .hn-link { color: var(--hn-accent); font-size: 13px; font-weight: 600; text-decoration: none; background: none; border: 0; cursor: pointer; font-family: inherit; }
 
-@media (max-width: 1180px) { .hn-collapsible { display: none; } .hn-search input { width: 110px } }
+@media (max-width: 1180px) { .hn-nav button { padding: 0 10px; font-size: 14px } .hn-search input { width: 110px } }
 @media (max-width: 900px) { .hn-search, .hn-who { display: none } }
 @media (max-width: 767px) {
   .hn-nav { display: none; }
