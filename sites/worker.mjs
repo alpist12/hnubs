@@ -21,13 +21,22 @@ function response(result) {
   });
 }
 
+/* 클라이언트가 보낸 신원 헤더는 버린다.
+   그대로 넘기면 호출량 제한과 비밀번호 잠금을 아무 값이나 넣어 넘어갈 수 있다.
+   진짜 주소는 Cloudflare 가 넣는 cf-connecting-ip 하나뿐이다. */
+function trustedHeaders(request) {
+  const headers = Object.fromEntries(request.headers);
+  for (const name of ['x-nf-client-connection-ip', 'client-ip', 'x-forwarded-for']) delete headers[name];
+  return headers;
+}
+
 async function eventOf(request, context) {
   const url = new URL(request.url);
   const event = {
     rawUrl: request.url,
     path: url.pathname,
     httpMethod: request.method,
-    headers: Object.fromEntries(request.headers),
+    headers: trustedHeaders(request),
     queryStringParameters: Object.fromEntries(url.searchParams),
     body: ['GET', 'HEAD'].includes(request.method) ? '' : await request.text(),
   };

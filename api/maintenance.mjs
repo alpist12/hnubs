@@ -5,7 +5,7 @@
  *
  *  비밀번호는 반드시 서버에서만 확인한다. 화면에서 비교하면 개발자 도구로 뚫린다.
  */
-import { firebaseGet, firebaseSet, preflight } from './_shared.mjs';
+import { clientIp, firebaseGet, firebaseSet, preflight } from './_shared.mjs';
 
 const PATH = 'scheduler/점검';
 const password = () => String(process.env.SCHEDULER_ADMIN_PASSWORD || '').trim();
@@ -24,12 +24,8 @@ const now = () => new Intl.DateTimeFormat('sv-SE', {
   hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false,
 }).format(new Date());
 
-const clientKey = event => String(
-  event.headers?.['x-nf-client-connection-ip']
-  || event.headers?.['client-ip']
-  || event.headers?.['x-forwarded-for']
-  || 'unknown',
-).split(',')[0].trim();
+// 위조 가능한 헤더를 세면 5회 잠금이 의미를 잃는다. _shared 의 판정을 그대로 쓴다.
+const clientKey = event => clientIp(event);
 
 function passwordBlocked(event) {
   const item = attempts.get(clientKey(event));

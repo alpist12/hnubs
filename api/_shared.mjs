@@ -40,22 +40,29 @@ export const originOf = event => {
    NVIDIA 호출은 돈이 든다. 인증이 없으면 주소만 알면 누구나 크레딧을 태울 수 있어서,
    IP 당 횟수를 막는다. 함수 인스턴스마다 따로 세므로 완벽하진 않지만,
    한 사람이 반복해서 긁는 것은 막는다. 제대로 막으려면 로그인이 필요하다. */
+/* 플랫폼이 직접 넣는 헤더만 믿는다.
+   x-forwarded-for 와 client-ip 는 브라우저가 아무 값이나 보낼 수 있어서,
+   그걸 세면 매 요청마다 다른 IP 인 척해서 제한을 그냥 넘어간다.
+   믿을 게 없으면 'unknown' 한 칸에 모아 센다 — 흩어지는 것보다 세게 막힌다. */
 export const clientIp = event => String(
-  event?.headers?.['x-nf-client-connection-ip']
-  || event?.headers?.['client-ip']
-  || event?.headers?.['x-forwarded-for']
+  event?.headers?.['cf-connecting-ip']              // Cloudflare 가 넣는다
+  || event?.headers?.['x-nf-client-connection-ip']  // Netlify 가 넣는다
   || 'unknown',
 ).split(',')[0].trim();
 
 const callLog = new Map();
 
 /** 지나간 기록을 버린다. 안 버리면 인스턴스가 살아 있는 동안 계속 쌓인다. */
+const CALL_LOG_MAX = 5000;
 function sweep(now, windowMs) {
   if (callLog.size < 500) return;
   for (const [key, times] of callLog) {
     const left = times.filter(t => now - t < windowMs);
     if (left.length) callLog.set(key, left); else callLog.delete(key);
   }
+  // 그래도 넘치면 오래된 것부터 버린다 (Map 은 넣은 순서를 지킨다).
+  // 안 버리면 기록이 메모리를 계속 먹는다.
+  while (callLog.size > CALL_LOG_MAX) callLog.delete(callLog.keys().next().value);
 }
 
 /**
