@@ -36,6 +36,52 @@ export const originOf = event => {
   return h.origin || h.Origin || '';
 };
 
+/* ── 호출량 제한 ──
+   NVIDIA 호출은 돈이 든다. 인증이 없으면 주소만 알면 누구나 크레딧을 태울 수 있어서,
+   IP 당 횟수를 막는다. 함수 인스턴스마다 따로 세므로 완벽하진 않지만,
+   한 사람이 반복해서 긁는 것은 막는다. 제대로 막으려면 로그인이 필요하다. */
+export const clientIp = event => String(
+  event?.headers?.['x-nf-client-connection-ip']
+  || event?.headers?.['client-ip']
+  || event?.headers?.['x-forwarded-for']
+  || 'unknown',
+).split(',')[0].trim();
+
+const callLog = new Map();
+
+/** 지나간 기록을 버린다. 안 버리면 인스턴스가 살아 있는 동안 계속 쌓인다. */
+function sweep(now, windowMs) {
+  if (callLog.size < 500) return;
+  for (const [key, times] of callLog) {
+    const left = times.filter(t => now - t < windowMs);
+    if (left.length) callLog.set(key, left); else callLog.delete(key);
+  }
+}
+
+/**
+ * @returns {number} 0 이면 통과, 양수면 몇 초 뒤에 다시 오라는 뜻.
+ */
+export function rateLimited(event, name, max, windowMs) {
+  const now = Date.now();
+  const key = `${name}:${clientIp(event)}`;
+  const times = (callLog.get(key) || []).filter(t => now - t < windowMs);
+  if (times.length >= max) {
+    return Math.max(1, Math.ceil((windowMs - (now - times[0])) / 1000));
+  }
+  times.push(now);
+  callLog.set(key, times);
+  sweep(now, windowMs);
+  return 0;
+}
+
+/** 제한에 걸렸을 때 돌려줄 응답. Retry-After 를 붙여 준다. */
+export const tooMany = (retryAfter, event) => {
+  const base = response(429, {
+    error: `요청이 너무 잦습니다. ${retryAfter}초 뒤에 다시 시도해 주세요.`,
+  }, event);
+  return { ...base, headers: { ...base.headers, 'retry-after': String(retryAfter) } };
+};
+
 export const response = (statusCode, value, event) => ({
   statusCode,
   headers: {

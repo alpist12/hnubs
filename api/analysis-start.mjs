@@ -1,8 +1,10 @@
 import crypto from 'node:crypto';
-import { firebaseGet, firebasePatch, firebaseSet, parseBody, precisionOf, preflight, publicJob, response, splitScenes } from './_shared.mjs';
+import { firebaseGet, firebasePatch, firebaseSet, parseBody, precisionOf, preflight, publicJob, rateLimited, response, splitScenes, tooMany } from './_shared.mjs';
 
 export const handler = async event => {
   const pre = preflight(event); if (pre) return pre;
+  // 작업 하나가 묶음 수만큼 NVIDIA 를 부른다. 시작은 더 짜게 막는다.
+  const slow = rateLimited(event, 'analysis-start', 5, 10 * 60_000); if (slow) return tooMany(slow, event);
   try {
     const body = parseBody(event);
     const precision = String(body.precision || '균형 (추천)');

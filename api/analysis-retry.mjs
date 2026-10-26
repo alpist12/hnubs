@@ -1,7 +1,9 @@
-import { analyzeJob, firebaseGet, firebaseSet, pathParts, preflight, publicJob, response } from './_shared.mjs';
+import { analyzeJob, firebaseGet, firebaseSet, pathParts, preflight, publicJob, rateLimited, response, tooMany } from './_shared.mjs';
 
 export const handler = async event => {
   const pre = preflight(event); if (pre) return pre;
+  // 묶음 하나당 NVIDIA 호출 한 번. 화면이 순서대로 부르므로 넉넉히 두되 상한은 둔다.
+  const slow = rateLimited(event, 'analysis-retry', 60, 10 * 60_000); if (slow) return tooMany(slow, event);
   try {
     const [pathId, pathIndex] = pathParts(event, 'analysis-retry');
     const id = event.queryStringParameters?.id || pathId;

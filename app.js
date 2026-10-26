@@ -12,6 +12,21 @@ const firebaseApp = initializeApp({
 });
 const db = getFirestore(firebaseApp, 'default');
 
+/* 익명 로그인.
+   지금 Firestore 규칙은 인증 없이 읽기·쓰기를 다 허용해서, 주소만 알면 부원 일정이 열린다.
+   규칙을 'request.auth != null' 로 좁히려면 앱이 먼저 로그인을 해야 하므로 여기서 해 둔다.
+   아직 규칙이 안 좁혀졌거나 콘솔에서 익명 로그인이 꺼져 있어도 앱이 멈추면 안 되니,
+   실패해도 그냥 넘어간다. 규칙을 좁히는 순간부터 이 줄이 실제로 일한다.
+   (firestore.rules.proposed 참고) */
+let authUid = '';
+try {
+  const { getAuth, signInAnonymously } = await import('https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js');
+  const credential = await signInAnonymously(getAuth(firebaseApp));
+  authUid = credential.user.uid;
+} catch (error) {
+  console.warn('익명 로그인 실패 — 규칙이 인증을 요구하면 데이터가 안 보입니다.', error?.code || error);
+}
+
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 document.documentElement.classList.toggle('reduce-motion',localStorage.getItem('hnubs:reduce-motion')==='true');

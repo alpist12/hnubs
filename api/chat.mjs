@@ -1,5 +1,5 @@
 import crypto from 'node:crypto';
-import { API_BASE, CHAT_MODEL, FALLBACK_MODEL, corsFor, dispatchChat, firebaseSet, originOf, parseBody, preflight, response } from './_shared.mjs';
+import { API_BASE, CHAT_MODEL, FALLBACK_MODEL, corsFor, dispatchChat, firebaseSet, originOf, parseBody, preflight, rateLimited, response, tooMany } from './_shared.mjs';
 import { TOOLS, runTool } from './_tools.mjs';
 
 const DOW = ['월', '화', '수', '목', '금', '토', '일'];
@@ -784,6 +784,8 @@ ${bulletList(action.items, x => `· ${fmtDate(x.date)} ${String(x.startH).padSta
 
 export async function handler(event) {
   const pre = preflight(event); if (pre) return pre;
+  // NVIDIA 호출은 돈이 든다. 인증이 없으니 IP 당 횟수라도 막는다.
+  const slow = rateLimited(event, 'chat', 20, 60_000); if (slow) return tooMany(slow, event);
   try {
     const body = parseBody(event);
     // 비동기 모드: 작업만 만들어 두고 백그라운드 함수에 넘긴다. (30초 제한을 받지 않는다)
