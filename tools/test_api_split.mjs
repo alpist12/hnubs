@@ -12,9 +12,9 @@ import fs from 'node:fs';
   for (const f of ['index.html', 'index.integrated.html']) {
     assert(fs.readFileSync(f, 'utf8').includes('api-config.js'), `${f} 가 설정을 안 읽는다`);
   }
-  for (const f of ['app.js', 'index.html']) {
-    assert(/window\.HNUBS_API/.test(fs.readFileSync(f, 'utf8')), `${f} 가 설정을 안 쓴다`);
-  }
+  /* 리뉴얼 전에는 index.html 의 인라인 스크립트도 이 값을 읽었다.
+     지금은 화면이 app.js 하나라 거기서만 쓴다. 읽는 곳이 하나면 어긋날 일도 없다. */
+  assert(/window\.HNUBS_API/.test(fs.readFileSync('app.js', 'utf8')), 'app.js 가 설정을 안 쓴다');
   // 예전처럼 주소를 직접 계산하는 곳이 남아 있으면 한쪽만 다른 서버를 보게 된다
   const html = fs.readFileSync('index.html', 'utf8');
   assert(!/\$\{location\.pathname\.startsWith\('\/scheduler'\) \? '\/scheduler' : ''\}\/api/.test(html),

@@ -190,18 +190,37 @@ async function fsRequest(doc, query = '') {
 /** RTDB 시절 경로를 Firestore 문서 경로로 옮긴다.
  *  분석 결과는 앱이 projects/{id} 의 aiAnalysis '필드' 로 읽으므로
  *  하위 컬렉션이 아니라 그 필드에 써야 한다. prefix 가 그 역할을 한다. */
+/* 서비스 계정 토큰은 Firestore 규칙을 건너뛴다.
+   그래서 id 에 경로를 끼워 넣으면 아무 문서나 읽고 쓸 수 있게 된다.
+   (/api/analysis/jobs/:id 의 id 는 주소에서 그대로 온다)
+   여기서 컬렉션과 문서 id 를 한 번 더 확인한다. */
+const FS_COLLECTIONS = ['analysisJobs', 'chatJobs', 'projects', 'shoots', 'settings', 'members', 'notices'];
+const FS_ID = /^[A-Za-z0-9_-]{1,128}$/;
+
+/** 주소에서 온 작업 ID 를 확인한다. 아니면 빈 문자열 — 호출부가 404 로 처리한다. */
+export const safeId = value => (FS_ID.test(String(value || '')) ? String(value) : '');
+
+function assertDoc(doc) {
+  const parts = String(doc).split('/');
+  if (parts.length !== 2) throw new Error('잘못된 문서 경로입니다.');
+  const [collection, id] = parts;
+  if (!FS_COLLECTIONS.includes(collection)) throw new Error('허용되지 않은 컬렉션입니다.');
+  if (!FS_ID.test(id)) throw new Error('잘못된 문서 ID 입니다.');
+  return doc;
+}
+
 function firestoreTarget(path) {
   const p = String(path || '').replace(/^\/+|\/+$/g, '');
   const analysis = p.match(/^scheduler\/프로젝트\/([^/]+)\/aiAnalysis$/);
-  if (analysis) return { doc: `projects/${analysis[1]}`, prefix: 'aiAnalysis.' };
+  if (analysis) return { doc: assertDoc(`projects/${analysis[1]}`), prefix: 'aiAnalysis.' };
   return {
-    doc: p
+    doc: assertDoc(p
       .replace(/^scheduler\/AI분석작업\//, 'analysisJobs/')
       .replace(/^scheduler\/AI채팅작업\//, 'chatJobs/')
       .replace(/^scheduler\/프로젝트\//, 'projects/')
       .replace(/^scheduler\/촬영일정\//, 'shoots/')
       .replace(/^scheduler\/점검$/, 'settings/maintenance')
-      .replace(/^scheduler\/설정$/, 'settings/app'),
+      .replace(/^scheduler\/설정$/, 'settings/app')),
     prefix: '',
   };
 }
