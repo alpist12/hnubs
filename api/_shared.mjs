@@ -45,8 +45,12 @@ export const originOf = event => {
    그걸 세면 매 요청마다 다른 IP 인 척해서 제한을 그냥 넘어간다.
    믿을 게 없으면 'unknown' 한 칸에 모아 센다 — 흩어지는 것보다 세게 막힌다. */
 export const clientIp = event => String(
-  event?.headers?.['cf-connecting-ip']              // Cloudflare 가 넣는다
-  || event?.headers?.['x-nf-client-connection-ip']  // Netlify 가 넣는다
+  // Cloudflare 경로: worker.mjs 가 cf-connecting-ip 를 읽어 여기에 직접 넣어 준다.
+  event?.clientIp
+  // Netlify 경로: 엣지가 넣는 헤더. 클라이언트가 보낸 값은 엣지가 덮어쓴다.
+  // 헤더를 순서대로 시도하면 안 된다 — Netlify 에서는 cf-connecting-ip 를 아무나 보낼 수 있어서
+  // 그걸 먼저 읽는 순간 제한이 그대로 뚫린다.
+  || event?.headers?.['x-nf-client-connection-ip']
   || 'unknown',
 ).split(',')[0].trim();
 

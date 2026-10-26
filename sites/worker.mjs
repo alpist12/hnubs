@@ -26,7 +26,7 @@ function response(result) {
    진짜 주소는 Cloudflare 가 넣는 cf-connecting-ip 하나뿐이다. */
 function trustedHeaders(request) {
   const headers = Object.fromEntries(request.headers);
-  for (const name of ['x-nf-client-connection-ip', 'client-ip', 'x-forwarded-for']) delete headers[name];
+  for (const name of ['x-nf-client-connection-ip', 'client-ip', 'x-forwarded-for', 'cf-connecting-ip']) delete headers[name];
   return headers;
 }
 
@@ -40,6 +40,8 @@ async function eventOf(request, context) {
     queryStringParameters: Object.fromEntries(url.searchParams),
     body: ['GET', 'HEAD'].includes(request.method) ? '' : await request.text(),
   };
+  // 진짜 주소는 Cloudflare 가 넣는 이 헤더 하나뿐이다. 헤더로 흘리지 않고 값으로 넘긴다.
+  event.clientIp = request.headers.get('cf-connecting-ip') || '';
   event.dispatchAnalysis = (id, indexes = null) => {
     const task = analysisBackground({ ...event, body: JSON.stringify({ id, indexes }) });
     context?.waitUntil ? context.waitUntil(task) : task.catch(console.error);
