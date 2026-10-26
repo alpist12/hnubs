@@ -36,3 +36,7 @@ _prototype-backup-20261025/
 # GitHub Pages 배포용. 이 레포는 Netlify 로 배포해서 쓰지 않는다.
 # (푸시에 workflow 권한이 필요해 레포에서는 뺀다. 파일은 디스크에 남아 있다.)
 .github/workflows/
+
+# 다른 AI 도구가 만든 폴더 (환경마다 다시 생긴다)
+.agents/
+.codex/
