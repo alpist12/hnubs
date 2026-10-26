@@ -1794,7 +1794,8 @@ if(airEl.button){
     airEl.chat.hidden=!open;
     airEl.button.setAttribute('aria-expanded',String(open));
     if(open){
-      if(!airEl.messages.children.length) airSay('안녕하세요, Air입니다. 이렇게 물어보세요.\n\n· 다음 주 촬영 일정 알려줘\n· 서연이랑 창민이 둘 다 되는 시간 알려줘\n· 11월 3일 19시부터 21시까지 회의 잡아줘');
+      // 예시에 실제 부원 이름을 쓰지 않는다. 쓰면 누가 누구와 겹치는지가 인사말로 새어 나간다.
+      if(!airEl.messages.children.length) airSay('안녕하세요, Air입니다. 이렇게 물어보세요.\n\n· 다음 주 촬영 일정 알려줘\n· 철수랑 영희 둘 다 되는 시간 알려줘\n· 11월 3일 19시부터 21시까지 회의 잡아줘');
       airEl.input.focus();
     }
   });

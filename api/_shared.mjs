@@ -125,6 +125,68 @@ const FS_DB = process.env.FIREBASE_FIRESTORE_DB || 'default';
 const FS_KEY = String(process.env.FIREBASE_API_KEY || 'AIzaSyDXmeiQpRSZshFA1_BgZ2z_8AKLy6_Nc8M').trim();
 const FS_BASE = `https://firestore.googleapis.com/v1/projects/${FS_PROJECT}/databases/${FS_DB}/documents`;
 
+/* ── 서버 신원 ──
+   공개 웹 API 키(?key=)로 쓰면 규칙을 거친다. 그래서 규칙이 열려 있는 동안은
+   누구나 같은 경로에 직접 쓸 수 있고, 화면의 관리자 잠금이 의미를 잃는다.
+   FIREBASE_SERVICE_ACCOUNT 를 주면 서비스 계정으로 토큰을 받아 Bearer 로 쓴다.
+   서비스 계정은 규칙을 건너뛰므로, 규칙에서 scheduler/* 를 막아도 서버는 계속 쓴다.
+   환경변수가 없으면 지금까지처럼 공개 키로 동작한다 (동작은 하되 보호는 없다). */
+let saCache = null;        // { token, expires }
+function serviceAccount() {
+  const raw = process.env.FIREBASE_SERVICE_ACCOUNT;
+  if (!raw) return null;
+  try {
+    const sa = JSON.parse(raw);
+    return sa.client_email && sa.private_key ? sa : null;
+  } catch { throw new Error('FIREBASE_SERVICE_ACCOUNT 가 올바른 JSON 이 아닙니다.'); }
+}
+
+const b64url = buf => Buffer.from(buf).toString('base64')
+  .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+
+/** 서비스 계정으로 액세스 토큰을 받는다. 만료 1분 전까지는 재사용한다. */
+async function serviceToken() {
+  const sa = serviceAccount();
+  if (!sa) return null;
+  if (saCache && saCache.expires > Date.now() + 60_000) return saCache.token;
+
+  const { createSign } = await import('node:crypto');
+  const now = Math.floor(Date.now() / 1000);
+  const claim = {
+    iss: sa.client_email,
+    scope: 'https://www.googleapis.com/auth/datastore',
+    aud: 'https://oauth2.googleapis.com/token',
+    iat: now, exp: now + 3600,
+  };
+  const unsigned = `${b64url(JSON.stringify({ alg: 'RS256', typ: 'JWT' }))}.${b64url(JSON.stringify(claim))}`;
+  const signer = createSign('RSA-SHA256');
+  signer.update(unsigned);
+  // 환경변수에 넣을 때 줄바꿈이 \n 두 글자로 들어가는 일이 잦다. 진짜 줄바꿈으로 되돌린다.
+  const pem = sa.private_key.includes('\\n') ? sa.private_key.replace(/\\n/g, '\n') : sa.private_key;
+  const jwt = `${unsigned}.${b64url(signer.sign(pem))}`;
+
+  const res = await fetch('https://oauth2.googleapis.com/token', {
+    method: 'POST',
+    headers: { 'content-type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({ grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer', assertion: jwt }),
+  });
+  if (!res.ok) throw new Error(`서비스 계정 토큰 발급 실패 (${res.status}): ${(await res.text()).slice(0, 200)}`);
+  const body = await res.json();
+  saCache = { token: body.access_token, expires: Date.now() + (body.expires_in || 3600) * 1000 };
+  return saCache.token;
+}
+
+/** Firestore 요청에 붙일 주소와 헤더. 서비스 계정이 있으면 ?key= 대신 Bearer 를 쓴다. */
+async function fsRequest(doc, query = '') {
+  const token = await serviceToken();
+  const sep = query ? '&' : '';
+  if (token) {
+    return { url: `${FS_BASE}/${doc}${query ? '?' + query : ''}`,
+             headers: { authorization: `Bearer ${token}` } };
+  }
+  return { url: `${FS_BASE}/${doc}?key=${FS_KEY}${sep}${query}`, headers: {} };
+}
+
 /** RTDB 시절 경로를 Firestore 문서 경로로 옮긴다.
  *  분석 결과는 앱이 projects/{id} 의 aiAnalysis '필드' 로 읽으므로
  *  하위 컬렉션이 아니라 그 필드에 써야 한다. prefix 가 그 역할을 한다. */
@@ -179,7 +241,8 @@ function fsDecode(value) {
 
 export async function firebaseGet(path) {
   const { doc, prefix } = firestoreTarget(path);
-  const res = await fetch(`${FS_BASE}/${doc}?key=${FS_KEY}`);
+  const { url, headers } = await fsRequest(doc);
+  const res = await fetch(url, { headers });
   if (res.status === 404) return null;      // 없는 문서는 null 로 돌려주던 예전 동작을 지킨다
   if (!res.ok) throw new Error(`Firestore 읽기 실패 (${res.status})`);
   const body = await res.json();
@@ -218,8 +281,11 @@ async function writeFields(path, value, replaceWhole) {
     ? (replaceWhole ? [maskName(parent)] : keys.map(k => `${maskName(parent)}.${maskPath(k)}`))
     : (replaceWhole ? [] : keys.map(maskPath));
   const mask = paths.map(k => `updateMask.fieldPaths=${encodeURIComponent(k)}`).join('&');
-  const res = await fetch(`${FS_BASE}/${doc}?key=${FS_KEY}${mask ? '&' + mask : ''}`, {
-    method: 'PATCH', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ fields }),
+  const { url, headers } = await fsRequest(doc, mask);
+  const res = await fetch(url, {
+    method: 'PATCH',
+    headers: { 'content-type': 'application/json', ...headers },
+    body: JSON.stringify({ fields }),
   });
   if (!res.ok) throw new Error(`Firestore 저장 실패 (${res.status}): ${(await res.text()).slice(0, 200)}`);
   return value;
