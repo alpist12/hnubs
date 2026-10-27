@@ -1289,17 +1289,38 @@ const PERSONAL_TONE={
   fixed:  ['#FFE9DF','#8A3A1A','linear-gradient(120deg, #FFF2EC, #FFF6F1)'],
   free:   ['#E3F7EE','#17603F','linear-gradient(120deg, #EEFAF4, #F3FBF7)'],
   shoot:  ['#E3EAFF','#2F4FC2','linear-gradient(120deg, #EEF2FF, #F3F5FF)'],
+  radio:  ['#FFF1CC','#6E5208','linear-gradient(120deg, #FFF7E3, #FFFAEF)'],
 };
 function rangeLabel(r){ return `${hourLabel(r.start)} – ${hourLabel(r.end)}`; }
 
-// 일정표에는 수업 시간표(fixedClasses)만 띄운다.
-// availability(참여 가능/불가)는 주간 일정표의 인원 계산에만 쓰고 여기서는 가린다.
+// 이 사람의 하루를 한 군데 모은다 — 수업, 참여 불가/가능 시간, 촬영, 라디오.
+// 예전에는 수업만 띄워서 '개인 일정엔 아무것도 없는데 왜 불가지?' 가 됐다.
 function personalEvents(memberId, iso){
-  const dayIdx=dataDay(new Date(`${iso}T00:00:00`));
-  return fixedRows
-    .filter(r=>r.memberId===memberId&&Number(r.data.day)===dayIdx)
-    .sort((a,b)=>Number(a.data.start)-Number(b.data.start))
-    .map(r=>({kind:'fixed',title:r.data.name||r.data.title||r.data.subject||'수업',time:rangeLabel(r.data),repeat:true}));
+  const dateObj=new Date(`${iso}T00:00:00`);
+  const dayIdx=dataDay(dateObj);
+  const out=[];
+
+  fixedRows.filter(r=>r.memberId===memberId&&Number(r.data.day)===dayIdx)
+    .forEach(r=>out.push({kind:'fixed',start:Number(r.data.start),title:r.data.name||r.data.title||r.data.subject||'수업',time:rangeLabel(r.data),repeat:true}));
+
+  const personal=availabilityRows.find(r=>r.memberId===memberId&&r.id===iso)?.data;
+  if(personal){
+    const busy=personal.unavailableRanges||(personal.status==='불가능'?(personal.ranges?.length?personal.ranges:[{start:9,end:23}]):[]);
+    const free=personal.availableRanges||(personal.status==='가능'?(personal.ranges||[]):[]);
+    (busy||[]).forEach(r=>out.push({kind:'busy',start:Number(r.start),title:personal.memo||'참여 불가',time:rangeLabel(r)}));
+    (free||[]).forEach(r=>out.push({kind:'free',start:Number(r.start),title:personal.memo||'참여 가능',time:rangeLabel(r)}));
+  }
+
+  schedules.filter(sc=>sc.date===iso&&sc.castIds?.includes(memberId))
+    .forEach(sc=>out.push({kind:'shoot',start:Number(sc.startH),title:sc.title||'촬영',time:rangeLabel({start:sc.startH,end:sc.endH})}));
+
+  RADIO_SLOTS.forEach(slot=>{
+    if(radioCast(iso,slot.key).some(c=>(c.id||c)===memberId)){
+      out.push({kind:'radio',start:slot.hour,title:slot.label,time:slot.time});
+    }
+  });
+
+  return out.sort((a,b)=>a.start-b.start);
 }
 
 function personalView(){
@@ -1343,7 +1364,7 @@ function personalView(){
       </div>
       <span class="hn-num" style="font-size:13px;font-weight:600;color:#4F5770">${esc(e.time)}</span>
     </div>`;}).join('')
-    ||`<div style="padding:24px 16px;border-radius:16px;background:linear-gradient(120deg, #F3F5FF, #F6F2FF);text-align:center;color:#4F5770;font-size:14px">등록된 수업이 없어요.<br>이 날은 촬영 참여 가능으로 표시돼요.</div>`;
+    ||`<div style="padding:24px 16px;border-radius:16px;background:linear-gradient(120deg, #F3F5FF, #F6F2FF);text-align:center;color:#4F5770;font-size:14px">이 날은 등록된 일정이 없어요.<br>촬영 참여 가능으로 표시돼요.</div>`;
 
   return `
   <section style="position:relative;overflow:hidden;border-radius:22px;background:linear-gradient(115deg, #3E5FD9 0%, #5A5FE0 50%, #7C5FD8 100%);color:#FFFFFF;padding:20px clamp(20px, 2.4vw, 28px);box-shadow:0 18px 40px rgba(72,82,200,0.26);display:flex;flex-wrap:wrap;gap:16px 24px;align-items:center;justify-content:space-between">
@@ -1358,8 +1379,8 @@ function personalView(){
       <span style="font-size:14.5px;color:#EEF0FF">촬영에 참여할 수 없는 시간을 등록하면 주간 일정표의 가능 인원에 바로 반영돼요.</span>
     </div>
     <div style="position:relative;display:flex;flex-wrap:wrap;align-items:center;gap:10px">
-      <span style="display:flex;flex-direction:column;min-width:96px;padding:8px 14px;border-radius:14px;background:rgba(255,255,255,0.14);border:1px solid rgba(255,255,255,0.26);line-height:1.3"><span style="font-size:12px;color:#DCE2FF">이번 달 수업</span><strong class="hn-num" style="font-size:20px;font-weight:800">${monthCount}<span style="font-size:12px;font-weight:600;color:#DCE2FF"> 건</span></strong></span>
-      <span style="display:flex;flex-direction:column;min-width:96px;padding:8px 14px;border-radius:14px;background:rgba(255,255,255,0.14);border:1px solid rgba(255,255,255,0.26);line-height:1.3"><span style="font-size:12px;color:#DCE2FF">매주 반복</span><strong class="hn-num" style="font-size:20px;font-weight:800">${repeatCount}<span style="font-size:12px;font-weight:600;color:#DCE2FF"> 개</span></strong></span>
+      <span style="display:flex;flex-direction:column;min-width:96px;padding:8px 14px;border-radius:14px;background:rgba(255,255,255,0.14);border:1px solid rgba(255,255,255,0.26);line-height:1.3"><span style="font-size:12px;color:#DCE2FF">이번 달 일정</span><strong class="hn-num" style="font-size:20px;font-weight:800">${monthCount}<span style="font-size:12px;font-weight:600;color:#DCE2FF"> 건</span></strong></span>
+      <span style="display:flex;flex-direction:column;min-width:96px;padding:8px 14px;border-radius:14px;background:rgba(255,255,255,0.14);border:1px solid rgba(255,255,255,0.26);line-height:1.3"><span style="font-size:12px;color:#DCE2FF">수업(매주)</span><strong class="hn-num" style="font-size:20px;font-weight:800">${repeatCount}<span style="font-size:12px;font-weight:600;color:#DCE2FF"> 개</span></strong></span>
       <button data-action="new-personal" style="display:inline-flex;align-items:center;gap:6px;height:44px;padding:0 18px;border-radius:12px;border:0;background:#FFFFFF;color:#3F4FD0;font-family:inherit;font-size:14px;font-weight:800;cursor:pointer;box-shadow:0 6px 16px rgba(30,30,120,0.18)"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>일정 추가</button>
     </div>
   </section>
@@ -1375,6 +1396,9 @@ function personalView(){
         </div>
         <div style="display:flex;flex-wrap:wrap;gap:12px;font-size:12px;font-weight:600;color:#4F5770">
           <span style="display:inline-flex;align-items:center;gap:6px"><i style="width:12px;height:12px;border-radius:4px;background:#FFE9DF"></i>수업 시간표</span>
+          <span style="display:inline-flex;align-items:center;gap:6px"><i style="width:12px;height:12px;border-radius:4px;background:#EDE6FF"></i>참여 불가</span>
+          <span style="display:inline-flex;align-items:center;gap:6px"><i style="width:12px;height:12px;border-radius:4px;background:#E3EAFF"></i>촬영</span>
+          <span style="display:inline-flex;align-items:center;gap:6px"><i style="width:12px;height:12px;border-radius:4px;background:#FFF1CC"></i>라디오</span>
         </div>
       </div>
       <div style="overflow-x:auto">
