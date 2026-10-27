@@ -12,20 +12,14 @@ mkdirSync(client, { recursive: true });
 
 for (const name of [
   'index.html',
-  'index.integrated.html',
   'app.js',
   'styles.css',   // 리뉴얼한 앱의 스타일. 빠지면 사이트가 맨몸으로 나온다
   'api-config.js',
   'extract-client.js',
   'schedule-rules.mjs',
-  'app.css',
-  'claude-handoff.css',
-  'refresh.css',
-  'standalone-desktop.html',
-  'standalone-mobile.html',
   'robots.txt',
+  '.nojekyll',
 ]) cpSync(resolve(root, name), resolve(client, name));
-cpSync(resolve(root, 'assets'), resolve(client, 'assets'), { recursive: true });
 cpSync(resolve(root, 'drive'), resolve(client, 'drive'), { recursive: true });
 
 mkdirSync(resolve(dist, 'server'), { recursive: true });

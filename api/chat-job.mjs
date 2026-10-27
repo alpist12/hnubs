@@ -8,6 +8,6 @@ export const handler = async event => {
     if (!id) return response(400, { error: '작업 ID가 없습니다.' }, event);
     const job = await firebaseGet(`scheduler/AI채팅작업/${id}`);
     if (!job) return response(404, { error: '채팅 작업을 찾을 수 없습니다.' }, event);
-    return response(200, { id, status: job.status, ...(job.result || {}, event) });
+    return response(200, { id, status: job.status, ...(job.result || {}) }, event);
   } catch (error) { return response(500, { error: error.message }, event); }
 };

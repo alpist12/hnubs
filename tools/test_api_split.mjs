@@ -9,7 +9,7 @@ import fs from 'node:fs';
   assert(!/NVIDIA|API_KEY|PASSWORD|비밀번호/i.test(cfg.replace(/\/\*[\s\S]*?\*\//g, '')),
     'api-config.js 는 브라우저로 내려간다. 비밀값을 두면 안 된다');
 
-  for (const f of ['index.html', 'index.integrated.html']) {
+  for (const f of ['index.html']) {
     assert(fs.readFileSync(f, 'utf8').includes('api-config.js'), `${f} 가 설정을 안 읽는다`);
   }
   /* 리뉴얼 전에는 index.html 의 인라인 스크립트도 이 값을 읽었다.
@@ -32,10 +32,10 @@ import fs from 'node:fs';
 // ── 4) 빌드 산출물(Pages 가 실제로 올리는 것)에 설정이 들어갔는지
 {
   const built = 'dist/client/';
-  for (const f of ['api-config.js', 'index.html', 'index.integrated.html']) {
+  for (const f of ['api-config.js', 'index.html']) {
     assert(fs.existsSync(built + f), `빌드 결과에 ${f} 가 없다`);
   }
-  for (const f of ['index.html', 'index.integrated.html']) {
+  for (const f of ['index.html']) {
     assert(fs.readFileSync(built + f, 'utf8').includes('api-config.js'),
       `빌드된 ${f} 가 설정을 안 읽는다 — Pages 에서 AI 기능이 죽는다`);
   }
