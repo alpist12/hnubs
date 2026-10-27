@@ -1055,6 +1055,7 @@ body.theme-light .folder-lock-badge {
 .file-list-header {
   display: grid;
   grid-template-columns: minmax(240px, 2.6fr) 110px 120px 150px 130px;
+  gap: 14px;
   align-items: center;
   position: sticky;
   top: 0;
