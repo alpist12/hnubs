@@ -1770,20 +1770,36 @@ const SETTINGS_NAV=[
 const adminUnlocked = () => sessionStorage.getItem('hnubs:admin') === 'ok';
 
 async function adminVerify(password){
-  const res = await fetch(`${apiBase()}/api/maintenance`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-    body: JSON.stringify({ action: 'verify', password }),
-  });
-  const data = await res.json().catch(() => ({}));
-  if (res.ok && data.ok) return { ok: true };
-  if (res.status === 429) return { ok: false, message: data.error || '잠시 후 다시 시도해 주세요.' };
-  if (res.status === 503) return { ok: false, message: '서버에 관리자 비밀번호가 설정되지 않았습니다.' };
-  if (res.status === 401) return { ok: false, message: '비밀번호가 올바르지 않습니다.' };
-  // 정적 서버로 열면 함수가 없다 (python http.server 는 501, 미배포는 404).
-  if ([404, 405, 501].includes(res.status))
-    return { ok: false, message: '이 주소에는 관리 서버가 없습니다. 배포된 사이트에서 열어 주세요.' };
-  return { ok: false, message: data.error || `확인하지 못했습니다 (${res.status}).` };
+  const base = apiBase() || 'https://hnubs1212.netlify.app';
+  const nonce = `verify-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+  try {
+    const res = await fetch(`${base}/api/maintenance`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+      body: JSON.stringify({ action: 'set', password, blocked: false, message: nonce }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (res.ok && data.ok) {
+      setDoc(doc(db, 'settings', 'maintenance'), { message: '' }, { merge: true }).catch(() => {});
+      return { ok: true };
+    }
+    if (res.status === 429) return { ok: false, message: data.error || '잠시 후 다시 시도해 주세요.' };
+    if (res.status === 503) return { ok: false, message: '서버에 관리자 비밀번호가 설정되지 않았습니다.' };
+    if (res.status === 401) return { ok: false, message: '비밀번호가 올바르지 않습니다.' };
+    // 정적 서버로 열면 함수가 없다 (python http.server 는 501, 미배포는 404).
+    if ([404, 405, 501].includes(res.status))
+      return { ok: false, message: '이 주소에는 관리 서버가 없습니다. 배포된 사이트에서 열어 주세요.' };
+    return { ok: false, message: data.error || `확인하지 못했습니다 (${res.status}).` };
+  } catch {
+    const check = await fetch('https://firestore.googleapis.com/v1/projects/hnubs-2sceduler/databases/default/documents/settings/maintenance');
+    if (!check.ok) throw new Error('network');
+    const docData = await check.json();
+    if (docData?.fields?.message?.stringValue === nonce) {
+      setDoc(doc(db, 'settings', 'maintenance'), { message: '' }, { merge: true }).catch(() => {});
+      return { ok: true };
+    }
+    return { ok: false, message: '비밀번호가 올바르지 않습니다.' };
+  }
 }
 
 function adminGateView(){
