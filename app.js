@@ -60,7 +60,7 @@ const firebaseState = { pending: new Set(['members','shoots','projects','availab
 // 공지사항은 Firestore 'notices' 컬렉션에서 온다. 비어 있으면 비어 있는 대로 둔다.
 let notices = [];
 
-const state = { route: location.hash.slice(1) || 'home', selectedSlot: '월 09:00', mobileDay: 0, aiProjectId: '', aiFile: '', aiText: '', aiChars: 0, aiExtracting: false, aiRunning: false, aiError: '', aiJob: null, aiSceneIndex: 0, aiMappings: {}, aiPrecision: '균형 (추천)', aiWeek: 0, aiStep: 0, makerTab: 'script', shortsState: 'idle', shortsSetup: false, aiHealthText: '', settingsSection: 'logs', selectedShoot: '', shootFilter: 'all', shootCategory: 'all', shootQuery: '', shootsMode: 'calendar', shootMonth: 0, shootDay: '', noticeTag: 'all', peopleDept: '전체', peopleQuery: '', personalMemberId: '', personalMonth: 0, homeMonth: 0, personalDay: '', slots: [], mustIds: [], weekOffset: 0 };
+const state = { route: location.hash.slice(1) || 'home', selectedSlot: '월 09:00', mobileDay: 0, aiProjectId: '', aiFile: '', aiText: '', aiChars: 0, aiExtracting: false, aiRunning: false, aiError: '', aiJob: null, aiSceneIndex: 0, aiMappings: {}, aiPrecision: '균형 (추천)', aiWeek: 0, aiStep: 0, makerTab: 'script', shortsState: 'idle', shortsSetup: false, driveState: 'idle', driveSetup: false, aiHealthText: '', settingsSection: 'logs', selectedShoot: '', shootFilter: 'all', shootCategory: 'all', shootQuery: '', shootsMode: 'calendar', shootMonth: 0, shootDay: '', noticeTag: 'all', peopleDept: '전체', peopleQuery: '', personalMemberId: '', personalMonth: 0, homeMonth: 0, personalDay: '', slots: [], mustIds: [], weekOffset: 0 };
 
 function icon(name) { return `<span data-icon="${name}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${icons[name] || ''}</svg></span>`; }
 function esc(value = '') { return String(value).replace(/[&<>'"]/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char])); }
@@ -713,6 +713,84 @@ function shortsView(){
   return `${hero}
   <section style="${CARD};box-sizing:border-box;width:min(560px, 100%);margin:min(6vh, 56px) auto 0;padding:36px;display:flex;flex-direction:column;gap:18px;text-align:center;align-items:center">
     <span aria-hidden="true" style="width:58px;height:58px;border-radius:18px;background:linear-gradient(140deg, #E3EAFF, #EDE6FF);color:#3F4FD0;display:flex;align-items:center;justify-content:center"><svg width="27" height="27" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="13" height="12" rx="2.5"/><path d="M16 10.5l5-3v9l-5-3"/></svg></span>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <h2 style="margin:0;font-size:21px;font-weight:800">${panel[0]}</h2>
+      <p style="margin:0;font-size:14px;color:#64708F;line-height:1.6">${panel[1]}</p>
+    </div>
+    <div style="width:100%;display:flex;flex-direction:column;gap:12px">${howto}${setup}</div>
+  </section>`;
+}
+
+/* ===== 공유드라이브 =====
+   쇼츠 메이커와 같은 방식. 이 컴퓨터에서 도는 로컬 웹앱을 탭 안에 띄운다.
+   이쪽은 열쇠가 없어서 주소만 맞추면 된다.
+   구글 로그인은 떼어 냈다 — Drive 자격증명은 서버가 계정 하나로 들고 있고,
+   연결 전에는 서버가 local 모드로 목록을 내준다. */
+const DRIVE_DEFAULT = 'http://127.0.0.1:3000';
+const driveBase = () => (localStorage.getItem('hnubs:drive-base') || DRIVE_DEFAULT).replace(/\/$/, '');
+const driveBlocked = () => location.protocol === 'https:' && driveBase().startsWith('http://');
+
+async function driveProbe(){
+  if (driveBlocked()) { state.driveState = 'https'; render(); return; }
+  state.driveState = 'checking'; render();
+  try {
+    await fetch(`${driveBase()}/api/files`, { mode: 'no-cors', signal: AbortSignal.timeout(4000) });
+    state.driveState = 'on';
+  } catch {
+    state.driveState = 'off';
+  }
+  render();
+}
+
+function driveView(){
+  const base = driveBase();
+  const st = state.driveState || 'idle';
+
+  // 연결되면 틀 없이 헤더 아래를 꽉 채운다 (쇼츠와 같은 규칙).
+  if (st === 'on') {
+    return `<section aria-label="공유드라이브"
+      style="margin:-22px calc(-1 * clamp(16px, 3vw, 32px)) -48px;height:calc(100vh - 64px);overflow:hidden;background:#F4F5FC">
+      <iframe src="${base}/" title="방송국 공유드라이브" style="display:block;width:100%;height:100%;border:0"></iframe>
+    </section>`;
+  }
+
+  const panel = {
+    checking: ['연결을 확인하는 중이에요', '잠시만 기다려 주세요.'],
+    https:    ['주소가 https 여야 해요', '이 사이트는 https 라서 http 주소를 불러올 수 없습니다. 작업공간을 로컬에서 열거나, 터널로 만든 https 주소를 넣어 주세요.'],
+    off:      ['공유드라이브가 꺼져 있어요', '아래 명령으로 켜면 이 탭에서 바로 쓸 수 있습니다.'],
+    idle:     ['공유드라이브를 불러올게요', '‘연결 확인’을 누르면 시작합니다.'],
+  }[st] || ['공유드라이브를 불러올게요', '‘연결 확인’을 누르면 시작합니다.'];
+
+  const howto = (st === 'off' || st === 'idle') ? `
+    <div style="display:flex;flex-direction:column;gap:8px;padding:16px;border-radius:14px;background:#F6F7FC;text-align:left">
+      <strong style="font-size:13.5px;font-weight:800">켜는 방법</strong>
+      <code style="font-family:ui-monospace,monospace;font-size:12.5px;color:#4F5770;word-break:break-all">바탕화면 › 프로젝트 › 방송국 공유드라이브 에서<br><b>npm start</b></code>
+      <span style="font-size:12.5px;color:#64708F">부원들은 따로 로그인하지 않습니다. 구글 계정 연결은 운영진이 한 번만 해 두면 됩니다.</span>
+    </div>` : '';
+
+  const setup = state.driveSetup ? `
+    <form id="drive-form" style="display:flex;flex-direction:column;gap:10px;padding:16px;border-radius:14px;background:#F8F9FD;text-align:left">
+      <label style="display:flex;flex-direction:column;gap:5px;font-size:12.5px;font-weight:700">주소
+        <input name="base" value="${esc(base)}" placeholder="${DRIVE_DEFAULT}" style="height:42px;padding:0 12px;border-radius:11px;border:1px solid #E6E9F3;background:#FFFFFF;font-family:inherit;font-size:14px;color:#20294D"></label>
+      <button type="submit" style="height:42px;border:0;border-radius:11px;background:linear-gradient(135deg, #416FDE, #6656DA);color:#FFFFFF;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer">저장하고 다시 확인</button>
+    </form>` : '';
+
+  return `
+  <section style="position:relative;overflow:hidden;border-radius:22px;background:linear-gradient(115deg, #3E5FD9 0%, #5A5FE0 50%, #7C5FD8 100%);color:#FFFFFF;padding:20px clamp(20px, 2.4vw, 28px);box-shadow:0 18px 40px rgba(72,82,200,0.26);display:flex;flex-wrap:wrap;gap:16px 24px;align-items:center;justify-content:space-between;min-height:92px">
+    <svg aria-hidden="true" width="560" height="560" viewBox="0 0 560 560" style="position:absolute;right:22%;top:-260px;opacity:0.14;pointer-events:none"><g fill="none" stroke="#FFFFFF" stroke-width="1.5"><circle cx="280" cy="280" r="90"/><circle cx="280" cy="280" r="150"/><circle cx="280" cy="280" r="210"/><circle cx="280" cy="280" r="270"/></g></svg>
+    <div style="position:relative;display:flex;flex-direction:column;gap:2px;min-width:0;max-width:720px">
+      <span style="font-size:13.5px;color:#DCE2FF">로그인 없이 바로</span>
+      <h1 style="margin:0;font-size:28px;font-weight:800;letter-spacing:-0.02em">공유드라이브</h1>
+      <span style="font-size:14.5px;color:#EEF0FF">방송국 자료를 함께 보관하고 꺼내 써요.</span>
+    </div>
+    <div style="position:relative;display:flex;flex-wrap:wrap;align-items:center;gap:8px">
+      <button data-drive-reload="1" style="height:42px;padding:0 14px;border-radius:12px;border:1px solid rgba(255,255,255,0.28);background:rgba(255,255,255,0.14);color:#FFFFFF;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer">연결 확인</button>
+      <button data-drive-setup="1" style="height:42px;padding:0 14px;border-radius:12px;border:1px solid rgba(255,255,255,0.28);background:rgba(255,255,255,0.14);color:#FFFFFF;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer">주소 설정</button>
+    </div>
+  </section>
+
+  <section style="${CARD};box-sizing:border-box;width:min(560px, 100%);margin:min(6vh, 56px) auto 0;padding:36px;display:flex;flex-direction:column;gap:18px;text-align:center;align-items:center">
+    <span aria-hidden="true" style="width:58px;height:58px;border-radius:18px;background:linear-gradient(140deg, #E3EAFF, #EDE6FF);color:#3F4FD0;display:flex;align-items:center;justify-content:center"><svg width="27" height="27" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></span>
     <div style="display:flex;flex-direction:column;gap:6px">
       <h2 style="margin:0;font-size:21px;font-weight:800">${panel[0]}</h2>
       <p style="margin:0;font-size:14px;color:#64708F;line-height:1.6">${panel[1]}</p>
@@ -1433,7 +1511,7 @@ function peopleSettings(){
   </section>`;
 }
 
-const views={home:homeView,weekly:weeklyView,maker:makerView,shoots:shootsView,personal:personalView,notices:noticesView,settings:settingsViewLocked};
+const views={home:homeView,weekly:weeklyView,maker:makerView,drive:driveView,shoots:shootsView,personal:personalView,notices:noticesView,settings:settingsViewLocked};
 
 function render(){
   // 인원 관리는 설정 안으로 옮겼다. 예전 #people 주소도 그쪽으로 보낸다.
@@ -1447,7 +1525,7 @@ function render(){
   $$('[data-route]').forEach(b=>b.classList.toggle('active',b.dataset.route===state.route));
   document.body.classList.toggle('hn-shorts', state.route==='maker' && state.makerTab==='shorts');
   renderNotifications();
-  hydrateIcons(); bindView(); document.title=`${{home:'홈',weekly:'주간 일정표',maker:'메이커스페이스',shoots:'일정',notices:'공지사항',personal:'개인 일정',people:'인원 관리',settings:'설정'}[state.route]} · HNUBS`;
+  hydrateIcons(); bindView(); document.title=`${{home:'홈',weekly:'주간 일정표',maker:'메이커스페이스',drive:'공유드라이브',shoots:'일정',notices:'공지사항',personal:'개인 일정',people:'인원 관리',settings:'설정'}[state.route]} · HNUBS`;
 }
 
 function renderNotifications(){
@@ -1467,6 +1545,14 @@ function bindView(){
   $$('[data-shoot-pick]').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();state.selectedShoot=b.dataset.shootPick;render();}));
   $('#ai-project')?.addEventListener('change',e=>{state.aiProjectId=e.target.value;state.aiJob=null;state.aiSceneIndex=0;render();});
   $$('[data-maker-tab]').forEach(b=>b.addEventListener('click',()=>{state.makerTab=b.dataset.makerTab;render();}));
+  $$('[data-drive-reload]').forEach(b=>b.addEventListener('click',driveProbe));
+  $$('[data-drive-setup]').forEach(b=>b.addEventListener('click',()=>{state.driveSetup=!state.driveSetup;render();}));
+  $('#drive-form')?.addEventListener('submit',e=>{
+    e.preventDefault();
+    localStorage.setItem('hnubs:drive-base', e.currentTarget.base.value.trim().replace(/\/$/,''));
+    state.driveSetup=false; driveProbe();
+  });
+  if(state.route==='drive'&&state.driveState==='idle') driveProbe();
   $$('[data-shorts-reload]').forEach(b=>b.addEventListener('click',shortsProbe));
   $$('[data-shorts-setup]').forEach(b=>b.addEventListener('click',()=>{state.shortsSetup=!state.shortsSetup;render();}));
   $('#shorts-form')?.addEventListener('submit',e=>{
