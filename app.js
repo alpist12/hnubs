@@ -749,7 +749,7 @@ function driveView(){
   // 연결되면 틀 없이 헤더 아래를 꽉 채운다 (쇼츠와 같은 규칙).
   if (st === 'on') {
     return `<section aria-label="공유드라이브"
-      style="margin:-22px calc(-1 * clamp(16px, 3vw, 32px)) -48px;height:calc(100vh - 64px);overflow:hidden;background:#F4F5FC">
+      style="margin:-22px calc(-1 * clamp(16px, 3vw, 32px)) -48px;height:calc(100vh - 66px);overflow:hidden;background:#F4F5FC">
       <iframe src="${base}/" title="방송국 공유드라이브" style="display:block;width:100%;height:100%;border:0"></iframe>
     </section>`;
   }
