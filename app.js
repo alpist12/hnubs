@@ -61,7 +61,7 @@ const firebaseState = { pending: new Set(['members','shoots','projects','availab
 // 공지사항은 Firestore 'notices' 컬렉션에서 온다. 비어 있으면 비어 있는 대로 둔다.
 let notices = [];
 
-const state = { route: location.hash.slice(1) || 'home', selectedSlot: '월 09:00', mobileDay: 0, aiProjectId: '', aiFile: '', aiText: '', aiChars: 0, aiExtracting: false, aiRunning: false, aiError: '', aiJob: null, aiSceneIndex: 0, aiMappings: {}, aiPrecision: '균형 (추천)', aiWeek: 0, aiStep: 0, makerTab: 'script', scheduleTab: 'weekly', radioPick: null, radioEdit: false, shortsState: 'idle', shortsSetup: false, aiHealthText: '', settingsSection: 'logs', selectedShoot: '', shootFilter: 'all', shootCategory: 'all', shootQuery: '', shootsMode: 'calendar', shootMonth: 0, shootDay: '', noticeTag: 'all', peopleDept: '전체', peopleQuery: '', personalMemberId: '', personalMonth: 0, homeMonth: 0, personalDay: '', slots: [], mustIds: [], mustOnly: false, weekOffset: 0 };
+const state = { route: location.hash.slice(1) || 'home', selectedSlot: '월 09:00', mobileDay: 0, aiProjectId: '', aiFile: '', aiText: '', aiChars: 0, aiExtracting: false, aiRunning: false, aiError: '', aiJob: null, aiSceneIndex: 0, aiMappings: {}, aiPrecision: '균형 (추천)', aiWeek: 0, aiStep: 0, makerTab: 'script', scheduleTab: 'weekly', radioPick: null, editPick: null, radioEdit: false, shortsState: 'idle', shortsSetup: false, aiHealthText: '', settingsSection: 'logs', selectedShoot: '', shootFilter: 'all', shootCategory: 'all', shootQuery: '', shootsMode: 'calendar', shootMonth: 0, shootDay: '', noticeTag: 'all', peopleDept: '전체', peopleQuery: '', personalMemberId: '', personalMonth: 0, homeMonth: 0, personalDay: '', slots: [], mustIds: [], mustOnly: false, weekOffset: 0 };
 
 function icon(name) { return `<span data-icon="${name}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${icons[name] || ''}</svg></span>`; }
 function esc(value = '') { return String(value).replace(/[&<>'"]/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char])); }
@@ -101,6 +101,7 @@ const DOW=['일','월','화','수','목','금','토'];
 // fixedClasses.day 는 월=0 으로 저장된다. 표시는 일요일 시작, 조회는 월=0 그대로.
 const dataDay=d=>(d.getDay()+6)%7;
 const CARD='border-radius:22px;background:rgba(255,255,255,0.9);border:1px solid #FFFFFF;backdrop-filter:blur(14px);box-shadow:0 12px 34px rgba(60,72,140,0.08)';
+const EDIT_ICON='<svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>';
 function initial(name){ return String(name||'?').trim().slice(0,1) || '?'; }
 function faces(names,limit=4){ return names.slice(0,limit).map((n,k)=>`<span aria-hidden="true" style="width:28px;height:28px;margin-left:-7px;border-radius:50%;border:2px solid #FFFFFF;background:${AV[k%4][0]};color:${AV[k%4][1]};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800">${esc(initial(n))}</span>`).join(''); }
 function pad2(n){ return String(n).padStart(2,'0'); }
@@ -295,7 +296,10 @@ function homeView() {
       <span style="flex:0 0 auto;padding:6px 10px;border-radius:10px;background:#FFFFFF;color:#4F5770;font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:800;letter-spacing:0.1em">${esc(cur.status)}</span>
       <span style="flex:1 1 220px;min-width:0;display:flex;flex-direction:column;line-height:1.4"><strong style="font-size:16px;font-weight:800">${esc(cur.title)}</strong><span style="font-size:13px;color:#64708F">${monthDay(cur.date)} (${dowOf(cur.date)}) · ${esc(cur.time)} · ${esc(cur.place||'장소 미정')}</span></span>
       <span style="display:flex;align-items:center;padding-left:7px">${faces(cur.people)}<span style="margin-left:8px;font-size:13px;color:#64708F">${cur.people.length}명</span></span>
-      <button data-detail="${esc(cur.id)}" style="display:inline-flex;align-items:center;height:36px;padding:0 12px;border:0;border-radius:10px;background:#FFFFFF;color:#3F55D6;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer">상세 보기</button>
+      <span style="display:inline-flex;align-items:center;gap:6px">
+        <button type="button" data-edit-open="shoot|${esc(cur.id)}" aria-label="${esc(cur.title)} 수정" title="수정" style="width:36px;height:36px;border:0;border-radius:10px;background:#FFFFFF;color:#3F55D6;display:inline-flex;align-items:center;justify-content:center;cursor:pointer">${EDIT_ICON}</button>
+        <button data-detail="${esc(cur.id)}" style="display:inline-flex;align-items:center;height:36px;padding:0 12px;border:0;border-radius:10px;background:#FFFFFF;color:#3F55D6;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer">상세 보기</button>
+      </span>
     </div>`:'';
 
   const tiles=[['#E3EAFF','#3F4FD0'],['#FFE9DF','#9A3E1E'],['#EDE6FF','#5B45C8']];
@@ -1189,14 +1193,17 @@ function shootsCalendar(items){
       ${sel.length?`<div style="display:flex;flex-direction:column">${sel.map((s,k)=>{const [,bg,fg]=categoryColor(s.type);
         return `<div style="display:flex;gap:12px">
           <span aria-hidden="true" style="flex:0 0 12px;position:relative;display:flex;justify-content:center"><i style="position:absolute;top:0;bottom:0;width:2px;background:#EAEDF7"></i><i style="position:relative;margin-top:16px;width:10px;height:10px;border-radius:50%;background:${fg};box-shadow:0 0 0 3px #F8F9FD"></i></span>
-          <button data-detail="${esc(s.id)}" style="flex:1 1 auto;min-width:0;margin-bottom:${k===sel.length-1?0:8}px;padding:12px 14px;border:0;border-radius:14px;background:${bg};color:#20294D;font-family:inherit;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:5px">
-            <span class="hn-num" style="font-size:12.5px;font-weight:700;color:#4F5770">${esc(s.time)}</span>
-            <span style="display:flex;align-items:center;gap:8px;min-width:0">
-              <span style="flex:0 0 auto;padding:2px 9px;border-radius:99px;background:#FFFFFF;color:${fg};font-size:11.5px;font-weight:800">${esc(s.type)}</span>
-              <strong style="flex:1 1 auto;min-width:0;font-size:15px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(s.title)}</strong>
-            </span>
+          <div data-detail="${esc(s.id)}" style="flex:1 1 auto;min-width:0;margin-bottom:${k===sel.length-1?0:8}px;padding:12px 14px;border-radius:14px;background:${bg};color:#20294D;cursor:pointer;display:flex;flex-direction:column;gap:5px">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+              <span class="hn-num" style="font-size:12.5px;font-weight:700;color:#4F5770">${esc(s.time)}</span>
+              <span style="display:inline-flex;align-items:center;gap:6px">
+                <span style="padding:2px 9px;border-radius:99px;background:#FFFFFF;color:${fg};font-size:11.5px;font-weight:800">${esc(s.type)}</span>
+                <button type="button" data-edit-open="shoot|${esc(s.id)}" aria-label="${esc(s.title)} 수정" title="수정" style="width:28px;height:28px;border:0;border-radius:9px;background:#FFFFFF;color:#3F55D6;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 6px rgba(60,72,140,0.08)">${EDIT_ICON}</button>
+              </span>
+            </div>
+            <strong style="font-size:15px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(s.title)}</strong>
             <span style="font-size:12.5px;color:#4F5770;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(s.place||'장소 미정')} · ${s.people.length}명</span>
-          </button>
+          </div>
         </div>`;}).join('')}</div>`
         :`<div style="padding:24px 16px;border-radius:16px;background:linear-gradient(120deg, #F3F5FF, #F6F2FF);text-align:center;color:#4F5770;font-size:14px">이 날은 등록된 일정이 없어요.</div>`}
     </aside>`;
@@ -1246,7 +1253,10 @@ function shootRows(items){
       </td>
       <td style="padding:8px 12px"><span style="display:inline-flex;align-items:center;gap:6px;padding:3px 10px 3px 4px;border-radius:99px;background:${stBg};color:${stFg};font-size:12px;font-weight:700;white-space:nowrap"><span class="hn-num" style="padding:0 5px;border-radius:99px;background:#FFFFFF;font-size:10px;font-weight:800;letter-spacing:0.05em">${code}</span>${s.status}</span></td>
       <td style="padding:8px 14px;text-align:right;white-space:nowrap;border-radius:0 14px 14px 0">
-        <button data-detail="${esc(s.id)}" aria-label="${esc(s.title)} 상세 보기" style="width:34px;height:34px;border-radius:10px;border:0;background:#F2F4FB;color:#3A4466;cursor:pointer"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button>
+        <span style="display:inline-flex;align-items:center;gap:6px">
+          <button type="button" data-edit-open="shoot|${esc(s.id)}" aria-label="${esc(s.title)} 수정" title="수정" style="width:34px;height:34px;border-radius:10px;border:0;background:#EEF2FF;color:#3F55D6;display:inline-flex;align-items:center;justify-content:center;cursor:pointer">${EDIT_ICON}</button>
+          <button type="button" data-detail="${esc(s.id)}" aria-label="${esc(s.title)} 상세 보기" title="상세 보기" style="width:34px;height:34px;border-radius:10px;border:0;background:#F2F4FB;color:#3A4466;display:inline-flex;align-items:center;justify-content:center;cursor:pointer"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button>
+        </span>
       </td>
     </tr>`;
   }).join('');
@@ -1334,12 +1344,12 @@ function personalEvents(memberId, iso){
   if(personal){
     const busy=personal.unavailableRanges||(personal.status==='불가능'?(personal.ranges?.length?personal.ranges:[{start:9,end:23}]):[]);
     const free=personal.availableRanges||(personal.status==='가능'?(personal.ranges||[]):[]);
-    (busy||[]).forEach(r=>out.push({kind:'busy',start:Number(r.start),title:personal.memo||'참여 불가',time:rangeLabel(r)}));
-    (free||[]).forEach(r=>out.push({kind:'free',start:Number(r.start),title:personal.memo||'참여 가능',time:rangeLabel(r)}));
+    (busy||[]).forEach(r=>out.push({kind:'busy',id:iso,start:Number(r.start),end:Number(r.end),title:personal.memo||'참여 불가',time:rangeLabel(r)}));
+    (free||[]).forEach(r=>out.push({kind:'free',id:iso,start:Number(r.start),end:Number(r.end),title:personal.memo||'참여 가능',time:rangeLabel(r)}));
   }
 
   schedules.filter(sc=>sc.date===iso&&sc.castIds?.includes(memberId))
-    .forEach(sc=>out.push({kind:'shoot',id:sc.id,start:Number(sc.startH),title:sc.title||'촬영',time:rangeLabel({start:sc.startH,end:sc.endH})}));
+    .forEach(sc=>out.push({kind:'shoot',id:sc.id,start:Number(sc.startH),end:Number(sc.endH),title:sc.title||'촬영',time:rangeLabel({start:sc.startH,end:sc.endH})}));
 
   RADIO_SLOTS.forEach(slot=>{
     if(radioCast(iso,slot.key).some(c=>(c.id||c)===memberId)){
@@ -1385,21 +1395,21 @@ function personalView(){
 
   const KIND_LABEL={fixed:'수업',busy:'참여 불가',free:'참여 가능',shoot:'촬영',radio:'라디오'};
   const eventCards=selEvents.map(e=>{ const [,fg,cardBg]=PERSONAL_TONE[e.kind];
-    const mine=e.kind==='busy'||e.kind==='free';
+    const editType=e.kind==='fixed'?'class':(e.kind==='busy'||e.kind==='free')?'avail':e.kind==='shoot'?'shoot':'';
     return `<div style="padding:14px;border-radius:16px;background:${cardBg};display:flex;flex-direction:column;gap:6px">
       <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
-        <strong style="font-size:15px;font-weight:800;color:${fg}">${esc(e.title)}</strong>
-        ${e.repeat?'<span style="padding:2px 8px;border-radius:99px;background:#FFFFFF;color:#4A3FB0;font-size:11.5px;font-weight:700">매주 반복</span>'
-          :`<span style="padding:2px 8px;border-radius:99px;background:#FFFFFF;color:${fg};font-size:11.5px;font-weight:700">${KIND_LABEL[e.kind]}</span>`}
+        <strong style="font-size:15px;font-weight:800;color:${fg};min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(e.title)}</strong>
+        <span style="flex:0 0 auto;display:inline-flex;align-items:center;gap:6px">
+          ${e.repeat?'<span style="padding:3px 9px;border-radius:99px;background:#FFFFFF;color:#4A3FB0;font-size:11.5px;font-weight:700">매주 반복</span>'
+            :`<span style="padding:3px 9px;border-radius:99px;background:#FFFFFF;color:${fg};font-size:11.5px;font-weight:700">${KIND_LABEL[e.kind]}</span>`}
+          ${editType?`<button type="button" data-edit-open="${editType}|${esc(e.id||state.personalDay)}" aria-label="${esc(e.title)} 수정" title="수정"
+            style="width:28px;height:28px;border:0;border-radius:9px;background:#FFFFFF;color:#3F55D6;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 6px rgba(60,72,140,0.08)">${EDIT_ICON}</button>`:''}
+        </span>
       </div>
-      <span class="hn-num" style="font-size:13px;font-weight:600;color:#4F5770">${esc(e.time)}</span>
-      <div style="display:flex;gap:6px;margin-top:2px">
-        ${mine?`<button data-personal-edit="1" style="height:30px;padding:0 11px;border:0;border-radius:9px;background:#FFFFFF;color:#3F55D6;font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer">수정</button>
-        <button data-personal-delete="1" style="height:30px;padding:0 11px;border:0;border-radius:9px;background:#FFFFFF;color:#A8324F;font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer">삭제</button>`:''}
-        ${e.kind==='fixed'?`<button data-class-edit="${esc(e.id)}" style="height:30px;padding:0 11px;border:0;border-radius:9px;background:#FFFFFF;color:#3F55D6;font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer">수정</button>
-        <button data-class-delete="${esc(e.id)}" style="height:30px;padding:0 11px;border:0;border-radius:9px;background:#FFFFFF;color:#A8324F;font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer">삭제</button>`:''}
-        ${e.kind==='shoot'?`<button data-detail="${esc(e.id)}" style="height:30px;padding:0 11px;border:0;border-radius:9px;background:#FFFFFF;color:#3F55D6;font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer">촬영 상세</button>`:''}
-        ${e.kind==='radio'?`<button data-goto-radio="1" style="height:30px;padding:0 11px;border:0;border-radius:9px;background:#FFFFFF;color:#6E5208;font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer">라디오에서 보기</button>`:''}
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+        <span class="hn-num" style="font-size:13px;font-weight:600;color:#4F5770">${esc(e.time)}</span>
+        ${e.kind==='shoot'?`<button type="button" data-detail="${esc(e.id)}" style="height:26px;padding:0 10px;border:0;border-radius:8px;background:#FFFFFF;color:#3F55D6;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer">촬영 상세</button>`:''}
+        ${e.kind==='radio'?`<button type="button" data-goto-radio="1" style="height:26px;padding:0 10px;border:0;border-radius:8px;background:#FFFFFF;color:#6E5208;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer">라디오에서 보기</button>`:''}
       </div>
     </div>`;}).join('')
     ||`<div style="padding:24px 16px;border-radius:16px;background:linear-gradient(120deg, #F3F5FF, #F6F2FF);text-align:center;color:#4F5770;font-size:14px">이 날은 등록된 일정이 없어요.<br>촬영 참여 가능으로 표시돼요.</div>`;
@@ -1457,14 +1467,179 @@ function personalView(){
         <button data-personal-add="1" style="height:44px;border-radius:12px;border:1px dashed #B5BEEA;background:transparent;color:#3F55D6;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer">+ 이 날짜에 일정 추가</button>
         <div style="margin-top:10px;padding-top:16px;border-top:1px solid #EEF0F6;display:flex;flex-direction:column;gap:8px">
           <span style="font-size:13px;font-weight:800">참여하는 촬영</span>
-          ${myShoots.map(s=>`<button data-detail="${esc(s.id)}" style="display:flex;align-items:center;gap:12px;padding:10px 12px;border:0;border-radius:14px;background:#F7F8FC;color:#20294D;font-family:inherit;text-align:left;cursor:pointer">
+          ${myShoots.map(s=>`<div data-detail="${esc(s.id)}" style="display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:14px;background:#F7F8FC;color:#20294D;cursor:pointer">
             <span style="flex:0 0 auto;padding:4px 8px;border-radius:9px;background:#E3EAFF;color:#3F4FD0;font-size:12px;font-weight:800">${monthDay(s.date)} ${dowOf(s.date)}</span>
-            <span style="display:flex;flex-direction:column;line-height:1.35"><strong style="font-size:14px;font-weight:700">${esc(s.title)}</strong><span class="hn-num" style="font-size:12.5px;color:#64708F">${esc(s.time)}</span></span>
-          </button>`).join('')||'<span style="font-size:13px;color:#64708F">예정된 촬영이 없습니다.</span>'}
+            <span style="flex:1 1 auto;min-width:0;display:flex;flex-direction:column;line-height:1.35"><strong style="font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(s.title)}</strong><span class="hn-num" style="font-size:12.5px;color:#64708F">${esc(s.time)}</span></span>
+            <button type="button" data-edit-open="shoot|${esc(s.id)}" aria-label="${esc(s.title)} 수정" title="수정" style="flex:0 0 auto;width:28px;height:28px;border:0;border-radius:9px;background:#FFFFFF;color:#3F55D6;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 6px rgba(60,72,140,0.08)">${EDIT_ICON}</button>
+          </div>`).join('')||'<span style="font-size:13px;color:#64708F">예정된 촬영이 없습니다.</span>'}
         </div>
       </div>
     </aside>
   </div>`;
+}
+
+function editPickCard(){
+  const pick=state.editPick;
+  if(!pick) return '';
+  let title='', sub='', fields='';
+
+  if(pick.kind==='class'){
+    const row=fixedRows.find(r=>r.memberId===pick.memberId&&r.id===pick.id);
+    if(!row) return '';
+    const d=row.data||{};
+    const me=memberById(pick.memberId);
+    const name=d.name||d.title||d.subject||'';
+    const day=Number(d.day??0);
+    const start=hourLabel(d.start??9), end=hourLabel(d.end??10);
+    title='수업 일정 수정';
+    sub=`${me?.[0]||'구성원'} · 매주 반복 수업`;
+    fields=`
+      <label class="field"><span>과목 이름 *</span><input name="name" required value="${esc(name)}" placeholder="예: 경제학원론"></label>
+      <label class="field"><span>요일 *</span><select name="day">${['월','화','수','목','금','토','일'].map((w,i)=>`<option value="${i}" ${i===day?'selected':''}>${w}요일</option>`).join('')}</select></label>
+      <div class="check-grid">
+        <label class="field"><span>시작 *</span><input name="start" type="time" required value="${esc(start)}"></label>
+        <label class="field"><span>종료 *</span><input name="end" type="time" required value="${esc(end)}"></label>
+      </div>
+      <small style="color:#64708F;font-size:12.5px">매주 같은 요일·시간에 반복됩니다.</small>`;
+  }else if(pick.kind==='avail'){
+    const iso=pick.iso||pick.id||state.personalDay;
+    const cur=availabilityRows.find(r=>r.memberId===pick.memberId&&r.id===iso)?.data||{};
+    const range=(cur.unavailableRanges||cur.availableRanges||cur.ranges||[])[0];
+    const me=memberById(pick.memberId);
+    const status=cur.unavailableRanges?.length||cur.status==='불가능'||!cur.availableRanges?.length?'불가능':'가능';
+    const start=range?hourLabel(range.start):'09:00', end=range?hourLabel(range.end):'10:00';
+    title='개인 일정 수정';
+    sub=`${me?.[0]||'구성원'} · ${monthDay(iso)} (${dowOf(iso)})`;
+    fields=`
+      <label class="field"><span>일정 메모</span><input name="memo" value="${esc(cur.memo||'')}" placeholder="예: 전공 수업, 병원 진료"></label>
+      <div class="check-grid">
+        <label class="field"><span>날짜 *</span><input name="date" type="date" required value="${esc(iso)}"></label>
+        <label class="field"><span>이 시간에는</span><select name="status">
+          <option value="불가능" ${status==='불가능'?'selected':''}>참여 불가능</option>
+          <option value="가능" ${status==='가능'?'selected':''}>참여 가능</option>
+        </select></label>
+      </div>
+      <div class="check-grid">
+        <label class="field"><span>시작 *</span><input name="start" type="time" required value="${esc(start)}"></label>
+        <label class="field"><span>종료 *</span><input name="end" type="time" required value="${esc(end)}"></label>
+      </div>`;
+  }else if(pick.kind==='shoot'){
+    const s=schedules.find(x=>x.id===pick.id);
+    if(!s) return '';
+    const start=hourLabel(s.startH??9), end=hourLabel(s.endH??11);
+    const castSet=new Set(s.castIds||[]);
+    title='촬영 일정 수정';
+    sub=`${monthDay(s.date)} (${dowOf(s.date)}) · ${s.time}`;
+    fields=`
+      <div class="check-grid">
+        <label class="field"><span>구분 *</span><select name="category">${CATEGORIES.map(c=>`<option value="${esc(c[0])}" ${c[0]===s.type?'selected':''}>${esc(c[0])}</option>`).join('')}</select></label>
+        <label class="field"><span>날짜 *</span><input name="date" type="date" required value="${esc(s.date)}"></label>
+      </div>
+      <label class="field"><span>제목 *</span><input name="title" required value="${esc(s.title)}" placeholder="예: 10월 캠퍼스 뉴스"></label>
+      <div class="check-grid">
+        <label class="field"><span>시작 *</span><input name="start" type="time" required value="${esc(start)}"></label>
+        <label class="field"><span>종료 *</span><input name="end" type="time" required value="${esc(end)}"></label>
+      </div>
+      <label class="field"><span>장소 *</span><input name="place" required value="${esc(s.place||'')}" placeholder="예: 본관 앞"></label>
+      <div class="field">
+        <span>참여 인원</span>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(130px, 1fr));gap:6px;max-height:152px;overflow-y:auto;padding:2px">
+          ${people.map(p=>`<label class="check-card" style="min-height:38px;padding:6px 10px;font-size:13px;font-weight:700;cursor:pointer"><input type="checkbox" name="cast" value="${esc(p[7])}" ${castSet.has(p[7])?'checked':''}><span>${esc(p[0])} <small style="font-weight:600;color:#64708F">${esc(p[2])}</small></span></label>`).join('')}
+        </div>
+      </div>
+      <label class="field"><span>메모</span><textarea name="memo" rows="2" style="min-height:68px" placeholder="준비물이나 전달 사항을 적어주세요.">${esc(s.raw?.note||'')}</textarea></label>`;
+  }else{
+    return '';
+  }
+
+  return `
+  <div data-edit-close="backdrop" style="position:fixed;inset:0;z-index:95;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(25,33,60,0.42);backdrop-filter:blur(3px)">
+    <section role="dialog" aria-modal="true" aria-label="${esc(title)}"
+      style="width:min(460px, 100%);max-height:88dvh;display:flex;flex-direction:column;border-radius:22px;background:#FFFFFF;box-shadow:0 24px 60px rgba(28,37,67,0.28);overflow:hidden">
+      <header style="display:flex;align-items:center;gap:12px;padding:18px 20px;border-bottom:1px solid #F0F2F9">
+        <span style="display:flex;flex-direction:column;gap:2px;flex:1;min-width:0">
+          <strong style="font-size:17px;font-weight:800;color:#20294D">${esc(title)}</strong>
+          <small style="font-size:12.5px;color:#64708F">${esc(sub)}</small>
+        </span>
+        <button type="button" data-edit-close="x" aria-label="닫기" style="width:36px;height:36px;border:0;border-radius:11px;background:#F2F4FB;color:#4F5770;font-family:inherit;font-size:16px;cursor:pointer">×</button>
+      </header>
+      <form id="edit-pick-form" class="form-stack" style="flex:1;min-height:0;overflow-y:auto;padding:18px 20px;gap:14px">
+        ${fields}
+      </form>
+      <footer style="display:flex;align-items:center;gap:8px;padding:14px 20px;border-top:1px solid #F0F2F9">
+        <button type="button" id="delete-edit-pick" style="height:42px;padding:0 16px;border:0;border-radius:12px;background:#FDECEF;color:#A8324F;font-family:inherit;font-size:14px;font-weight:800;cursor:pointer">삭제</button>
+        <span style="margin-right:auto"></span>
+        <button type="button" data-edit-close="cancel" style="height:42px;padding:0 16px;border:1px solid #E8EBF5;border-radius:12px;background:#FFFFFF;color:#4F5770;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer">취소</button>
+        <button type="submit" form="edit-pick-form" id="save-edit-pick" style="height:42px;padding:0 18px;border:0;border-radius:12px;background:linear-gradient(135deg, #416FDE, #6656DA);color:#FFFFFF;font-family:inherit;font-size:14px;font-weight:800;cursor:pointer">수정</button>
+      </footer>
+    </section>
+  </div>`;
+}
+
+async function saveEditPick(e){
+  e.preventDefault();
+  const f=e.currentTarget; if(!f.reportValidity()) return;
+  const pick=state.editPick; if(!pick) return;
+  const start=Number(f.start.value.slice(0,2))+Number(f.start.value.slice(3,5))/60;
+  const end=Number(f.end.value.slice(0,2))+Number(f.end.value.slice(3,5))/60;
+  if(end<=start){ toast('종료 시간은 시작 시간보다 늦어야 합니다.'); return; }
+  const btn=$('#save-edit-pick');
+  if(btn){ btn.disabled=true; btn.textContent='저장 중…'; }
+  try{
+    if(pick.kind==='class'){
+      const name=f.name.value.trim();
+      await setDoc(doc(db,'members',pick.memberId,'fixedClasses',pick.id),{memberId:pick.memberId,name,title:name,day:Number(f.day.value),start,end,updatedAt:serverTimestamp()},{merge:true});
+      state.editPick=null; render(); toast('수업 일정을 수정했습니다.');
+    }else if(pick.kind==='avail'){
+      const oldIso=pick.iso||pick.id||state.personalDay;
+      const newIso=f.date.value;
+      const range=[{start,end}];
+      await setDoc(doc(db,'members',pick.memberId,'availability',newIso),{
+        memberId:pick.memberId,date:newIso,status:f.status.value,entryMode:'range',
+        availableRanges:f.status.value==='가능'?range:[],unavailableRanges:f.status.value==='불가능'?range:[],
+        memo:f.memo.value.trim(),mandatory:false,updatedAt:serverTimestamp()
+      },{merge:true});
+      if(newIso!==oldIso) await deleteDoc(doc(db,'members',pick.memberId,'availability',oldIso));
+      state.personalDay=newIso; state.editPick=null; render(); toast('개인 일정을 수정했습니다.');
+    }else if(pick.kind==='shoot'){
+      const castIds=[...f.querySelectorAll('input[name="cast"]:checked')].map(el=>el.value);
+      await setDoc(doc(db,'shoots',pick.id),{
+        date:f.date.value,title:f.title.value.trim(),category:f.category.value,
+        startH:start,endH:end,location:f.place.value.trim(),note:f.memo.value.trim(),
+        castIds,cast:castIds.map(id=>({id,name:memberById(id)?.[0]||''})),
+        updatedAt:serverTimestamp()
+      },{merge:true});
+      state.editPick=null; render(); toast('촬영 일정을 수정했습니다.');
+    }
+  }catch(error){
+    if(btn){ btn.disabled=false; btn.textContent='다시 시도'; }
+    toast(`저장하지 못했습니다: ${error.code||error.message}`);
+  }
+}
+
+async function deleteEditPick(){
+  const pick=state.editPick; if(!pick) return;
+  const msg=pick.kind==='class'?'이 수업을 시간표에서 지울까요? 매주 반복이라 모든 주에서 사라집니다.'
+    :pick.kind==='shoot'?'이 촬영 일정을 삭제할까요?'
+    :`${monthDay(pick.iso||pick.id)} 개인 일정을 지울까요?`;
+  if(!confirm(msg)) return;
+  const btn=$('#delete-edit-pick');
+  if(btn){ btn.disabled=true; btn.textContent='삭제 중…'; }
+  try{
+    if(pick.kind==='class'){
+      await deleteDoc(doc(db,'members',pick.memberId,'fixedClasses',pick.id));
+      state.editPick=null; render(); toast('수업을 삭제했습니다.');
+    }else if(pick.kind==='avail'){
+      await deleteDoc(doc(db,'members',pick.memberId,'availability',pick.iso||pick.id));
+      state.editPick=null; render(); toast('개인 일정을 삭제했습니다.');
+    }else if(pick.kind==='shoot'){
+      await deleteDoc(doc(db,'shoots',pick.id));
+      state.editPick=null; render(); toast('촬영 일정을 삭제했습니다.');
+    }
+  }catch(error){
+    if(btn){ btn.disabled=false; btn.textContent='삭제'; }
+    toast(`삭제하지 못했습니다: ${error.code||error.message}`);
+  }
 }
 
 // 부서 표시 순서. 여기 없는 부서는 뒤로 밀고 그들끼리 ㄱㄴㄷ순으로 둔다.
@@ -1700,7 +1875,7 @@ function render(){
   if(state.route==='script'||state.route==='shorts'){ state.makerTab=state.route; state.route='maker'; }
   if(['weekly','shoots','radio','personal'].includes(state.route)){ state.scheduleTab=state.route; state.route='schedule'; }
   if(!views[state.route]) state.route='home';
-  $('#app').innerHTML=views[state.route]();
+  $('#app').innerHTML=views[state.route]()+editPickCard();
   $$('[data-route]').forEach(b=>b.classList.toggle('active',b.dataset.route===state.route));
   document.body.classList.toggle('hn-shorts', state.route==='maker' && state.makerTab==='shorts');
   renderNotifications();
@@ -1735,6 +1910,9 @@ function bindView(){
   $$('[data-radio-other]').forEach(b=>b.addEventListener('click',()=>{const d=b.dataset.radioOther;const o=state.radioPick.other;state.radioPick.other=o.includes(d)?o.filter(x=>x!==d):[...o,d];render();}));
   $$('[data-radio-close]').forEach(b=>b.addEventListener('click',e=>{if(b.dataset.radioClose==='backdrop'&&e.target!==b)return;state.radioPick=null;render();}));
   $('#save-radio')?.addEventListener('click',saveRadioPick);
+  $$('[data-edit-close]').forEach(b=>b.addEventListener('click',e=>{if(b.dataset.editClose==='backdrop'&&e.target!==b)return;state.editPick=null;render();}));
+  $('#edit-pick-form')?.addEventListener('submit',saveEditPick);
+  $('#delete-edit-pick')?.addEventListener('click',deleteEditPick);
   $$('[data-schedule-tab]').forEach(b=>b.addEventListener('click',()=>{state.scheduleTab=b.dataset.scheduleTab;render();}));
   $$('[data-shorts-reload]').forEach(b=>b.addEventListener('click',shortsProbe));
   $$('[data-shorts-setup]').forEach(b=>b.addEventListener('click',()=>{state.shortsSetup=!state.shortsSetup;render();}));
@@ -1819,6 +1997,15 @@ function navigate(route){ if(route==='people'){state.settingsSection='people';ro
   if(['weekly','shoots','radio','personal'].includes(route)){state.scheduleTab=route;route='schedule';}
   if(route==='script'||route==='shorts'){ state.makerTab=route; route='maker'; } state.route=route; location.hash=route; closeMobileMenu(); closePopovers(); render(); scrollTo({top:0,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'}); }
 document.addEventListener('click',e=>{
+  const editOpen=e.target.closest('[data-edit-open]');
+  if(editOpen){
+    e.stopPropagation();
+    const [kind,id]=editOpen.dataset.editOpen.split('|');
+    closeDrawer();
+    state.editPick={kind,id:id||state.personalDay,memberId:state.personalMemberId,iso:id||state.personalDay};
+    render();
+    return;
+  }
   const routeTarget=e.target.closest('[data-route]');const route=routeTarget?.dataset.route;if(route){if(routeTarget.dataset.settingsTarget)state.settingsSection=routeTarget.dataset.settingsTarget;navigate(route);return;}
   const action=e.target.closest('[data-action]')?.dataset.action;if(action==='new-shoot')openShootDrawer();if(action==='new-personal')openPersonalDrawer();if(action==='new-person')openPersonDrawer();if(action==='new-notice')openNoticeDrawer();if(action==='close-drawer')closeDrawer();if(action==='close-popover')closePopovers();if(action==='close-mobile-menu')closeMobileMenu();
   const detail=e.target.closest('[data-detail]')?.dataset.detail;if(detail)openScheduleDetail(detail);
@@ -1937,7 +2124,7 @@ function openScheduleDetail(id){
        </div>
        ${s.raw?.note?`<div class="field"><span>메모</span><p style="margin:6px 0 0;padding:12px;border-radius:12px;background:#F6F7FC;font-size:14px;color:#4F5770">${esc(s.raw.note)}</p></div>`:''}
      </div>`,
-    `<button class="primary-button" data-action="close-drawer">확인</button>`));
+    `<button class="secondary-button" type="button" data-edit-open="shoot|${esc(s.id)}">수정 / 삭제</button><button class="primary-button" type="button" data-action="close-drawer">확인</button>`));
 }
 function openPersonDetail(id){const p=memberById(id);if(!p)return;openDrawer(drawerTemplate('구성원 상세',`<div class="people-avatar" style="margin-bottom:24px"><span class="avatar avatar-${p[6]}" style="width:56px;height:56px;font-size:18px">${esc(p[0][0]||'?')}</span><span><strong style="font-size:18px">${esc(p[0])}</strong><small>${esc(p[2])} · ${esc(p[3])}</small></span></div><div class="form-stack"><div class="field"><span>연락처</span><strong>${esc(p[4]||'미등록')}</strong></div><div class="field"><span>활동 상태</span><span class="badge mint">${esc(p[5])}</span></div></div>`,`<button class="primary-button" data-action="close-drawer">확인</button>`))}
 function openSlotDrawer(){const dayNames=['월','화','수','목','금','토','일'],parts=state.selectedSlot.split(' '),day=Math.max(0,dayNames.indexOf(parts[0])),hour=Number((parts[1]||'09:00').slice(0,2)),dates=weekDates(),iso=localIso(dates[day]),available=people.filter(p=>memberAvailable(p[7],iso,day,hour));openDrawer(drawerTemplate('선택 시간 상세',`<span class="badge mint">${available.length}명 가능</span><h2>${state.selectedSlot}</h2><p style="color:var(--muted)">개인 일정과 고정 시간표를 반영한 실시간 결과입니다.</p><div class="member-list">${available.slice(0,8).map(p=>`<div class="member-mini"><span class="avatar avatar-${p[6]}">${esc(p[0][0]||'?')}</span><span><strong>${esc(p[0])}</strong><small>${esc(p[2])} · ${esc(p[3])}</small></span><span class="badge mint">가능</span></div>`).join('')||emptyState('이 시간에 가능한 구성원이 없습니다.')}</div>`,`<button class="primary-button" data-action="new-shoot">이 시간으로 등록</button>`))}
@@ -1950,7 +2137,7 @@ $('#notification-button').addEventListener('click',e=>{e.stopPropagation();const
 $('#profile-button').addEventListener('click',e=>{e.stopPropagation();const p=$('#profile-popover');const opening=p.hidden;closePopovers();p.hidden=!opening;e.currentTarget.setAttribute('aria-expanded',opening)});
 $('#mobile-more').addEventListener('click',()=>{$('#mobile-menu-backdrop').hidden=false;$('#mobile-menu').classList.add('open');$('#mobile-menu').setAttribute('aria-hidden','false')});
 $('#mobile-menu-backdrop').addEventListener('click',closeMobileMenu);$('#drawer-backdrop').addEventListener('click',closeDrawer);
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeDrawer();closeMobileMenu();closePopovers()}if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='k'){e.preventDefault();$('#global-search')?.focus()}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(state.editPick||state.radioPick){state.editPick=null;state.radioPick=null;render();}closeDrawer();closeMobileMenu();closePopovers()}if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='k'){e.preventDefault();$('#global-search')?.focus()}});
 document.addEventListener('click',e=>{if(!e.target.closest('.popover,.header-actions'))closePopovers()});
 window.addEventListener('hashchange',()=>{const route=location.hash.slice(1);if(route&&route!==state.route){state.route=route;render()}});
 
@@ -1964,7 +2151,7 @@ function applyShoots(){
     if(!names.length&&Array.isArray(data.cast))data.cast.forEach(value=>{const name=typeof value==='string'?value:value?.name;if(name)names.push(name);});
     const startH=Number(data.startH??9),endH=Number(data.endH??(startH+2));
     const [status,tone]=shootStatus({date:data.date,startH,endH});
-    return {id,date:data.date||'',startH,endH,time:`${hourLabel(startH)} - ${hourLabel(endH)}`,title:projects[data.projectId]?.name||data.title||'제목 없는 촬영',place:data.location||'',type:data.category||'촬영',status,tone,people:names,castIds,raw:data};
+    return {id,date:data.date||'',startH,endH,time:`${hourLabel(startH)} - ${hourLabel(endH)}`,title:data.title||projects[data.projectId]?.name||'제목 없는 촬영',place:data.location||'',type:data.category||'촬영',status,tone,people:names,castIds,raw:data};
   }).sort((a,b)=>`${a.date}-${a.startH}`.localeCompare(`${b.date}-${b.startH}`));
 }
 
