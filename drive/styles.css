@@ -1020,7 +1020,7 @@ body.theme-light .folder-lock-badge {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  padding: 4px 26px 120px;
+  padding: 0 26px 120px;
 }
 
 .drop-overlay {
@@ -1048,6 +1048,7 @@ body.theme-light .folder-lock-badge {
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);
   border-radius: 20px;
+  overflow: clip;
   backdrop-filter: blur(12px);
   box-shadow: var(--shadow-lg);
 }
@@ -1513,7 +1514,7 @@ body.theme-light .edit-tag {
   .fab-btn { display: flex; }
   .top-header { padding: 10px 16px; min-height: 60px; }
   .sub-toolbar { padding: 8px 16px; }
-  .file-scroll { padding: 4px 16px 140px; }
+  .file-scroll { padding: 0 16px 140px; }
   .upload-floating-bar { bottom: 86px; }
   .toast-container { bottom: 96px; }
 }

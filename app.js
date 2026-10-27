@@ -725,7 +725,7 @@ function shortsView(){
    예전엔 이 컴퓨터에서 돌던 로컬 서버(127.0.0.1:3000)를 띄웠다.
    이제 drive/ 폴더에 같이 들어 있어서 같은 출처에서 바로 연다.
    서버 탐지도, 주소 설정도, 꺼져 있다는 안내도 필요 없다. */
-const DRIVE_VERSION = '20261027-7';
+const DRIVE_VERSION = '20261027-9';
 function driveView(){
   const hash = state.driveSettings ? '#settings' : '';
   state.driveSettings = false;
@@ -740,7 +740,7 @@ function driveView(){
    둘 다 '만드는' 작업이라 한 탭 아래 둔다. */
 const MAKER_TABS = [['script', 'AI 대본 분석'], ['shorts', '쇼츠']];
 /* 주간 일정표와 촬영 일정은 같은 '일정' 탭 안에 둔다 (메이커스페이스와 같은 방식). */
-const SCHEDULE_TABS = [['weekly', '주간 일정표'], ['shoots', '촬영 일정']];
+const SCHEDULE_TABS = [['weekly', '주간 일정표'], ['shoots', '촬영 일정'], ['radio', '라디오']];
 
 function subTabBar(list, current, attr, label){
   const tabs = list.map(([k, text]) => {
@@ -751,9 +751,58 @@ function subTabBar(list, current, attr, label){
   return `<div role="tablist" aria-label="${label}" style="display:flex;align-items:center;gap:4px;padding:6px;border-radius:16px;background:rgba(255,255,255,0.9);border:1px solid #FFFFFF;box-shadow:0 8px 24px rgba(60,72,140,0.06)">${tabs}</div>`;
 }
 
+const RADIO_SLOTS = [
+  { key: 'lunch', label: '점심방송', time: '12:30 – 13:00', hour: 12 },
+  { key: 'dinner', label: '저녁방송', time: '18:00 – 18:35', hour: 18 },
+];
+
+function radioView(){
+  const dates = weekDates(state.weekOffset).slice(1, 6); // 월–금
+  const range = `${monthDay(localIso(dates[0]))} – ${monthDay(localIso(dates[4]))}`;
+  const today = localIso();
+
+  const grid = RADIO_SLOTS.map(slot => {
+    const cells = dates.map(dateObj => {
+      const iso = localIso(dateObj);
+      const free = people.filter(p => memberAvailable(p[7], iso, dataDay(dateObj), slot.hour));
+      const isToday = iso === today;
+      return `<div style="display:flex;flex-direction:column;gap:7px;padding:12px;border-radius:16px;background:${isToday ? 'linear-gradient(135deg, #F0F3FF, #F4F0FF)' : '#F8F9FD'};border:1px solid ${isToday ? '#DDE3FF' : '#EEF0F7'}">
+        <span style="font-size:12px;font-weight:700;color:#64708F">${DOW[dateObj.getDay()]} ${dateObj.getDate()}일</span>
+        <strong class="hn-num" style="font-size:19px;font-weight:800;color:${free.length ? '#20294D' : '#A13F5A'}">${free.length}명</strong>
+        <span style="display:flex;padding-left:7px">${free.length ? faces(free.map(p => p[0])) : '<span style="font-size:12px;color:#A13F5A">가능한 부원 없음</span>'}</span>
+      </div>`;
+    }).join('');
+
+    return `<section style="${CARD};padding:20px clamp(16px, 2vw, 24px);display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 12px">
+        <h2 style="margin:0;font-size:19px;font-weight:800">${slot.label}</h2>
+        <span class="hn-num" style="padding:3px 10px;border-radius:99px;background:#E3EAFF;color:#3F4FD0;font-size:13px;font-weight:800">${slot.time}</span>
+        <span style="font-size:13px;color:#64708F">월요일부터 금요일까지 매일 진행해요.</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(140px, 1fr));gap:10px">${cells}</div>
+    </section>`;
+  }).join('');
+
+  return `
+  <section style="position:relative;overflow:hidden;border-radius:22px;background:linear-gradient(115deg, #3E5FD9 0%, #5A5FE0 50%, #7C5FD8 100%);color:#FFFFFF;padding:20px clamp(20px, 2.4vw, 28px);box-shadow:0 18px 40px rgba(72,82,200,0.26);display:flex;flex-wrap:wrap;gap:16px 24px;align-items:center;justify-content:space-between">
+    <svg aria-hidden="true" width="560" height="560" viewBox="0 0 560 560" style="position:absolute;right:22%;top:-260px;opacity:0.14;pointer-events:none"><g fill="none" stroke="#FFFFFF" stroke-width="1.5"><circle cx="280" cy="280" r="90"/><circle cx="280" cy="280" r="150"/><circle cx="280" cy="280" r="210"/><circle cx="280" cy="280" r="270"/></g></svg>
+    <div style="position:relative;display:flex;flex-direction:column;gap:2px;min-width:0">
+      <span style="font-size:13.5px;color:#DCE2FF">${esc(range)}</span>
+      <h1 style="margin:0;font-size:28px;font-weight:800;letter-spacing:-0.02em">라디오</h1>
+      <span style="font-size:14.5px;color:#EEF0FF">점심·저녁 두 방송에 그 시간 가능한 부원을 보여 줘요.</span>
+    </div>
+    <div style="position:relative;display:flex;align-items:center;gap:6px">
+      <button data-week-step="-1" aria-label="이전 주" style="width:40px;height:40px;border-radius:12px;border:1px solid rgba(255,255,255,0.28);background:rgba(255,255,255,0.14);color:#FFFFFF;font-family:inherit;font-size:16px;cursor:pointer">‹</button>
+      <button data-week-step="0" style="height:40px;padding:0 14px;border-radius:12px;border:1px solid rgba(255,255,255,0.28);background:rgba(255,255,255,0.14);color:#FFFFFF;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer">이번 주</button>
+      <button data-week-step="1" aria-label="다음 주" style="width:40px;height:40px;border-radius:12px;border:1px solid rgba(255,255,255,0.28);background:rgba(255,255,255,0.14);color:#FFFFFF;font-family:inherit;font-size:16px;cursor:pointer">›</button>
+    </div>
+  </section>
+  ${grid}`;
+}
+
 function scheduleView(){
   return `${subTabBar(SCHEDULE_TABS, state.scheduleTab, 'schedule-tab', '일정')}
-  ${state.scheduleTab === 'shoots' ? shootsView() : weeklyView()}`;
+  ${state.scheduleTab === 'shoots' ? shootsView() : state.scheduleTab === 'radio' ? radioView() : weeklyView()}`;
 }
 
 function makerView(){
