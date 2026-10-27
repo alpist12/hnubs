@@ -401,6 +401,9 @@ function homeView() {
 function weeklyView() {
   const dates=weekDates(state.weekOffset), today=localIso();
   const hours=[]; for(let h=9;h<=22;h++) hours.push(h);
+  // 이미 지난 시간대는 연한 회색으로 눕혀 둔다.
+  const nowHour=new Date().getHours();
+  const isPast=(iso,h)=>iso<today||(iso===today&&h<nowHour);
   const total=people.length;
   const slots=state.slots;
 
@@ -422,6 +425,8 @@ function weeklyView() {
       if(total&&n===total){ bg='#F0FAF5'; fg='#2A7553'; }
       else if(n>2){ bg='#FFFAEC'; fg='#7A5E14'; }
       if(shoot){ bg='linear-gradient(90deg, #F0F3FF, #F4F0FF)'; fg='#3A4590'; }
+      const past=isPast(iso,h);
+      if(past){ bg='#F3F4F8'; fg='#A5ABBF'; }
       if(on){ bg='linear-gradient(135deg, #4C6FE6, #7C5FD8)'; fg='#FFFFFF'; }
       const aria=`${DOW[d]}요일 ${h}시, 가능 ${n}명${shoot?`, 촬영 ${esc(shoot.title)}`:''}`;
       cells+=`<button data-week-slot="${key}" aria-pressed="${on}" aria-label="${aria}" title="${aria}" style="height:38px;border-radius:10px;border:0;background:${bg};color:${fg};box-shadow:${on?'0 6px 14px rgba(90,95,224,0.32)':'none'};font-family:'Plus Jakarta Sans','Noto Sans KR',sans-serif;font-size:12.5px;font-weight:700;cursor:pointer;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;padding:0 6px">${shoot?esc(shoot.title):`${n}명`}</button>`;
