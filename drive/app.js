@@ -716,6 +716,28 @@ function uploadFilesReal(fileList, replaceId = null) {
 // CRUD OPERATIONS
 // ============================================================================
 
+/* 사진·영상은 실제 화면을 보여 준다.
+   내가 방금 올린 파일(blobMap) > 구글이 준 썸네일 > 백엔드 스트림 순으로 고른다. */
+function thumbSrc(it) {
+  if (state.blobMap[it.id]) return { type: 'media', src: state.blobMap[it.id] };
+  if (it.thumbnailLink) return { type: 'img', src: it.thumbnailLink };
+  if (state.hasBackend && (it.localFile || it.source === 'google')) {
+    return { type: 'media', src: `/api/files/${it.id}/download?inline=1` };
+  }
+  return null;
+}
+
+function thumbInner(it, size) {
+  const t = thumbSrc(it);
+  if (!t) return '';
+  const fit = 'width:100%;height:100%;object-fit:cover;display:block';
+  if (it.kind === 'video' && t.type === 'media') {
+    // #t=0.5 를 붙이면 첫 프레임 대신 0.5초 지점을 잡아 검은 화면을 피한다.
+    return `<video src="${t.src}#t=0.5" muted playsinline preload="metadata" style="${fit}"></video>`;
+  }
+  return `<img src="${t.src}" alt="" loading="lazy" style="${fit}">`;
+}
+
 async function saveMemo(id) {
   const box = document.getElementById('memo-input');
   if (!box) return;
@@ -1738,9 +1760,10 @@ function render() {
                 return `
                   <div class="file-row" onclick="handleItemTap('${it.id}')">
                     <div class="row-main-cell">
-                      ${isVideo ? `
-                        <div class="video-thumb-sm">
-                          ${iconSvg('play', 16)}
+                      ${isVideo || it.kind === 'image' ? `
+                        <div class="video-thumb-sm${it.kind === 'image' ? ' is-image' : ''}">
+                          ${thumbInner(it) || iconSvg(isVideo ? 'play' : 'image', 16)}
+                          ${isVideo && thumbSrc(it) ? `<span class="thumb-play">${iconSvg('play', 13)}</span>` : ''}
                           ${it.dur ? `<span class="dur-badge">${esc(it.dur)}</span>` : ''}
                         </div>
                       ` : `
@@ -1810,7 +1833,8 @@ function render() {
                 return `
                   <div class="grid-card" onclick="handleItemTap('${it.id}')">
                     <div class="grid-thumb" style="background:${thumbBg};color:${isVideo || it.kind === 'image' ? '#fff' : k.color}">
-                      ${isVideo ? iconSvg('play', 32) : iconSvg(k.icon, 38)}
+                      ${thumbInner(it) || (isVideo ? iconSvg('play', 32) : iconSvg(k.icon, 38))}
+                      ${thumbSrc(it) && isVideo ? `<span class="thumb-play" style="width:38px;height:38px">${iconSvg('play', 17)}</span>` : ''}
                       ${isVideo && it.dur ? `<span class="dur-badge" style="right:8px;bottom:8px;font-size:10.5px">${esc(it.dur)}</span>` : ''}
                       ${it.starred ? `<span style="position:absolute;left:10px;top:10px;color:#F59E0B">${iconSvg('starFill', 15)}</span>` : ''}
                       ${it.editable ? `<span class="edit-tag" style="position:absolute;right:8px;top:8px">직접편집</span>` : ''}
