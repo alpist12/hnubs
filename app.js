@@ -776,24 +776,40 @@ function radioPickCard(){
   const depts = [...new Set([...DEPARTMENT_ORDER, ...people.map(p => p[2])])].filter(d => people.some(p => p[2] === d));
   const picked = dept => people.filter(p => p[2] === dept && pick.ids.includes(p[7])).length;
 
+  const chipFor = (p, showDept) => {
+    const free = radioAvailable(p, pick.iso, dataDay(dateObj), slot.hour);
+    const on = pick.ids.includes(p[7]);
+    const sub = `${showDept ? `${p[2]} · ` : ''}${free ? '이 시간 가능' : '이 시간 불가'}`;
+    return `<button type="button" data-radio-pick="${esc(p[7])}" aria-pressed="${on}"
+      style="display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:10px 13px;border-radius:13px;border:1px solid ${on?'transparent':'#E8EBF5'};background:${on?'linear-gradient(135deg, #4C6FE6, #7C5FD8)':'#FFFFFF'};color:${on?'#FFFFFF':'#20294D'};font-family:inherit;text-align:left;cursor:pointer">
+      <strong style="font-size:14px;font-weight:700">${esc(p[0])}</strong>
+      <span style="font-size:11.5px;color:${on?'#DCE2FF':(free?'#64708F':'#A13F5A')}">${esc(sub)}</span>
+    </button>`;
+  };
+
   const groups = depts.map(dept => {
-    const chips = people.filter(p => p[2] === dept).map(p => {
-      const free = radioAvailable(p, pick.iso, dataDay(dateObj), slot.hour);
-      const on = pick.ids.includes(p[7]);
-      return `<button type="button" data-radio-pick="${esc(p[7])}" aria-pressed="${on}"
-        style="display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:10px 13px;border-radius:13px;border:1px solid ${on?'transparent':'#E8EBF5'};background:${on?'linear-gradient(135deg, #4C6FE6, #7C5FD8)':'#FFFFFF'};color:${on?'#FFFFFF':'#20294D'};font-family:inherit;text-align:left;cursor:pointer">
-        <strong style="font-size:14px;font-weight:700">${esc(p[0])}</strong>
-        <span style="font-size:11.5px;color:${on?'#DCE2FF':(free?'#64708F':'#A13F5A')}">${free ? '이 시간 가능' : '이 시간 불가'}</span>
-      </button>`;
-    }).join('');
+    // '기타'를 켜면 다른 부서 사람도 이 자리에 넣을 수 있다. 사람이 없는 날이 생겨서다.
+    const open = pick.other.includes(dept);
+    const own = people.filter(p => p[2] === dept);
+    const rest = people.filter(p => p[2] !== dept);
     const n = picked(dept);
     const [bg, fg] = deptColor(dept);
     return `<section style="display:flex;flex-direction:column;gap:8px">
-      <div style="display:flex;align-items:center;gap:8px">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
         <span style="padding:3px 10px;border-radius:99px;background:${bg};color:${fg};font-size:12.5px;font-weight:800">${esc(dept)}</span>
         <span style="font-size:12.5px;font-weight:700;color:${n?'#2A7553':'#8A93AE'}">${n ? `${n}명 선택` : '아직 없음'}</span>
       </div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(140px, 1fr));gap:8px">${chips}</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(140px, 1fr));gap:8px">${own.map(p => chipFor(p, false)).join('')}
+        <button type="button" data-radio-other="${esc(dept)}" aria-pressed="${open}"
+          style="display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:10px 13px;border-radius:13px;border:1px dashed ${open?'#3F55D6':'#D7DCEC'};background:${open?'#EEF2FF':'transparent'};color:${open?'#3F55D6':'#64708F'};font-family:inherit;text-align:left;cursor:pointer">
+          <strong style="font-size:14px;font-weight:700">${open ? '기타 닫기' : '기타'}</strong>
+          <span style="font-size:11.5px">다른 부서에서</span>
+        </button>
+      </div>
+      ${open ? `<div style="display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:14px;background:#F8F9FD;border:1px solid #EEF0F7">
+        <span style="font-size:12px;font-weight:700;color:#64708F">다른 부서에서 이 자리를 맡을 부원</span>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(140px, 1fr));gap:8px">${rest.map(p => chipFor(p, true)).join('')}</div>
+      </div>` : ''}
     </section>`;
   }).join('');
 
@@ -1642,8 +1658,9 @@ function bindView(){
   $('#ai-project')?.addEventListener('change',e=>{state.aiProjectId=e.target.value;state.aiJob=null;state.aiSceneIndex=0;render();});
   $$('[data-maker-tab]').forEach(b=>b.addEventListener('click',()=>{state.makerTab=b.dataset.makerTab;render();}));
   $$('[data-radio-mode]').forEach(b=>b.addEventListener('click',()=>{state.radioEdit=!state.radioEdit;render();}));
-  $$('[data-radio-edit]').forEach(b=>b.addEventListener('click',()=>{const [iso,key]=b.dataset.radioEdit.split('|');state.radioPick={iso,slotKey:key,ids:radioCast(iso,key).map(c=>c.id||c)};render();}));
+  $$('[data-radio-edit]').forEach(b=>b.addEventListener('click',()=>{const [iso,key]=b.dataset.radioEdit.split('|');state.radioPick={iso,slotKey:key,ids:radioCast(iso,key).map(c=>c.id||c),other:[]};render();}));
   $$('[data-radio-pick]').forEach(b=>b.addEventListener('click',()=>{const id=b.dataset.radioPick;const ids=state.radioPick.ids;state.radioPick.ids=ids.includes(id)?ids.filter(x=>x!==id):[...ids,id];render();}));
+  $$('[data-radio-other]').forEach(b=>b.addEventListener('click',()=>{const d=b.dataset.radioOther;const o=state.radioPick.other;state.radioPick.other=o.includes(d)?o.filter(x=>x!==d):[...o,d];render();}));
   $$('[data-radio-close]').forEach(b=>b.addEventListener('click',e=>{if(b.dataset.radioClose==='backdrop'&&e.target!==b)return;state.radioPick=null;render();}));
   $('#save-radio')?.addEventListener('click',saveRadioPick);
   $$('[data-schedule-tab]').forEach(b=>b.addEventListener('click',()=>{state.scheduleTab=b.dataset.scheduleTab;render();}));
