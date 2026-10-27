@@ -725,12 +725,13 @@ function shortsView(){
    예전엔 이 컴퓨터에서 돌던 로컬 서버(127.0.0.1:3000)를 띄웠다.
    이제 drive/ 폴더에 같이 들어 있어서 같은 출처에서 바로 연다.
    서버 탐지도, 주소 설정도, 꺼져 있다는 안내도 필요 없다. */
+const DRIVE_VERSION = '20261027-2';
 function driveView(){
   const hash = state.driveSettings ? '#settings' : '';
   state.driveSettings = false;
   return `<section aria-label="공유드라이브"
     style="margin:-22px calc(-1 * clamp(16px, 3vw, 32px)) -48px;height:calc(100vh - 66px);overflow:hidden;background:#F4F5FC">
-    <iframe src="./drive/index.html${hash}" title="방송국 공유드라이브" style="display:block;width:100%;height:100%;border:0"></iframe>
+    <iframe src="./drive/index.html?v=${DRIVE_VERSION}${hash}" title="방송국 공유드라이브" style="display:block;width:100%;height:100%;border:0"></iframe>
   </section>`;
 }
 
