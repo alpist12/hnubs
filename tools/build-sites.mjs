@@ -26,6 +26,7 @@ for (const name of [
   'robots.txt',
 ]) cpSync(resolve(root, name), resolve(client, name));
 cpSync(resolve(root, 'assets'), resolve(client, 'assets'), { recursive: true });
+cpSync(resolve(root, 'drive'), resolve(client, 'drive'), { recursive: true });
 
 mkdirSync(resolve(dist, 'server'), { recursive: true });
 await build({
