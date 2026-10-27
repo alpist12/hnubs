@@ -1544,13 +1544,6 @@ function render() {
 
       <!-- LEFT SIDEBAR: ON-AIR STUDIO CONTROL DECK -->
       <aside class="sidebar">
-        <div class="brand-card">
-          <div class="brand-logo">${iconSvg('play', 20)}</div>
-          <div style="min-width:0;flex:1">
-            <div class="brand-title">${esc(state.driveName)}</div>
-          </div>
-        </div>
-
         <nav class="side-nav">
           <div class="side-nav-label">방송국 작업공간</div>
           ${NAV_TABS.map(([k, label, icn]) => {
@@ -1650,7 +1643,6 @@ function render() {
                     : `<span>${esc(state.driveName)} · 로그인 없이 바로</span>`}
                 </div>
                 <div class="dv-hero-title">${esc(headerTitle)}</div>
-                <span class="dv-lock" title="지정된 구글 드라이브 폴더(${esc(LOCKED_ROOT_FOLDER_ID)}) 외 외부 폴더 접근 차단됨">🔒 지정 폴더 전용 · 외부 폴더 차단됨</span>
               </div>
             </div>
 

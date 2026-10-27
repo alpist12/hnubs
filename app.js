@@ -60,7 +60,7 @@ const firebaseState = { pending: new Set(['members','shoots','projects','availab
 // 공지사항은 Firestore 'notices' 컬렉션에서 온다. 비어 있으면 비어 있는 대로 둔다.
 let notices = [];
 
-const state = { route: location.hash.slice(1) || 'home', selectedSlot: '월 09:00', mobileDay: 0, aiProjectId: '', aiFile: '', aiText: '', aiChars: 0, aiExtracting: false, aiRunning: false, aiError: '', aiJob: null, aiSceneIndex: 0, aiMappings: {}, aiPrecision: '균형 (추천)', aiWeek: 0, aiStep: 0, makerTab: 'script', shortsState: 'idle', shortsSetup: false, aiHealthText: '', settingsSection: 'logs', selectedShoot: '', shootFilter: 'all', shootCategory: 'all', shootQuery: '', shootsMode: 'calendar', shootMonth: 0, shootDay: '', noticeTag: 'all', peopleDept: '전체', peopleQuery: '', personalMemberId: '', personalMonth: 0, homeMonth: 0, personalDay: '', slots: [], mustIds: [], weekOffset: 0 };
+const state = { route: location.hash.slice(1) || 'home', selectedSlot: '월 09:00', mobileDay: 0, aiProjectId: '', aiFile: '', aiText: '', aiChars: 0, aiExtracting: false, aiRunning: false, aiError: '', aiJob: null, aiSceneIndex: 0, aiMappings: {}, aiPrecision: '균형 (추천)', aiWeek: 0, aiStep: 0, makerTab: 'script', scheduleTab: 'weekly', shortsState: 'idle', shortsSetup: false, aiHealthText: '', settingsSection: 'logs', selectedShoot: '', shootFilter: 'all', shootCategory: 'all', shootQuery: '', shootsMode: 'calendar', shootMonth: 0, shootDay: '', noticeTag: 'all', peopleDept: '전체', peopleQuery: '', personalMemberId: '', personalMonth: 0, homeMonth: 0, personalDay: '', slots: [], mustIds: [], weekOffset: 0 };
 
 function icon(name) { return `<span data-icon="${name}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${icons[name] || ''}</svg></span>`; }
 function esc(value = '') { return String(value).replace(/[&<>'"]/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char])); }
@@ -738,16 +738,25 @@ function driveView(){
    대본에서 촬영거리를 뽑는 일(대본 분석)과 영상에서 쇼츠를 뽑는 일(쇼츠)은
    둘 다 '만드는' 작업이라 한 탭 아래 둔다. */
 const MAKER_TABS = [['script', 'AI 대본 분석'], ['shorts', '쇼츠']];
+/* 주간 일정표와 촬영 일정은 같은 '일정' 탭 안에 둔다 (메이커스페이스와 같은 방식). */
+const SCHEDULE_TABS = [['weekly', '주간 일정표'], ['shoots', '촬영 일정']];
+
+function subTabBar(list, current, attr, label){
+  const tabs = list.map(([k, text]) => {
+    const on = current === k;
+    return `<button data-${attr}="${k}" aria-selected="${on}" role="tab"
+      style="height:38px;padding:0 16px;border:0;border-radius:11px;background:${on ? '#EEF2FF' : 'transparent'};color:${on ? '#3F55D6' : '#64708F'};font-family:inherit;font-size:14.5px;font-weight:${on ? 700 : 600};cursor:pointer">${text}</button>`;
+  }).join('');
+  return `<div role="tablist" aria-label="${label}" style="display:flex;align-items:center;gap:4px;padding:6px;border-radius:16px;background:rgba(255,255,255,0.9);border:1px solid #FFFFFF;box-shadow:0 8px 24px rgba(60,72,140,0.06)">${tabs}</div>`;
+}
+
+function scheduleView(){
+  return `${subTabBar(SCHEDULE_TABS, state.scheduleTab, 'schedule-tab', '일정')}
+  ${state.scheduleTab === 'shoots' ? shootsView() : weeklyView()}`;
+}
 
 function makerView(){
-  const tabs = MAKER_TABS.map(([k, label]) => {
-    const on = state.makerTab === k;
-    return `<button data-maker-tab="${k}" aria-selected="${on}" role="tab"
-      style="height:38px;padding:0 16px;border:0;border-radius:11px;background:${on ? '#EEF2FF' : 'transparent'};color:${on ? '#3F55D6' : '#64708F'};font-family:inherit;font-size:14.5px;font-weight:${on ? 700 : 600};cursor:pointer">${label}</button>`;
-  }).join('');
-
-  return `
-  <div role="tablist" aria-label="메이커스페이스" style="display:flex;align-items:center;gap:4px;padding:6px;border-radius:16px;background:rgba(255,255,255,0.9);border:1px solid #FFFFFF;box-shadow:0 8px 24px rgba(60,72,140,0.06)">${tabs}</div>
+  return `${subTabBar(MAKER_TABS, state.makerTab, 'maker-tab', '메이커스페이스')}
   ${state.makerTab === 'shorts' ? shortsView() : scriptView()}`;
 }
 
@@ -1453,7 +1462,7 @@ function peopleSettings(){
   </section>`;
 }
 
-const views={home:homeView,weekly:weeklyView,maker:makerView,drive:driveView,shoots:shootsView,personal:personalView,notices:noticesView,settings:settingsViewLocked};
+const views={home:homeView,schedule:scheduleView,maker:makerView,drive:driveView,personal:personalView,notices:noticesView,settings:settingsViewLocked};
 
 function render(){
   // 인원 관리는 설정 안으로 옮겼다. 예전 #people 주소도 그쪽으로 보낸다.
@@ -1462,12 +1471,13 @@ function render(){
   if(state.route==='analysis') state.route='weekly';
   // 대본 분석과 쇼츠는 메이커스페이스 안으로 들어갔다. 예전 주소도 그쪽으로 보낸다.
   if(state.route==='script'||state.route==='shorts'){ state.makerTab=state.route; state.route='maker'; }
+  if(state.route==='weekly'||state.route==='shoots'){ state.scheduleTab=state.route; state.route='schedule'; }
   if(!views[state.route]) state.route='home';
   $('#app').innerHTML=views[state.route]();
   $$('[data-route]').forEach(b=>b.classList.toggle('active',b.dataset.route===state.route));
   document.body.classList.toggle('hn-shorts', state.route==='maker' && state.makerTab==='shorts');
   renderNotifications();
-  hydrateIcons(); bindView(); document.title=`${{home:'홈',weekly:'주간 일정표',maker:'메이커스페이스',drive:'공유드라이브',shoots:'일정',notices:'공지사항',personal:'개인 일정',people:'인원 관리',settings:'설정'}[state.route]} · HNUBS`;
+  hydrateIcons(); bindView(); document.title=`${{home:'홈',schedule:'일정',maker:'메이커스페이스',drive:'공유드라이브',notices:'공지사항',personal:'개인 일정',people:'인원 관리',settings:'설정'}[state.route]} · HNUBS`;
 }
 
 function renderNotifications(){
@@ -1487,6 +1497,7 @@ function bindView(){
   $$('[data-shoot-pick]').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();state.selectedShoot=b.dataset.shootPick;render();}));
   $('#ai-project')?.addEventListener('change',e=>{state.aiProjectId=e.target.value;state.aiJob=null;state.aiSceneIndex=0;render();});
   $$('[data-maker-tab]').forEach(b=>b.addEventListener('click',()=>{state.makerTab=b.dataset.makerTab;render();}));
+  $$('[data-schedule-tab]').forEach(b=>b.addEventListener('click',()=>{state.scheduleTab=b.dataset.scheduleTab;render();}));
   $$('[data-shorts-reload]').forEach(b=>b.addEventListener('click',shortsProbe));
   $$('[data-shorts-setup]').forEach(b=>b.addEventListener('click',()=>{state.shortsSetup=!state.shortsSetup;render();}));
   $('#shorts-form')?.addEventListener('submit',e=>{
@@ -1552,6 +1563,7 @@ function bindView(){
 }
 
 function navigate(route){ if(route==='people'){state.settingsSection='people';route='settings';} if(route==='analysis')route='weekly';
+  if(route==='weekly'||route==='shoots'){state.scheduleTab=route;route='schedule';}
   if(route==='script'||route==='shorts'){ state.makerTab=route; route='maker'; } state.route=route; location.hash=route; closeMobileMenu(); closePopovers(); render(); scrollTo({top:0,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'}); }
 document.addEventListener('click',e=>{
   const routeTarget=e.target.closest('[data-route]');const route=routeTarget?.dataset.route;if(route){if(routeTarget.dataset.settingsTarget)state.settingsSection=routeTarget.dataset.settingsTarget;navigate(route);return;}
