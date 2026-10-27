@@ -275,7 +275,7 @@ const state = {
   blobMap: {},
   loading: true,
   nav: 'drive',
-  folder: 'f11',
+  folder: 'root',
   typeFilter: 'all',
   query: '',
   searchingMobile: false,
@@ -460,9 +460,7 @@ async function fetchFiles() {
         state.googleQuotaUsedGb = res.storageQuota.usageGb;
       }
       state.items = res.items || [];
-      if (state.folder !== 'root' && !byId(state.folder)) {
-        state.folder = byId('f11') ? 'f11' : 'root';
-      }
+      if (state.folder !== 'root' && !byId(state.folder)) state.folder = 'root';
       return;
     }
 
@@ -470,9 +468,7 @@ async function fetchFiles() {
     state.mode = 'google';
     state.rootFolderId = LOCKED_ROOT_FOLDER_ID;
     state.items = loadBrowserLocalItems();
-    if (state.folder !== 'root' && !byId(state.folder)) {
-      state.folder = byId('f11') ? 'f11' : 'root';
-    }
+    if (state.folder !== 'root' && !byId(state.folder)) state.folder = 'root';
   } catch (err) {
     if (!state.items.length) state.items = loadBrowserLocalItems();
   } finally {

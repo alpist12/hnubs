@@ -61,7 +61,7 @@ const firebaseState = { pending: new Set(['members','shoots','projects','availab
 // 공지사항은 Firestore 'notices' 컬렉션에서 온다. 비어 있으면 비어 있는 대로 둔다.
 let notices = [];
 
-const state = { route: location.hash.slice(1) || 'home', selectedSlot: '월 09:00', mobileDay: 0, aiProjectId: '', aiFile: '', aiText: '', aiChars: 0, aiExtracting: false, aiRunning: false, aiError: '', aiJob: null, aiSceneIndex: 0, aiMappings: {}, aiPrecision: '균형 (추천)', aiWeek: 0, aiStep: 0, makerTab: 'script', scheduleTab: 'weekly', radioPick: null, shortsState: 'idle', shortsSetup: false, aiHealthText: '', settingsSection: 'logs', selectedShoot: '', shootFilter: 'all', shootCategory: 'all', shootQuery: '', shootsMode: 'calendar', shootMonth: 0, shootDay: '', noticeTag: 'all', peopleDept: '전체', peopleQuery: '', personalMemberId: '', personalMonth: 0, homeMonth: 0, personalDay: '', slots: [], mustIds: [], weekOffset: 0 };
+const state = { route: location.hash.slice(1) || 'home', selectedSlot: '월 09:00', mobileDay: 0, aiProjectId: '', aiFile: '', aiText: '', aiChars: 0, aiExtracting: false, aiRunning: false, aiError: '', aiJob: null, aiSceneIndex: 0, aiMappings: {}, aiPrecision: '균형 (추천)', aiWeek: 0, aiStep: 0, makerTab: 'script', scheduleTab: 'weekly', radioPick: null, radioEdit: false, shortsState: 'idle', shortsSetup: false, aiHealthText: '', settingsSection: 'logs', selectedShoot: '', shootFilter: 'all', shootCategory: 'all', shootQuery: '', shootsMode: 'calendar', shootMonth: 0, shootDay: '', noticeTag: 'all', peopleDept: '전체', peopleQuery: '', personalMemberId: '', personalMonth: 0, homeMonth: 0, personalDay: '', slots: [], mustIds: [], weekOffset: 0 };
 
 function icon(name) { return `<span data-icon="${name}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${icons[name] || ''}</svg></span>`; }
 function esc(value = '') { return String(value).replace(/[&<>'"]/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char])); }
@@ -83,14 +83,14 @@ function weekDates(offset = 0) {
   return Array.from({length:7},(_,i)=>{ const d=new Date(start); d.setDate(start.getDate()+i); return d; });
 }
 function inRanges(ranges, time) { return (Array.isArray(ranges) ? ranges : []).some(r => Number(r.start) <= time && Number(r.end) >= time + 1); }
-function memberAvailable(memberId, iso, dayIndex, time) {
+function memberAvailable(memberId, iso, dayIndex, time, ignoreShoots = false) {
   const personal = availabilityRows.find(r => r.memberId === memberId && r.id === iso)?.data;
   const unavailable = personal?.unavailableRanges || (personal?.status === '불가능' ? (personal.ranges?.length ? personal.ranges : [{start:9,end:23}]) : []);
   const available = personal?.availableRanges || (personal?.status === '가능' ? personal.ranges : []);
   if (inRanges(unavailable, time)) return false;
   const fixed = fixedRows.filter(r => r.memberId === memberId && Number(r.data.day) === dayIndex && Number(r.data.start) < time + 1 && Number(r.data.end) > time);
   if (fixed.length && !inRanges(available, time)) return false;
-  if (schedules.some(s => s.date === iso && s.castIds?.includes(memberId) && Number(s.startH) < time + 1 && Number(s.endH) > time)) return false;
+  if (!ignoreShoots && schedules.some(s => s.date === iso && s.castIds?.includes(memberId) && Number(s.startH) < time + 1 && Number(s.endH) > time)) return false;
   return true;
 }
 function availabilityCount(iso, dayIndex, time) { return people.filter(p => memberAvailable(p[7], iso, dayIndex, time)).length; }
@@ -726,7 +726,7 @@ function shortsView(){
    예전엔 이 컴퓨터에서 돌던 로컬 서버(127.0.0.1:3000)를 띄웠다.
    이제 drive/ 폴더에 같이 들어 있어서 같은 출처에서 바로 연다.
    서버 탐지도, 주소 설정도, 꺼져 있다는 안내도 필요 없다. */
-const DRIVE_VERSION = '20261027-11';
+const DRIVE_VERSION = '20261027-12';
 function driveView(){
   const hash = state.driveSettings ? '#settings' : '';
   state.driveSettings = false;
@@ -757,6 +757,11 @@ const RADIO_SLOTS = [
   { key: 'dinner', label: '저녁방송', time: '18:00 – 18:35', hour: 18 },
 ];
 
+function radioAvailable(member, iso, dayIndex, time){
+  // 기획부는 라디오 시간에 촬영을 병행할 수 있다. 촬영 일정은 막는 조건에서 뺀다.
+  return memberAvailable(member[7], iso, dayIndex, time, member[2] === '기획부');
+}
+
 function radioCast(iso, slotKey){
   const row = radioRows.find(r => r.id === iso)?.data || {};
   return Array.isArray(row[slotKey]) ? row[slotKey] : [];
@@ -767,15 +772,32 @@ function radioPickCard(){
   if (!pick) return '';
   const slot = RADIO_SLOTS.find(x => x.key === pick.slotKey);
   const dateObj = new Date(`${pick.iso}T00:00:00`);
-  const chips = people.map(p => {
-    const free = memberAvailable(p[7], pick.iso, dataDay(dateObj), slot.hour);
-    const on = pick.ids.includes(p[7]);
-    return `<button type="button" data-radio-pick="${esc(p[7])}" aria-pressed="${on}"
-      style="display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:10px 13px;border-radius:13px;border:1px solid ${on?'transparent':'#E8EBF5'};background:${on?'linear-gradient(135deg, #4C6FE6, #7C5FD8)':'#FFFFFF'};color:${on?'#FFFFFF':'#20294D'};font-family:inherit;text-align:left;cursor:pointer">
-      <strong style="font-size:14px;font-weight:700">${esc(p[0])}</strong>
-      <span style="font-size:11.5px;color:${on?'#DCE2FF':(free?'#64708F':'#A13F5A')}">${esc(p[2])}${free?'':' · 이 시간 불가'}</span>
-    </button>`;
+  // 방송 한 번에 기획·아나운서·기술 한 명씩 들어간다. 부서별로 묶어 두면 세 명을 고르기 쉽다.
+  const depts = [...new Set([...DEPARTMENT_ORDER, ...people.map(p => p[2])])].filter(d => people.some(p => p[2] === d));
+  const picked = dept => people.filter(p => p[2] === dept && pick.ids.includes(p[7])).length;
+
+  const groups = depts.map(dept => {
+    const chips = people.filter(p => p[2] === dept).map(p => {
+      const free = radioAvailable(p, pick.iso, dataDay(dateObj), slot.hour);
+      const on = pick.ids.includes(p[7]);
+      return `<button type="button" data-radio-pick="${esc(p[7])}" aria-pressed="${on}"
+        style="display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:10px 13px;border-radius:13px;border:1px solid ${on?'transparent':'#E8EBF5'};background:${on?'linear-gradient(135deg, #4C6FE6, #7C5FD8)':'#FFFFFF'};color:${on?'#FFFFFF':'#20294D'};font-family:inherit;text-align:left;cursor:pointer">
+        <strong style="font-size:14px;font-weight:700">${esc(p[0])}</strong>
+        <span style="font-size:11.5px;color:${on?'#DCE2FF':(free?'#64708F':'#A13F5A')}">${free ? '이 시간 가능' : '이 시간 불가'}</span>
+      </button>`;
+    }).join('');
+    const n = picked(dept);
+    const [bg, fg] = deptColor(dept);
+    return `<section style="display:flex;flex-direction:column;gap:8px">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="padding:3px 10px;border-radius:99px;background:${bg};color:${fg};font-size:12.5px;font-weight:800">${esc(dept)}</span>
+        <span style="font-size:12.5px;font-weight:700;color:${n?'#2A7553':'#8A93AE'}">${n ? `${n}명 선택` : '아직 없음'}</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(140px, 1fr));gap:8px">${chips}</div>
+    </section>`;
   }).join('');
+
+  const summary = depts.map(d => `${d} ${picked(d)}`).join(' · ');
 
   return `
   <div data-radio-close="backdrop" style="position:fixed;inset:0;z-index:90;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(25,33,60,0.42);backdrop-filter:blur(3px)">
@@ -788,9 +810,9 @@ function radioPickCard(){
         </span>
         <button type="button" data-radio-close="x" aria-label="닫기" style="width:36px;height:36px;border:0;border-radius:11px;background:#F2F4FB;color:#4F5770;font-family:inherit;font-size:16px;cursor:pointer">×</button>
       </header>
-      <div style="flex:1;min-height:0;overflow-y:auto;padding:16px 20px;display:grid;grid-template-columns:repeat(auto-fill, minmax(150px, 1fr));gap:8px">${chips}</div>
+      <div style="flex:1;min-height:0;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:18px">${groups}</div>
       <footer style="display:flex;align-items:center;gap:9px;padding:14px 20px;border-top:1px solid #F0F2F9">
-        <span style="margin-right:auto;font-size:13px;color:#64708F">${pick.ids.length ? `${pick.ids.length}명 선택` : '선택한 부원 없음'}</span>
+        <span style="margin-right:auto;font-size:13px;color:#64708F">${pick.ids.length ? `${pick.ids.length}명 · ${esc(summary)}` : '부서마다 한 명씩 골라 주세요.'}</span>
         <button type="button" data-radio-close="cancel" style="height:42px;padding:0 16px;border:1px solid #E8EBF5;border-radius:12px;background:#FFFFFF;color:#4F5770;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer">취소</button>
         <button type="button" id="save-radio" style="height:42px;padding:0 18px;border:0;border-radius:12px;background:linear-gradient(135deg, #416FDE, #6656DA);color:#FFFFFF;font-family:inherit;font-size:14px;font-weight:800;cursor:pointer">저장하기</button>
       </footer>
@@ -810,7 +832,7 @@ async function saveRadioPick(){
       [pick.slotKey]: pick.ids.map(id => ({ id, name: memberById(id)?.[0] || '' })),
       updatedAt: serverTimestamp(),
     }, { merge: true });
-    state.radioPick = null; render();
+    state.radioPick = null; state.radioEdit = false; render();
     toast(`${slot.label} 담당을 저장했습니다.`);
   } catch (error) {
     if (button) { button.disabled = false; button.textContent = '다시 시도'; }
@@ -826,7 +848,7 @@ function radioView(){
   const grid = RADIO_SLOTS.map(slot => {
     const cells = dates.map(dateObj => {
       const iso = localIso(dateObj);
-      const free = people.filter(p => memberAvailable(p[7], iso, dataDay(dateObj), slot.hour));
+      const free = people.filter(p => radioAvailable(p, iso, dataDay(dateObj), slot.hour));
       const cast = radioCast(iso, slot.key);
       const isToday = iso === today;
       return `<div style="display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:16px;background:${isToday ? 'linear-gradient(135deg, #F0F3FF, #F4F0FF)' : '#F8F9FD'};border:1px solid ${isToday ? '#DDE3FF' : '#EEF0F7'}">
@@ -835,7 +857,7 @@ function radioView(){
           ? `<strong style="font-size:14.5px;font-weight:800;color:#20294D;line-height:1.4">${cast.map(c => esc(c.name || '이름 미등록')).join(', ')}</strong>`
           : `<strong style="font-size:14.5px;font-weight:700;color:#8A93AE">담당 미정</strong>`}
         <span style="font-size:12px;color:${free.length ? '#64708F' : '#A13F5A'}">이 시간 가능 ${free.length}명</span>
-        <button data-radio-edit="${iso}|${slot.key}" style="height:32px;border:0;border-radius:10px;background:#E3EAFF;color:#3F4FD0;font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer">담당 ${cast.length ? '수정' : '지정'}</button>
+        ${state.radioEdit ? `<button data-radio-edit="${iso}|${slot.key}" style="height:32px;border:0;border-radius:10px;background:#E3EAFF;color:#3F4FD0;font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer">담당 ${cast.length ? '수정' : '지정'}</button>` : ''}
       </div>`;
     }).join('');
 
@@ -858,6 +880,11 @@ function radioView(){
       <span style="font-size:14.5px;color:#EEF0FF">날짜 칸의 ‘담당 지정’을 눌러 진행자를 정해요.</span>
     </div>
     <div style="position:relative;display:flex;align-items:center;gap:6px">
+      <button data-radio-mode="1" aria-pressed="${state.radioEdit}" aria-label="${state.radioEdit ? '담당 수정 끝내기' : '담당 수정하기'}" title="${state.radioEdit ? '수정 끝내기' : '담당 수정'}"
+        style="display:flex;align-items:center;justify-content:center;gap:6px;height:40px;padding:0 14px;border-radius:12px;border:1px solid ${state.radioEdit ? 'transparent' : 'rgba(255,255,255,0.28)'};background:${state.radioEdit ? '#FFFFFF' : 'rgba(255,255,255,0.14)'};color:${state.radioEdit ? '#3F4FD0' : '#FFFFFF'};font-family:inherit;font-size:14px;font-weight:700;cursor:pointer">
+        <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>${state.radioEdit ? '끝내기' : '담당 수정'}
+      </button>
+      <span aria-hidden="true" style="width:1px;height:24px;background:rgba(255,255,255,0.28)"></span>
       <button data-week-step="-1" aria-label="이전 주" style="width:40px;height:40px;border-radius:12px;border:1px solid rgba(255,255,255,0.28);background:rgba(255,255,255,0.14);color:#FFFFFF;font-family:inherit;font-size:16px;cursor:pointer">‹</button>
       <button data-week-step="0" style="height:40px;padding:0 14px;border-radius:12px;border:1px solid rgba(255,255,255,0.28);background:rgba(255,255,255,0.14);color:#FFFFFF;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer">이번 주</button>
       <button data-week-step="1" aria-label="다음 주" style="width:40px;height:40px;border-radius:12px;border:1px solid rgba(255,255,255,0.28);background:rgba(255,255,255,0.14);color:#FFFFFF;font-family:inherit;font-size:16px;cursor:pointer">›</button>
@@ -1614,6 +1641,7 @@ function bindView(){
   $$('[data-shoot-pick]').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();state.selectedShoot=b.dataset.shootPick;render();}));
   $('#ai-project')?.addEventListener('change',e=>{state.aiProjectId=e.target.value;state.aiJob=null;state.aiSceneIndex=0;render();});
   $$('[data-maker-tab]').forEach(b=>b.addEventListener('click',()=>{state.makerTab=b.dataset.makerTab;render();}));
+  $$('[data-radio-mode]').forEach(b=>b.addEventListener('click',()=>{state.radioEdit=!state.radioEdit;render();}));
   $$('[data-radio-edit]').forEach(b=>b.addEventListener('click',()=>{const [iso,key]=b.dataset.radioEdit.split('|');state.radioPick={iso,slotKey:key,ids:radioCast(iso,key).map(c=>c.id||c)};render();}));
   $$('[data-radio-pick]').forEach(b=>b.addEventListener('click',()=>{const id=b.dataset.radioPick;const ids=state.radioPick.ids;state.radioPick.ids=ids.includes(id)?ids.filter(x=>x!==id):[...ids,id];render();}));
   $$('[data-radio-close]').forEach(b=>b.addEventListener('click',e=>{if(b.dataset.radioClose==='backdrop'&&e.target!==b)return;state.radioPick=null;render();}));
