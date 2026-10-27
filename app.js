@@ -54,13 +54,14 @@ let schedules = [];
 let people = [];
 let projects = {};
 let availabilityRows = [];
+let radioRows = [];  // radio/{날짜} — 방송별 담당 부원
 let fixedRows = [];
 let rawShootRows = [];
 const firebaseState = { pending: new Set(['members','shoots','projects','availability','fixed']), error: '', connected: false, updatedAt: null };
 // 공지사항은 Firestore 'notices' 컬렉션에서 온다. 비어 있으면 비어 있는 대로 둔다.
 let notices = [];
 
-const state = { route: location.hash.slice(1) || 'home', selectedSlot: '월 09:00', mobileDay: 0, aiProjectId: '', aiFile: '', aiText: '', aiChars: 0, aiExtracting: false, aiRunning: false, aiError: '', aiJob: null, aiSceneIndex: 0, aiMappings: {}, aiPrecision: '균형 (추천)', aiWeek: 0, aiStep: 0, makerTab: 'script', scheduleTab: 'weekly', shortsState: 'idle', shortsSetup: false, aiHealthText: '', settingsSection: 'logs', selectedShoot: '', shootFilter: 'all', shootCategory: 'all', shootQuery: '', shootsMode: 'calendar', shootMonth: 0, shootDay: '', noticeTag: 'all', peopleDept: '전체', peopleQuery: '', personalMemberId: '', personalMonth: 0, homeMonth: 0, personalDay: '', slots: [], mustIds: [], weekOffset: 0 };
+const state = { route: location.hash.slice(1) || 'home', selectedSlot: '월 09:00', mobileDay: 0, aiProjectId: '', aiFile: '', aiText: '', aiChars: 0, aiExtracting: false, aiRunning: false, aiError: '', aiJob: null, aiSceneIndex: 0, aiMappings: {}, aiPrecision: '균형 (추천)', aiWeek: 0, aiStep: 0, makerTab: 'script', scheduleTab: 'weekly', radioPick: null, shortsState: 'idle', shortsSetup: false, aiHealthText: '', settingsSection: 'logs', selectedShoot: '', shootFilter: 'all', shootCategory: 'all', shootQuery: '', shootsMode: 'calendar', shootMonth: 0, shootDay: '', noticeTag: 'all', peopleDept: '전체', peopleQuery: '', personalMemberId: '', personalMonth: 0, homeMonth: 0, personalDay: '', slots: [], mustIds: [], weekOffset: 0 };
 
 function icon(name) { return `<span data-icon="${name}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${icons[name] || ''}</svg></span>`; }
 function esc(value = '') { return String(value).replace(/[&<>'"]/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char])); }
@@ -725,7 +726,7 @@ function shortsView(){
    예전엔 이 컴퓨터에서 돌던 로컬 서버(127.0.0.1:3000)를 띄웠다.
    이제 drive/ 폴더에 같이 들어 있어서 같은 출처에서 바로 연다.
    서버 탐지도, 주소 설정도, 꺼져 있다는 안내도 필요 없다. */
-const DRIVE_VERSION = '20261027-10';
+const DRIVE_VERSION = '20261027-11';
 function driveView(){
   const hash = state.driveSettings ? '#settings' : '';
   state.driveSettings = false;
@@ -740,7 +741,7 @@ function driveView(){
    둘 다 '만드는' 작업이라 한 탭 아래 둔다. */
 const MAKER_TABS = [['script', 'AI 대본 분석'], ['shorts', '쇼츠']];
 /* 주간 일정표와 촬영 일정은 같은 '일정' 탭 안에 둔다 (메이커스페이스와 같은 방식). */
-const SCHEDULE_TABS = [['weekly', '주간 일정표'], ['shoots', '촬영 일정'], ['radio', '라디오']];
+const SCHEDULE_TABS = [['weekly', '주간 일정표'], ['shoots', '촬영 일정'], ['radio', '라디오'], ['personal', '개인 일정']];
 
 function subTabBar(list, current, attr, label){
   const tabs = list.map(([k, text]) => {
@@ -756,6 +757,67 @@ const RADIO_SLOTS = [
   { key: 'dinner', label: '저녁방송', time: '18:00 – 18:35', hour: 18 },
 ];
 
+function radioCast(iso, slotKey){
+  const row = radioRows.find(r => r.id === iso)?.data || {};
+  return Array.isArray(row[slotKey]) ? row[slotKey] : [];
+}
+
+function radioPickCard(){
+  const pick = state.radioPick;
+  if (!pick) return '';
+  const slot = RADIO_SLOTS.find(x => x.key === pick.slotKey);
+  const dateObj = new Date(`${pick.iso}T00:00:00`);
+  const chips = people.map(p => {
+    const free = memberAvailable(p[7], pick.iso, dataDay(dateObj), slot.hour);
+    const on = pick.ids.includes(p[7]);
+    return `<button type="button" data-radio-pick="${esc(p[7])}" aria-pressed="${on}"
+      style="display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:10px 13px;border-radius:13px;border:1px solid ${on?'transparent':'#E8EBF5'};background:${on?'linear-gradient(135deg, #4C6FE6, #7C5FD8)':'#FFFFFF'};color:${on?'#FFFFFF':'#20294D'};font-family:inherit;text-align:left;cursor:pointer">
+      <strong style="font-size:14px;font-weight:700">${esc(p[0])}</strong>
+      <span style="font-size:11.5px;color:${on?'#DCE2FF':(free?'#64708F':'#A13F5A')}">${esc(p[2])}${free?'':' · 이 시간 불가'}</span>
+    </button>`;
+  }).join('');
+
+  return `
+  <div data-radio-close="backdrop" style="position:fixed;inset:0;z-index:90;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(25,33,60,0.42);backdrop-filter:blur(3px)">
+    <section role="dialog" aria-modal="true" aria-label="${esc(slot.label)} 담당 지정"
+      style="width:min(520px, 100%);max-height:88dvh;display:flex;flex-direction:column;border-radius:22px;background:#FFFFFF;box-shadow:0 24px 60px rgba(28,37,67,0.28);overflow:hidden">
+      <header style="display:flex;align-items:center;gap:12px;padding:18px 20px;border-bottom:1px solid #F0F2F9">
+        <span style="display:flex;flex-direction:column;gap:2px;flex:1;min-width:0">
+          <strong style="font-size:17px;font-weight:800">${esc(slot.label)} 담당</strong>
+          <small style="font-size:12.5px;color:#64708F">${esc(monthDay(pick.iso))} (${esc(dowOf(pick.iso))}) · ${esc(slot.time)}</small>
+        </span>
+        <button type="button" data-radio-close="x" aria-label="닫기" style="width:36px;height:36px;border:0;border-radius:11px;background:#F2F4FB;color:#4F5770;font-family:inherit;font-size:16px;cursor:pointer">×</button>
+      </header>
+      <div style="flex:1;min-height:0;overflow-y:auto;padding:16px 20px;display:grid;grid-template-columns:repeat(auto-fill, minmax(150px, 1fr));gap:8px">${chips}</div>
+      <footer style="display:flex;align-items:center;gap:9px;padding:14px 20px;border-top:1px solid #F0F2F9">
+        <span style="margin-right:auto;font-size:13px;color:#64708F">${pick.ids.length ? `${pick.ids.length}명 선택` : '선택한 부원 없음'}</span>
+        <button type="button" data-radio-close="cancel" style="height:42px;padding:0 16px;border:1px solid #E8EBF5;border-radius:12px;background:#FFFFFF;color:#4F5770;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer">취소</button>
+        <button type="button" id="save-radio" style="height:42px;padding:0 18px;border:0;border-radius:12px;background:linear-gradient(135deg, #416FDE, #6656DA);color:#FFFFFF;font-family:inherit;font-size:14px;font-weight:800;cursor:pointer">저장하기</button>
+      </footer>
+    </section>
+  </div>`;
+}
+
+async function saveRadioPick(){
+  const pick = state.radioPick;
+  if (!pick) return;
+  const slot = RADIO_SLOTS.find(x => x.key === pick.slotKey);
+  const button = $('#save-radio');
+  if (button) { button.disabled = true; button.textContent = '저장 중…'; }
+  try {
+    await setDoc(doc(db,'radio',pick.iso), {
+      date: pick.iso,
+      [pick.slotKey]: pick.ids.map(id => ({ id, name: memberById(id)?.[0] || '' })),
+      updatedAt: serverTimestamp(),
+    }, { merge: true });
+    state.radioPick = null; render();
+    toast(`${slot.label} 담당을 저장했습니다.`);
+  } catch (error) {
+    if (button) { button.disabled = false; button.textContent = '다시 시도'; }
+    toast(`저장하지 못했습니다: ${error.code || error.message}`);
+  }
+}
+
 function radioView(){
   const dates = weekDates(state.weekOffset).slice(1, 6); // 월–금
   const range = `${monthDay(localIso(dates[0]))} – ${monthDay(localIso(dates[4]))}`;
@@ -765,11 +827,15 @@ function radioView(){
     const cells = dates.map(dateObj => {
       const iso = localIso(dateObj);
       const free = people.filter(p => memberAvailable(p[7], iso, dataDay(dateObj), slot.hour));
+      const cast = radioCast(iso, slot.key);
       const isToday = iso === today;
-      return `<div style="display:flex;flex-direction:column;gap:7px;padding:12px;border-radius:16px;background:${isToday ? 'linear-gradient(135deg, #F0F3FF, #F4F0FF)' : '#F8F9FD'};border:1px solid ${isToday ? '#DDE3FF' : '#EEF0F7'}">
+      return `<div style="display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:16px;background:${isToday ? 'linear-gradient(135deg, #F0F3FF, #F4F0FF)' : '#F8F9FD'};border:1px solid ${isToday ? '#DDE3FF' : '#EEF0F7'}">
         <span style="font-size:12px;font-weight:700;color:#64708F">${DOW[dateObj.getDay()]} ${dateObj.getDate()}일</span>
-        <strong class="hn-num" style="font-size:19px;font-weight:800;color:${free.length ? '#20294D' : '#A13F5A'}">${free.length}명</strong>
-        <span style="display:flex;padding-left:7px">${free.length ? faces(free.map(p => p[0])) : '<span style="font-size:12px;color:#A13F5A">가능한 부원 없음</span>'}</span>
+        ${cast.length
+          ? `<strong style="font-size:14.5px;font-weight:800;color:#20294D;line-height:1.4">${cast.map(c => esc(c.name || '이름 미등록')).join(', ')}</strong>`
+          : `<strong style="font-size:14.5px;font-weight:700;color:#8A93AE">담당 미정</strong>`}
+        <span style="font-size:12px;color:${free.length ? '#64708F' : '#A13F5A'}">이 시간 가능 ${free.length}명</span>
+        <button data-radio-edit="${iso}|${slot.key}" style="height:32px;border:0;border-radius:10px;background:#E3EAFF;color:#3F4FD0;font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer">담당 ${cast.length ? '수정' : '지정'}</button>
       </div>`;
     }).join('');
 
@@ -789,7 +855,7 @@ function radioView(){
     <div style="position:relative;display:flex;flex-direction:column;gap:2px;min-width:0">
       <span style="font-size:13.5px;color:#DCE2FF">${esc(range)}</span>
       <h1 style="margin:0;font-size:28px;font-weight:800;letter-spacing:-0.02em">라디오</h1>
-      <span style="font-size:14.5px;color:#EEF0FF">점심·저녁 두 방송에 그 시간 가능한 부원을 보여 줘요.</span>
+      <span style="font-size:14.5px;color:#EEF0FF">날짜 칸의 ‘담당 지정’을 눌러 진행자를 정해요.</span>
     </div>
     <div style="position:relative;display:flex;align-items:center;gap:6px">
       <button data-week-step="-1" aria-label="이전 주" style="width:40px;height:40px;border-radius:12px;border:1px solid rgba(255,255,255,0.28);background:rgba(255,255,255,0.14);color:#FFFFFF;font-family:inherit;font-size:16px;cursor:pointer">‹</button>
@@ -797,12 +863,13 @@ function radioView(){
       <button data-week-step="1" aria-label="다음 주" style="width:40px;height:40px;border-radius:12px;border:1px solid rgba(255,255,255,0.28);background:rgba(255,255,255,0.14);color:#FFFFFF;font-family:inherit;font-size:16px;cursor:pointer">›</button>
     </div>
   </section>
-  ${grid}`;
+  ${grid}
+  ${radioPickCard()}`;
 }
 
 function scheduleView(){
   return `${subTabBar(SCHEDULE_TABS, state.scheduleTab, 'schedule-tab', '일정')}
-  ${state.scheduleTab === 'shoots' ? shootsView() : state.scheduleTab === 'radio' ? radioView() : weeklyView()}`;
+  ${state.scheduleTab === 'shoots' ? shootsView() : state.scheduleTab === 'radio' ? radioView() : state.scheduleTab === 'personal' ? personalView() : weeklyView()}`;
 }
 
 function makerView(){
@@ -1512,7 +1579,7 @@ function peopleSettings(){
   </section>`;
 }
 
-const views={home:homeView,schedule:scheduleView,maker:makerView,drive:driveView,personal:personalView,notices:noticesView,settings:settingsViewLocked};
+const views={home:homeView,schedule:scheduleView,maker:makerView,drive:driveView,notices:noticesView,settings:settingsViewLocked};
 
 function render(){
   // 인원 관리는 설정 안으로 옮겼다. 예전 #people 주소도 그쪽으로 보낸다.
@@ -1521,13 +1588,13 @@ function render(){
   if(state.route==='analysis') state.route='weekly';
   // 대본 분석과 쇼츠는 메이커스페이스 안으로 들어갔다. 예전 주소도 그쪽으로 보낸다.
   if(state.route==='script'||state.route==='shorts'){ state.makerTab=state.route; state.route='maker'; }
-  if(state.route==='weekly'||state.route==='shoots'){ state.scheduleTab=state.route; state.route='schedule'; }
+  if(['weekly','shoots','radio','personal'].includes(state.route)){ state.scheduleTab=state.route; state.route='schedule'; }
   if(!views[state.route]) state.route='home';
   $('#app').innerHTML=views[state.route]();
   $$('[data-route]').forEach(b=>b.classList.toggle('active',b.dataset.route===state.route));
   document.body.classList.toggle('hn-shorts', state.route==='maker' && state.makerTab==='shorts');
   renderNotifications();
-  hydrateIcons(); bindView(); document.title=`${{home:'홈',schedule:'일정',maker:'메이커스페이스',drive:'공유드라이브',notices:'공지사항',personal:'개인 일정',people:'인원 관리',settings:'설정'}[state.route]} · HNUBS`;
+  hydrateIcons(); bindView(); document.title=`${{home:'홈',schedule:'일정',maker:'메이커스페이스',drive:'공유드라이브',notices:'공지사항',people:'인원 관리',settings:'설정'}[state.route]} · HNUBS`;
 }
 
 function renderNotifications(){
@@ -1547,6 +1614,10 @@ function bindView(){
   $$('[data-shoot-pick]').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();state.selectedShoot=b.dataset.shootPick;render();}));
   $('#ai-project')?.addEventListener('change',e=>{state.aiProjectId=e.target.value;state.aiJob=null;state.aiSceneIndex=0;render();});
   $$('[data-maker-tab]').forEach(b=>b.addEventListener('click',()=>{state.makerTab=b.dataset.makerTab;render();}));
+  $$('[data-radio-edit]').forEach(b=>b.addEventListener('click',()=>{const [iso,key]=b.dataset.radioEdit.split('|');state.radioPick={iso,slotKey:key,ids:radioCast(iso,key).map(c=>c.id||c)};render();}));
+  $$('[data-radio-pick]').forEach(b=>b.addEventListener('click',()=>{const id=b.dataset.radioPick;const ids=state.radioPick.ids;state.radioPick.ids=ids.includes(id)?ids.filter(x=>x!==id):[...ids,id];render();}));
+  $$('[data-radio-close]').forEach(b=>b.addEventListener('click',e=>{if(b.dataset.radioClose==='backdrop'&&e.target!==b)return;state.radioPick=null;render();}));
+  $('#save-radio')?.addEventListener('click',saveRadioPick);
   $$('[data-schedule-tab]').forEach(b=>b.addEventListener('click',()=>{state.scheduleTab=b.dataset.scheduleTab;render();}));
   $$('[data-shorts-reload]').forEach(b=>b.addEventListener('click',shortsProbe));
   $$('[data-shorts-setup]').forEach(b=>b.addEventListener('click',()=>{state.shortsSetup=!state.shortsSetup;render();}));
@@ -1613,7 +1684,7 @@ function bindView(){
 }
 
 function navigate(route){ if(route==='people'){state.settingsSection='people';route='settings';} if(route==='analysis')route='weekly';
-  if(route==='weekly'||route==='shoots'){state.scheduleTab=route;route='schedule';}
+  if(['weekly','shoots','radio','personal'].includes(route)){state.scheduleTab=route;route='schedule';}
   if(route==='script'||route==='shorts'){ state.makerTab=route; route='maker'; } state.route=route; location.hash=route; closeMobileMenu(); closePopovers(); render(); scrollTo({top:0,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'}); }
 document.addEventListener('click',e=>{
   const routeTarget=e.target.closest('[data-route]');const route=routeTarget?.dataset.route;if(route){if(routeTarget.dataset.settingsTarget)state.settingsSection=routeTarget.dataset.settingsTarget;navigate(route);return;}
@@ -1733,6 +1804,7 @@ onSnapshot(collection(db,'members'),snapshot=>{
 onSnapshot(collection(db,'notices'),snapshot=>{notices=snapshotRows(snapshot).map(({id,data})=>({id,...data})).sort((a,b)=>String(noticeDate(b)).localeCompare(String(noticeDate(a))));render();},error=>console.error('공지 구독 실패',error));
 onSnapshot(collection(db,'projects'),snapshot=>{projects=Object.fromEntries(snapshotRows(snapshot).map(({id,data})=>[id,data]));applyShoots();finishFirebase('projects');},error=>failFirebase('projects',error));
 onSnapshot(collection(db,'shoots'),snapshot=>{rawShootRows=snapshotRows(snapshot);applyShoots();finishFirebase('shoots');},error=>failFirebase('shoots',error));
+onSnapshot(collection(db,'radio'),snapshot=>{radioRows=snapshotRows(snapshot);render();},error=>console.warn('radio 구독 실패',error?.code||error));
 onSnapshot(collectionGroup(db,'availability'),snapshot=>{availabilityRows=snapshotRows(snapshot).map(row=>({...row,memberId:row.ref.parent.parent?.id||row.data.memberId||''}));finishFirebase('availability');},error=>failFirebase('availability',error));
 onSnapshot(collectionGroup(db,'fixedClasses'),snapshot=>{fixedRows=snapshotRows(snapshot).map(row=>({...row,memberId:row.ref.parent.parent?.id||row.data.memberId||''}));finishFirebase('fixed');},error=>failFirebase('fixed',error));
 
