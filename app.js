@@ -1,6 +1,6 @@
 (async function startWorkspace(){
 const { initializeApp } = await import('https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js');
-const { collection, collectionGroup, doc, getFirestore, onSnapshot, serverTimestamp, setDoc } = await import('https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js');
+const { collection, collectionGroup, deleteDoc, doc, getFirestore, onSnapshot, serverTimestamp, setDoc } = await import('https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js');
 
 const firebaseApp = initializeApp({
   apiKey: 'AIzaSyDXmeiQpRSZshFA1_BgZ2z_8AKLy6_Nc8M',
@@ -61,7 +61,7 @@ const firebaseState = { pending: new Set(['members','shoots','projects','availab
 // 공지사항은 Firestore 'notices' 컬렉션에서 온다. 비어 있으면 비어 있는 대로 둔다.
 let notices = [];
 
-const state = { route: location.hash.slice(1) || 'home', selectedSlot: '월 09:00', mobileDay: 0, aiProjectId: '', aiFile: '', aiText: '', aiChars: 0, aiExtracting: false, aiRunning: false, aiError: '', aiJob: null, aiSceneIndex: 0, aiMappings: {}, aiPrecision: '균형 (추천)', aiWeek: 0, aiStep: 0, makerTab: 'script', scheduleTab: 'weekly', radioPick: null, radioEdit: false, shortsState: 'idle', shortsSetup: false, aiHealthText: '', settingsSection: 'logs', selectedShoot: '', shootFilter: 'all', shootCategory: 'all', shootQuery: '', shootsMode: 'calendar', shootMonth: 0, shootDay: '', noticeTag: 'all', peopleDept: '전체', peopleQuery: '', personalMemberId: '', personalMonth: 0, homeMonth: 0, personalDay: '', slots: [], mustIds: [], weekOffset: 0 };
+const state = { route: location.hash.slice(1) || 'home', selectedSlot: '월 09:00', mobileDay: 0, aiProjectId: '', aiFile: '', aiText: '', aiChars: 0, aiExtracting: false, aiRunning: false, aiError: '', aiJob: null, aiSceneIndex: 0, aiMappings: {}, aiPrecision: '균형 (추천)', aiWeek: 0, aiStep: 0, makerTab: 'script', scheduleTab: 'weekly', radioPick: null, radioEdit: false, shortsState: 'idle', shortsSetup: false, aiHealthText: '', settingsSection: 'logs', selectedShoot: '', shootFilter: 'all', shootCategory: 'all', shootQuery: '', shootsMode: 'calendar', shootMonth: 0, shootDay: '', noticeTag: 'all', peopleDept: '전체', peopleQuery: '', personalMemberId: '', personalMonth: 0, homeMonth: 0, personalDay: '', slots: [], mustIds: [], mustOnly: false, weekOffset: 0 };
 
 function icon(name) { return `<span data-icon="${name}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${icons[name] || ''}</svg></span>`; }
 function esc(value = '') { return String(value).replace(/[&<>'"]/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char])); }
@@ -91,6 +91,7 @@ function memberAvailable(memberId, iso, dayIndex, time, ignoreShoots = false) {
   const fixed = fixedRows.filter(r => r.memberId === memberId && Number(r.data.day) === dayIndex && Number(r.data.start) < time + 1 && Number(r.data.end) > time);
   if (fixed.length && !inRanges(available, time)) return false;
   if (!ignoreShoots && schedules.some(s => s.date === iso && s.castIds?.includes(memberId) && Number(s.startH) < time + 1 && Number(s.endH) > time)) return false;
+  if (!ignoreShoots && radioBusy(memberId, iso, time)) return false;
   return true;
 }
 function availabilityCount(iso, dayIndex, time) { return people.filter(p => memberAvailable(p[7], iso, dayIndex, time)).length; }
@@ -404,7 +405,8 @@ function weeklyView() {
   // 이미 지난 시간대는 연한 회색으로 눕혀 둔다.
   const nowHour=new Date().getHours();
   const isPast=(iso,h)=>iso<today||(iso===today&&h<nowHour);
-  const total=people.length;
+  const pool=state.mustOnly&&state.mustIds.length?state.mustIds.map(memberById).filter(Boolean):people;
+  const total=pool.length;
   const slots=state.slots;
 
   const heads=dates.map((d,i)=>{ const isToday=localIso(d)===today;
@@ -418,7 +420,7 @@ function weeklyView() {
     cells+=`<span class="hn-num" style="display:flex;align-items:center;justify-content:flex-end;padding-right:8px;font-size:12px;font-weight:600;color:#64708F">${pad2(h)}:00</span>`;
     dates.forEach((dateObj,d)=>{
       const iso=localIso(dateObj), key=`${d}-${h}`;
-      const n=availabilityCount(iso,dataDay(dateObj),h);
+      const n=pool.filter(p=>memberAvailable(p[7],iso,dataDay(dateObj),h)).length;
       const shoot=schedules.find(s=>s.date===iso&&Number(s.startH)<h+1&&Number(s.endH)>h);
       const on=slots.includes(key);
       let bg='#FFF4F6', fg='#A13F5A';
@@ -495,6 +497,11 @@ function weeklyView() {
         <option value="">+ 추가</option>
         ${people.filter(p=>!state.mustIds.includes(p[7])).map(p=>`<option value="${esc(p[7])}">${esc(p[0])} · ${esc(p[2])}</option>`).join('')}
       </select>
+      <button data-must-only="1" aria-pressed="${state.mustOnly}" title="${state.mustOnly ? '전체 인원으로 돌아가기' : '필수 인원만 놓고 보기'}"
+        ${state.mustIds.length ? '' : 'disabled'}
+        style="display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:99px;border:1px solid ${state.mustOnly ? 'transparent' : '#E0E4F2'};background:${state.mustOnly ? 'linear-gradient(135deg, #4C6FE6, #7C5FD8)' : '#FFFFFF'};color:${state.mustOnly ? '#FFFFFF' : (state.mustIds.length ? '#4F5770' : '#B6BCCE')};font-family:inherit;font-size:13px;font-weight:700;cursor:${state.mustIds.length ? 'pointer' : 'default'}">
+        <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>${state.mustOnly ? '필수 인원만 보는 중' : '필수 인원만'}
+      </button>
     </div>
     <div style="display:flex;flex-wrap:wrap;gap:14px;font-size:12.5px;font-weight:600;color:#4F5770">
       <span style="display:inline-flex;align-items:center;gap:6px"><i style="display:block;width:14px;height:14px;border-radius:5px;background:#F0FAF5"></i>전원 가능</span>
@@ -762,6 +769,15 @@ const RADIO_SLOTS = [
   { key: 'dinner', label: '저녁방송', time: '18:00 – 18:35', hour: 18 },
 ];
 
+const RADIO_ON_AIR_DEPTS = ['아나운서부', '기술부'];
+function radioOff(iso){ return Boolean(radioRows.find(r => r.id === iso)?.data?.off); }
+function radioBusy(memberId, iso, time){
+  if (radioOff(iso)) return false;
+  const member = memberById(memberId);
+  if (!member || !RADIO_ON_AIR_DEPTS.includes(member[2])) return false;
+  return RADIO_SLOTS.some(slot => slot.hour === time && radioCast(iso, slot.key).some(c => (c.id || c) === memberId));
+}
+
 function radioAvailable(member, iso, dayIndex, time){
   // 기획부는 라디오 시간에 촬영을 병행할 수 있다. 촬영 일정은 막는 조건에서 뺀다.
   return memberAvailable(member[7], iso, dayIndex, time, member[2] === '기획부');
@@ -869,16 +885,23 @@ function radioView(){
   const grid = RADIO_SLOTS.map(slot => {
     const cells = dates.map(dateObj => {
       const iso = localIso(dateObj);
+      const off = radioOff(iso);
       const free = people.filter(p => radioAvailable(p, iso, dataDay(dateObj), slot.hour));
       const cast = radioCast(iso, slot.key);
       const isToday = iso === today;
-      return `<div style="display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:16px;background:${isToday ? 'linear-gradient(135deg, #F0F3FF, #F4F0FF)' : '#F8F9FD'};border:1px solid ${isToday ? '#DDE3FF' : '#EEF0F7'}">
-        <span style="font-size:12px;font-weight:700;color:#64708F">${DOW[dateObj.getDay()]} ${dateObj.getDate()}일</span>
-        ${cast.length
-          ? `<strong style="font-size:14.5px;font-weight:800;color:#20294D;line-height:1.4">${cast.map(c => esc(c.name || '이름 미등록')).join(', ')}</strong>`
-          : `<strong style="font-size:14.5px;font-weight:700;color:#8A93AE">담당 미정</strong>`}
-        <span style="font-size:12px;color:${free.length ? '#64708F' : '#A13F5A'}">이 시간 가능 ${free.length}명</span>
-        ${state.radioEdit ? `<button data-radio-edit="${iso}|${slot.key}" style="height:32px;border:0;border-radius:10px;background:#E3EAFF;color:#3F4FD0;font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer">담당 ${cast.length ? '수정' : '지정'}</button>` : ''}
+      return `<div style="display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:16px;background:${off ? '#F3F4F8' : (isToday ? 'linear-gradient(135deg, #F0F3FF, #F4F0FF)' : '#F8F9FD')};border:1px solid ${off ? '#E6E8F0' : (isToday ? '#DDE3FF' : '#EEF0F7')}">
+        <span style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:#64708F">${DOW[dateObj.getDay()]} ${dateObj.getDate()}일
+          ${off ? '<span style="padding:1px 7px;border-radius:99px;background:#E6E8F0;color:#5A6480;font-size:11px;font-weight:800">휴방</span>' : ''}</span>
+        ${off
+          ? `<strong style="font-size:14.5px;font-weight:700;color:#A5ABBF">방송 없음</strong>`
+          : cast.length
+            ? `<strong style="font-size:14.5px;font-weight:800;color:#20294D;line-height:1.4">${cast.map(c => esc(c.name || '이름 미등록')).join(', ')}</strong>`
+            : `<strong style="font-size:14.5px;font-weight:700;color:#8A93AE">담당 미정</strong>`}
+        ${off ? '' : `<span style="font-size:12px;color:${free.length ? '#64708F' : '#A13F5A'}">이 시간 가능 ${free.length}명</span>`}
+        ${state.radioEdit ? `<div style="display:flex;gap:6px">
+          ${off ? '' : `<button data-radio-edit="${iso}|${slot.key}" style="flex:1 1 auto;height:32px;border:0;border-radius:10px;background:#E3EAFF;color:#3F4FD0;font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer">담당 ${cast.length ? '수정' : '지정'}</button>`}
+          <button data-radio-off="${iso}" title="${off ? '휴방 해제' : '이 날 휴방'}" style="flex:${off ? '1 1 auto' : '0 0 auto'};height:32px;padding:0 10px;border:0;border-radius:10px;background:${off ? '#E3F7EE' : '#F2F4FB'};color:${off ? '#1C6E4A' : '#64708F'};font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer">${off ? '휴방 해제' : '휴방'}</button>
+        </div>` : ''}
       </div>`;
     }).join('');
 
@@ -1157,7 +1180,7 @@ function shootsCalendar(items){
 
   const sel=state.shootDay&&items.filter(s=>s.date===state.shootDay).sort((a,b)=>a.startH-b.startH);
   const dayPanel=!state.shootDay?'':`
-    <div style="margin-top:16px;padding-top:16px;border-top:1px solid #EEF0F6">
+    <aside style="flex:1 1 300px;min-width:0;align-self:stretch;padding:16px;border-radius:18px;background:#F8F9FD;border:1px solid #EEF0F7">
       <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:12px">
         <span style="flex:0 0 46px;height:50px;border-radius:14px;background:linear-gradient(135deg, #4C6FE6, #7C5FD8);color:#FFFFFF;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.1;box-shadow:0 8px 18px rgba(90,95,224,0.3)"><span style="font-size:11px;font-weight:700">${dowOf(state.shootDay)}</span><strong class="hn-num" style="font-size:19px;font-weight:800">${new Date(`${state.shootDay}T00:00:00`).getDate()}</strong></span>
         <span style="display:flex;flex-direction:column;line-height:1.35"><strong style="font-size:16px;font-weight:800">${monthDay(state.shootDay)} ${dowOf(state.shootDay)}요일</strong><span style="font-size:13px;color:#64708F">일정 ${sel.length}건</span></span>
@@ -1165,16 +1188,18 @@ function shootsCalendar(items){
       </div>
       ${sel.length?`<div style="display:flex;flex-direction:column">${sel.map((s,k)=>{const [,bg,fg]=categoryColor(s.type);
         return `<div style="display:flex;gap:12px">
-          <span class="hn-num" style="flex:0 0 96px;padding-top:12px;font-size:12.5px;font-weight:700;color:#4F5770;text-align:right">${esc(s.time)}</span>
-          <span aria-hidden="true" style="flex:0 0 12px;position:relative;display:flex;justify-content:center"><i style="position:absolute;top:0;bottom:0;width:2px;background:#EEF0F6"></i><i style="position:relative;margin-top:16px;width:10px;height:10px;border-radius:50%;background:${fg};box-shadow:0 0 0 3px #FFFFFF"></i></span>
-          <button data-detail="${esc(s.id)}" style="flex:1 1 auto;min-width:0;margin-bottom:${k===sel.length-1?0:8}px;padding:12px 14px;border:0;border-radius:14px;background:${bg};color:#20294D;font-family:inherit;text-align:left;cursor:pointer;display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px">
-            <span style="padding:2px 9px;border-radius:99px;background:#FFFFFF;color:${fg};font-size:11.5px;font-weight:800">${esc(s.type)}</span>
-            <strong style="flex:1 1 auto;min-width:0;font-size:15px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(s.title)}</strong>
-            <span style="font-size:12.5px;color:#4F5770">${esc(s.place||'장소 미정')} · ${s.people.length}명</span>
+          <span aria-hidden="true" style="flex:0 0 12px;position:relative;display:flex;justify-content:center"><i style="position:absolute;top:0;bottom:0;width:2px;background:#EAEDF7"></i><i style="position:relative;margin-top:16px;width:10px;height:10px;border-radius:50%;background:${fg};box-shadow:0 0 0 3px #F8F9FD"></i></span>
+          <button data-detail="${esc(s.id)}" style="flex:1 1 auto;min-width:0;margin-bottom:${k===sel.length-1?0:8}px;padding:12px 14px;border:0;border-radius:14px;background:${bg};color:#20294D;font-family:inherit;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:5px">
+            <span class="hn-num" style="font-size:12.5px;font-weight:700;color:#4F5770">${esc(s.time)}</span>
+            <span style="display:flex;align-items:center;gap:8px;min-width:0">
+              <span style="flex:0 0 auto;padding:2px 9px;border-radius:99px;background:#FFFFFF;color:${fg};font-size:11.5px;font-weight:800">${esc(s.type)}</span>
+              <strong style="flex:1 1 auto;min-width:0;font-size:15px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(s.title)}</strong>
+            </span>
+            <span style="font-size:12.5px;color:#4F5770;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(s.place||'장소 미정')} · ${s.people.length}명</span>
           </button>
         </div>`;}).join('')}</div>`
         :`<div style="padding:24px 16px;border-radius:16px;background:linear-gradient(120deg, #F3F5FF, #F6F2FF);text-align:center;color:#4F5770;font-size:14px">이 날은 등록된 일정이 없어요.</div>`}
-    </div>`;
+    </aside>`;
 
   return `<section aria-label="${year}년 ${month+1}월 일정" style="${CARD};padding:18px">
     <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px">
@@ -1188,13 +1213,15 @@ function shootsCalendar(items){
         ${CATEGORIES.slice(0,3).map(([label,bg])=>`<span style="display:inline-flex;align-items:center;gap:6px"><i style="width:12px;height:12px;border-radius:4px;background:${bg}"></i>${label}</span>`).join('')}
       </div>
     </div>
-    <div style="overflow-x:auto">
-      <div style="min-width:680px;padding:2px;display:grid;grid-template-columns:repeat(7, minmax(0, 1fr));gap:6px">
-        ${DOW.map((d,i)=>`<span style="padding:4px 8px 2px;font-size:12.5px;font-weight:700;color:${i===0?'#A8324F':'#64708F'}">${d}</span>`).join('')}
-        ${cells}
+    <div style="display:flex;flex-wrap:wrap;align-items:flex-start;gap:16px">
+      <div style="flex:999 1 620px;min-width:0;overflow-x:auto">
+        <div style="min-width:620px;padding:2px;display:grid;grid-template-columns:repeat(7, minmax(0, 1fr));gap:6px">
+          ${DOW.map((d,i)=>`<span style="padding:4px 8px 2px;font-size:12.5px;font-weight:700;color:${i===0?'#A8324F':'#64708F'}">${d}</span>`).join('')}
+          ${cells}
+        </div>
       </div>
+      ${dayPanel}
     </div>
-    ${dayPanel}
   </section>`;
 }
 
@@ -1301,7 +1328,7 @@ function personalEvents(memberId, iso){
   const out=[];
 
   fixedRows.filter(r=>r.memberId===memberId&&Number(r.data.day)===dayIdx)
-    .forEach(r=>out.push({kind:'fixed',start:Number(r.data.start),title:r.data.name||r.data.title||r.data.subject||'수업',time:rangeLabel(r.data),repeat:true}));
+    .forEach(r=>out.push({kind:'fixed',id:r.id,start:Number(r.data.start),end:Number(r.data.end),day:Number(r.data.day),title:r.data.name||r.data.title||r.data.subject||'수업',time:rangeLabel(r.data),repeat:true}));
 
   const personal=availabilityRows.find(r=>r.memberId===memberId&&r.id===iso)?.data;
   if(personal){
@@ -1312,11 +1339,11 @@ function personalEvents(memberId, iso){
   }
 
   schedules.filter(sc=>sc.date===iso&&sc.castIds?.includes(memberId))
-    .forEach(sc=>out.push({kind:'shoot',start:Number(sc.startH),title:sc.title||'촬영',time:rangeLabel({start:sc.startH,end:sc.endH})}));
+    .forEach(sc=>out.push({kind:'shoot',id:sc.id,start:Number(sc.startH),title:sc.title||'촬영',time:rangeLabel({start:sc.startH,end:sc.endH})}));
 
   RADIO_SLOTS.forEach(slot=>{
     if(radioCast(iso,slot.key).some(c=>(c.id||c)===memberId)){
-      out.push({kind:'radio',start:slot.hour,title:slot.label,time:slot.time});
+      out.push({kind:'radio',id:slot.key,start:slot.hour,title:slot.label,time:slot.time});
     }
   });
 
@@ -1356,13 +1383,24 @@ function personalView(){
   const selEvents=personalEvents(state.personalMemberId,state.personalDay);
   const myShoots=schedules.filter(s=>s.castIds?.includes(state.personalMemberId)&&s.date>=today).slice(0,3);
 
+  const KIND_LABEL={fixed:'수업',busy:'참여 불가',free:'참여 가능',shoot:'촬영',radio:'라디오'};
   const eventCards=selEvents.map(e=>{ const [,fg,cardBg]=PERSONAL_TONE[e.kind];
+    const mine=e.kind==='busy'||e.kind==='free';
     return `<div style="padding:14px;border-radius:16px;background:${cardBg};display:flex;flex-direction:column;gap:6px">
       <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
         <strong style="font-size:15px;font-weight:800;color:${fg}">${esc(e.title)}</strong>
-        ${e.repeat?'<span style="padding:2px 8px;border-radius:99px;background:#FFFFFF;color:#4A3FB0;font-size:11.5px;font-weight:700">매주 반복</span>':''}
+        ${e.repeat?'<span style="padding:2px 8px;border-radius:99px;background:#FFFFFF;color:#4A3FB0;font-size:11.5px;font-weight:700">매주 반복</span>'
+          :`<span style="padding:2px 8px;border-radius:99px;background:#FFFFFF;color:${fg};font-size:11.5px;font-weight:700">${KIND_LABEL[e.kind]}</span>`}
       </div>
       <span class="hn-num" style="font-size:13px;font-weight:600;color:#4F5770">${esc(e.time)}</span>
+      <div style="display:flex;gap:6px;margin-top:2px">
+        ${mine?`<button data-personal-edit="1" style="height:30px;padding:0 11px;border:0;border-radius:9px;background:#FFFFFF;color:#3F55D6;font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer">수정</button>
+        <button data-personal-delete="1" style="height:30px;padding:0 11px;border:0;border-radius:9px;background:#FFFFFF;color:#A8324F;font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer">삭제</button>`:''}
+        ${e.kind==='fixed'?`<button data-class-edit="${esc(e.id)}" style="height:30px;padding:0 11px;border:0;border-radius:9px;background:#FFFFFF;color:#3F55D6;font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer">수정</button>
+        <button data-class-delete="${esc(e.id)}" style="height:30px;padding:0 11px;border:0;border-radius:9px;background:#FFFFFF;color:#A8324F;font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer">삭제</button>`:''}
+        ${e.kind==='shoot'?`<button data-detail="${esc(e.id)}" style="height:30px;padding:0 11px;border:0;border-radius:9px;background:#FFFFFF;color:#3F55D6;font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer">촬영 상세</button>`:''}
+        ${e.kind==='radio'?`<button data-goto-radio="1" style="height:30px;padding:0 11px;border:0;border-radius:9px;background:#FFFFFF;color:#6E5208;font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer">라디오에서 보기</button>`:''}
+      </div>
     </div>`;}).join('')
     ||`<div style="padding:24px 16px;border-radius:16px;background:linear-gradient(120deg, #F3F5FF, #F6F2FF);text-align:center;color:#4F5770;font-size:14px">이 날은 등록된 일정이 없어요.<br>촬영 참여 가능으로 표시돼요.</div>`;
 
@@ -1416,7 +1454,7 @@ function personalView(){
       </div>
       <div style="padding:0 18px 18px;display:flex;flex-direction:column;gap:10px">
         ${eventCards}
-        <button data-action="new-personal" style="height:44px;border-radius:12px;border:1px dashed #B5BEEA;background:transparent;color:#3F55D6;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer">+ 이 날짜에 일정 추가</button>
+        <button data-personal-add="1" style="height:44px;border-radius:12px;border:1px dashed #B5BEEA;background:transparent;color:#3F55D6;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer">+ 이 날짜에 일정 추가</button>
         <div style="margin-top:10px;padding-top:16px;border-top:1px solid #EEF0F6;display:flex;flex-direction:column;gap:8px">
           <span style="font-size:13px;font-weight:800">참여하는 촬영</span>
           ${myShoots.map(s=>`<button data-detail="${esc(s.id)}" style="display:flex;align-items:center;gap:12px;padding:10px 12px;border:0;border-radius:14px;background:#F7F8FC;color:#20294D;font-family:inherit;text-align:left;cursor:pointer">
@@ -1686,6 +1724,11 @@ function bindView(){
   $$('[data-shoot-pick]').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();state.selectedShoot=b.dataset.shootPick;render();}));
   $('#ai-project')?.addEventListener('change',e=>{state.aiProjectId=e.target.value;state.aiJob=null;state.aiSceneIndex=0;render();});
   $$('[data-maker-tab]').forEach(b=>b.addEventListener('click',()=>{state.makerTab=b.dataset.makerTab;render();}));
+  $$('[data-radio-off]').forEach(b=>b.addEventListener('click',async()=>{
+    const iso=b.dataset.radioOff, next=!radioOff(iso);
+    try{ await setDoc(doc(db,'radio',iso),{date:iso,off:next,updatedAt:serverTimestamp()},{merge:true}); toast(next?'휴방으로 표시했습니다.':'휴방을 해제했습니다.'); }
+    catch(error){ toast(`저장하지 못했습니다: ${error.code||error.message}`); }
+  }));
   $$('[data-radio-mode]').forEach(b=>b.addEventListener('click',()=>{state.radioEdit=!state.radioEdit;render();}));
   $$('[data-radio-edit]').forEach(b=>b.addEventListener('click',()=>{const [iso,key]=b.dataset.radioEdit.split('|');state.radioPick={iso,slotKey:key,ids:radioCast(iso,key).map(c=>c.id||c),other:[]};render();}));
   $$('[data-radio-pick]').forEach(b=>b.addEventListener('click',()=>{const id=b.dataset.radioPick;const ids=state.radioPick.ids;state.radioPick.ids=ids.includes(id)?ids.filter(x=>x!==id):[...ids,id];render();}));
@@ -1731,6 +1774,7 @@ function bindView(){
   $$('[data-week-slot]').forEach(b=>b.addEventListener('click',()=>{const k=b.dataset.weekSlot;state.slots=state.slots.includes(k)?state.slots.filter(x=>x!==k):[...state.slots,k];render();}));
   $$('[data-week-step]').forEach(b=>b.addEventListener('click',()=>{const step=Number(b.dataset.weekStep);state.weekOffset=step?state.weekOffset+step:0;state.slots=[];render();}));
   $$('[data-week-clear]').forEach(b=>b.addEventListener('click',()=>{state.slots=[];render();}));
+  $$('[data-must-only]').forEach(b=>b.addEventListener('click',()=>{if(!state.mustIds.length)return;state.mustOnly=!state.mustOnly;render();}));
   $$('[data-must-remove]').forEach(b=>b.addEventListener('click',()=>{state.mustIds=state.mustIds.filter(id=>id!==b.dataset.mustRemove);render();}));
   $('#must-add')?.addEventListener('change',e=>{if(e.target.value){state.mustIds=[...state.mustIds,e.target.value];render();}});
   $$('[data-slot]').forEach(b=>b.addEventListener('click',()=>{state.selectedSlot=b.dataset.slot;render();if(innerWidth<768) openSlotDrawer();}));
@@ -1747,6 +1791,20 @@ function bindView(){
   $$('[data-people-dept]').forEach(b=>b.addEventListener('click',()=>{state.peopleDept=b.dataset.peopleDept;render();}));
   $$('[data-mini-month]').forEach(b=>b.addEventListener('click',()=>{state.homeMonth+=Number(b.dataset.miniMonth);render();}));
   $$('[data-mini-day]').forEach(b=>b.addEventListener('click',()=>{const hit=schedules.find(x=>x.date===b.dataset.miniDay);if(hit)openScheduleDetail(hit.id);}));
+  $$('[data-goto-radio]').forEach(b=>b.addEventListener('click',()=>{state.scheduleTab='radio';render();}));
+  $$('[data-class-delete]').forEach(b=>b.addEventListener('click',async()=>{
+    if(!confirm('이 수업을 시간표에서 지울까요? 매주 반복이라 모든 주에서 사라집니다.')) return;
+    try{ await deleteDoc(doc(db,'members',state.personalMemberId,'fixedClasses',b.dataset.classDelete)); toast('수업을 삭제했습니다.'); }
+    catch(error){ toast(`삭제하지 못했습니다: ${error.code||error.message}`); }
+  }));
+  $$('[data-class-edit]').forEach(b=>b.addEventListener('click',()=>openClassDrawer(state.personalMemberId,b.dataset.classEdit)));
+  $$('[data-personal-add]').forEach(b=>b.addEventListener('click',()=>openPersonalDrawer(state.personalMemberId,state.personalDay,true)));
+  $$('[data-personal-edit]').forEach(b=>b.addEventListener('click',()=>openPersonalDrawer(state.personalMemberId,state.personalDay)));
+  $$('[data-personal-delete]').forEach(b=>b.addEventListener('click',async()=>{
+    if(!confirm(`${monthDay(state.personalDay)} 개인 일정을 지울까요?`)) return;
+    try{ await deleteDoc(doc(db,'members',state.personalMemberId,'availability',state.personalDay)); toast('개인 일정을 삭제했습니다.'); }
+    catch(error){ toast(`삭제하지 못했습니다: ${error.code||error.message}`); }
+  }));
   $$('[data-personal-day]').forEach(b=>b.addEventListener('click',()=>{state.personalDay=b.dataset.personalDay;render();}));
   $$('[data-personal-month]').forEach(b=>b.addEventListener('click',()=>{const step=Number(b.dataset.personalMonth);state.personalMonth=step?state.personalMonth+step:0;state.personalDay='';render();}));
   $('#personal-member')?.addEventListener('change',e=>{state.personalMemberId=e.target.value;render();});
@@ -1776,10 +1834,54 @@ function openShootDrawer(){
   openDrawer(drawerTemplate('일정 등록',`<form id="shoot-form" class="form-stack"><label class="field"><span>구분 *</span><select name="category">${CATEGORIES.map(c=>`<option>${c[0]}</option>`).join('')}</select></label><label class="field"><span>제목 *</span><input name="title" required placeholder="예: 10월 캠퍼스 뉴스"></label><div class="check-grid"><label class="field"><span>날짜 *</span><input name="date" type="date" required value="${defaultDate}"></label><label class="field"><span>시작 시간 *</span><input name="time" type="time" required value="14:00"></label></div><label class="field"><span>장소 *</span><input name="place" required placeholder="예: 본관 앞"></label><label class="field"><span>담당 인원</span><select name="people" multiple size="4">${people.map(p=>`<option value="${esc(p[7])}">${esc(p[0])} · ${esc(p[2])}</option>`).join('')}</select><small>Ctrl 또는 ⌘ 키를 누르면 여러 명을 선택할 수 있어요.</small></label><label class="field"><span>메모</span><textarea name="memo" placeholder="준비물이나 전달 사항을 적어주세요."></textarea></label></form>`,`<button class="secondary-button" data-action="close-drawer">취소</button><button class="primary-button" id="save-shoot">등록하기</button>`));
   $('#save-shoot').onclick=async()=>{const f=$('#shoot-form');if(!f.reportValidity())return;const button=$('#save-shoot');button.disabled=true;button.textContent='저장 중…';const startH=Number(f.time.value.slice(0,2))+Number(f.time.value.slice(3,5))/60;const castIds=[...f.people.selectedOptions].map(o=>o.value);const ref=doc(collection(db,'shoots'));try{await setDoc(ref,{date:f.date.value,title:f.title.value.trim(),category:f.category.value,uploadWeek:'',startH,endH:Math.min(startH+2,24),location:f.place.value.trim(),note:f.memo.value.trim(),castIds,cast:castIds.map(id=>({id,name:memberById(id)?.[0]||''})),projectId:'',createdAt:serverTimestamp(),updatedAt:serverTimestamp()});closeDrawer();toast(f.category.value+' 일정이 Firebase에 등록되었습니다.');}catch(error){button.disabled=false;button.textContent='다시 시도';toast(`저장하지 못했습니다: ${error.code||error.message}`);}};
 }
-function openPersonalDrawer(){
-  openDrawer(drawerTemplate('개인 일정 추가',`<form id="personal-form" class="form-stack"><label class="field"><span>구성원 *</span><select name="member" required><option value="">선택하세요</option>${people.map(p=>`<option value="${esc(p[7])}">${esc(p[0])} · ${esc(p[2])}</option>`).join('')}</select></label><label class="field"><span>일정 메모</span><input name="memo" placeholder="예: 전공 수업"></label><label class="field"><span>날짜 *</span><input name="date" required type="date" value="${localIso()}"></label><div class="check-grid"><label class="field"><span>시작 *</span><input name="start" required type="time" value="09:00"></label><label class="field"><span>종료 *</span><input name="end" required type="time" value="10:00"></label></div><label class="field"><span>이 시간에는</span><select name="status"><option value="불가능">참여 불가능</option><option value="가능">참여 가능</option></select></label></form>`,`<button class="secondary-button" data-action="close-drawer">취소</button><button class="primary-button" id="save-personal">저장하기</button>`));
+function openPersonalDrawer(memberId='', iso='', blank=false){
+  const cur = !blank && memberId && iso ? availabilityRows.find(r=>r.memberId===memberId&&r.id===iso)?.data : null;
+  const range = (cur?.unavailableRanges||cur?.availableRanges||cur?.ranges||[])[0];
+  const pre = {
+    member: memberId || '',
+    date: iso || localIso(),
+    start: range ? hourLabel(range.start) : '09:00',
+    end: range ? hourLabel(range.end) : '10:00',
+    status: cur ? (cur.unavailableRanges?.length || cur.status === '불가능' ? '불가능' : '가능') : '불가능',
+    memo: cur?.memo || '',
+  };
+  return openPersonalDrawerWith(pre);
+}
+function openPersonalDrawerWith(pre){
+  const editing = Boolean(pre.member && availabilityRows.some(r=>r.memberId===pre.member&&r.id===pre.date));
+  openDrawer(drawerTemplate(editing?'개인 일정 수정':'개인 일정 추가',`<form id="personal-form" class="form-stack"><label class="field"><span>구성원 *</span><select name="member" required><option value="">선택하세요</option>${people.map(p=>`<option value="${esc(p[7])}" ${p[7]===pre.member?'selected':''}>${esc(p[0])} · ${esc(p[2])}</option>`).join('')}</select></label><label class="field"><span>일정 메모</span><input name="memo" placeholder="예: 전공 수업" value="${esc(pre.memo)}"></label><label class="field"><span>날짜 *</span><input name="date" required type="date" value="${esc(pre.date)}"></label><div class="check-grid"><label class="field"><span>시작 *</span><input name="start" required type="time" value="${esc(pre.start)}"></label><label class="field"><span>종료 *</span><input name="end" required type="time" value="${esc(pre.end)}"></label></div><label class="field"><span>이 시간에는</span><select name="status"><option value="불가능" ${pre.status==='불가능'?'selected':''}>참여 불가능</option><option value="가능" ${pre.status==='가능'?'selected':''}>참여 가능</option></select></label></form>`,`<button class="secondary-button" data-action="close-drawer">취소</button><button class="primary-button" id="save-personal">${editing?'수정하기':'저장하기'}</button>`));
   $('#save-personal').onclick=async()=>{const f=$('#personal-form');if(!f.reportValidity())return;const start=Number(f.start.value.slice(0,2))+Number(f.start.value.slice(3,5))/60;const end=Number(f.end.value.slice(0,2))+Number(f.end.value.slice(3,5))/60;if(end<=start){toast('종료 시간은 시작 시간보다 늦어야 합니다.');return;}const button=$('#save-personal');button.disabled=true;button.textContent='저장 중…';const range=[{start,end}];try{await setDoc(doc(db,'members',f.member.value,'availability',f.date.value),{memberId:f.member.value,date:f.date.value,status:f.status.value,entryMode:'range',availableRanges:f.status.value==='가능'?range:[],unavailableRanges:f.status.value==='불가능'?range:[],memo:f.memo.value.trim(),mandatory:false,createdAt:serverTimestamp(),updatedAt:serverTimestamp()},{merge:true});closeDrawer();toast('개인 일정이 Firebase에 저장되었습니다.');}catch(error){button.disabled=false;button.textContent='다시 시도';toast(`저장하지 못했습니다: ${error.code||error.message}`);}};
 }
+function openClassDrawer(memberId, classId=''){
+  const row = fixedRows.find(r=>r.memberId===memberId&&r.id===classId);
+  const d = row?.data || {};
+  const pre = { name: d.name||d.title||d.subject||'', day: Number(d.day??0), start: hourLabel(d.start??9), end: hourLabel(d.end??10) };
+  openDrawer(drawerTemplate(classId?'수업 수정':'수업 추가',
+    `<form id="class-form" class="form-stack">
+      <label class="field"><span>과목 이름 *</span><input name="name" required value="${esc(pre.name)}" placeholder="예: 경제학원론"></label>
+      <label class="field"><span>요일 *</span><select name="day">${['월','화','수','목','금','토','일'].map((d,i)=>`<option value="${i}" ${i===pre.day?'selected':''}>${d}요일</option>`).join('')}</select></label>
+      <div class="check-grid">
+        <label class="field"><span>시작 *</span><input name="start" required type="time" value="${esc(pre.start)}"></label>
+        <label class="field"><span>종료 *</span><input name="end" required type="time" value="${esc(pre.end)}"></label>
+      </div>
+      <small>매주 같은 요일·시간에 반복됩니다.</small>
+    </form>`,
+    `<button class="secondary-button" data-action="close-drawer">취소</button><button class="primary-button" id="save-class">${classId?'수정하기':'추가하기'}</button>`));
+
+  $('#save-class').onclick=async()=>{
+    const f=$('#class-form'); if(!f.reportValidity())return;
+    const start=Number(f.start.value.slice(0,2))+Number(f.start.value.slice(3,5))/60;
+    const end=Number(f.end.value.slice(0,2))+Number(f.end.value.slice(3,5))/60;
+    if(end<=start){ toast('종료 시간은 시작 시간보다 늦어야 합니다.'); return; }
+    const button=$('#save-class'); button.disabled=true; button.textContent='저장 중…';
+    const ref = classId ? doc(db,'members',memberId,'fixedClasses',classId) : doc(collection(db,'members',memberId,'fixedClasses'));
+    try{
+      await setDoc(ref,{memberId,name:f.name.value.trim(),day:Number(f.day.value),start,end,updatedAt:serverTimestamp()},{merge:true});
+      closeDrawer(); toast(classId?'수업을 수정했습니다.':'수업을 추가했습니다.');
+    }catch(error){ button.disabled=false; button.textContent='다시 시도'; toast(`저장하지 못했습니다: ${error.code||error.message}`); }
+  };
+}
+
 function openPersonDrawer(){
   openDrawer(drawerTemplate('구성원 등록',`<form id="person-form" class="form-stack"><label class="field"><span>이름 *</span><input name="name" required autocomplete="name" placeholder="이름"></label><div class="check-grid"><label class="field"><span>부서 *</span><select name="department">${DEPARTMENT_ORDER.map(d=>`<option>${d}</option>`).join('')}</select></label><label class="field"><span>직책</span><input name="role" placeholder="예: PD"></label></div><label class="field"><span>연락처</span><input name="contact" type="tel" autocomplete="tel" placeholder="010-0000-0000"></label></form>`,`<button class="secondary-button" data-action="close-drawer">취소</button><button class="primary-button" id="save-person">등록하기</button>`));
   $('#save-person').onclick=async()=>{const f=$('#person-form');if(!f.reportValidity())return;const button=$('#save-person');button.disabled=true;button.textContent='저장 중…';const ref=doc(collection(db,'members'));try{await setDoc(ref,{name:f.name.value.trim(),department:f.department.value,role:f.role.value.trim()||'구성원',contact:f.contact.value.trim(),status:'활동 중',createdAt:serverTimestamp(),updatedAt:serverTimestamp()});closeDrawer();toast('구성원이 Firebase에 등록되었습니다.');}catch(error){button.disabled=false;button.textContent='다시 시도';toast(`저장하지 못했습니다: ${error.code||error.message}`);}};
