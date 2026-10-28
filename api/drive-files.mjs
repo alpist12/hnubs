@@ -12,7 +12,7 @@
  * 하나라도 빠지면 아래 reason 에 무엇이 빠졌는지 담아 200 으로 돌려준다.
  * 화면은 그 응답을 보고 안내를 띄우고 샘플로 돌아간다.
  */
-import { preflight, response } from './_shared.mjs';
+import { preflight, rateLimited, response, tooMany } from './_shared.mjs';
 import { googleToken, serviceAccountEmail } from './_google.mjs';
 
 const ROOT_FOLDER_ID = '1Sb255-QJM--dC_1YGzJax-VlqpWtAxif';
@@ -65,14 +65,14 @@ function mapFile(f) {
     rawParentId,
     size: Number((Number(f.size || 0) / (1024 * 1024)).toFixed(2)),
     date: dateStr(f.modifiedTime),
-    by: props.uploadedBy || f.owners?.[0]?.displayName || '관리자',
+    by: props.uploadedBy || f.owners?.[0]?.displayName || '관리자',   // 이름만, owners 원본은 내보내지 않는다
     dur: durationOf(f),
     starred: Boolean(f.starred),
     shared: Boolean(f.shared || props.shared === 'true'),
     trashed: Boolean(f.trashed),
     description: f.description || '',
     webViewLink: f.webViewLink || '',
-    webContentLink: f.webContentLink || '',
+    webContentLink: '',   // 내려받기 주소는 내보내지 않는다. 필요하면 webViewLink 로 연다.
     thumbnailLink: f.thumbnailLink || '',
     editable: TEXT_EXT.includes(ext(f.name)) || f.mimeType === 'application/vnd.google-apps.document',
     source: 'google',
@@ -129,21 +129,22 @@ async function listSubtree(token) {
 export const handler = async event => {
   const pre = preflight(event); if (pre) return pre;
 
+  // 목록 전체를 반복해서 긁어 가지 못하게 막는다.
+  const wait = rateLimited(event, 'drive-files', 30, 60_000);
+  if (wait) return tooMany(wait, event);
+
   const email = (() => { try { return serviceAccountEmail(); } catch { return ''; } })();
 
   let token;
   try {
     token = await googleToken(SCOPE);
   } catch (error) {
-    return response(200, { mode: 'unconfigured', reason: 'token', message: error.message, items: [] }, event);
+    // 자세한 내용은 서버 로그에만 남긴다. 키 경로나 계정 정보가 화면으로 새면 안 된다.
+    console.error('[drive-files] 토큰 발급 실패:', error.message);
+    return response(200, { mode: 'unconfigured', reason: 'token', items: [] }, event);
   }
   if (!token) {
-    return response(200, {
-      mode: 'unconfigured',
-      reason: 'no-service-account',
-      message: 'Netlify 환경변수 GOOGLE_DRIVE_SERVICE_ACCOUNT 가 비어 있습니다.',
-      items: [],
-    }, event);
+    return response(200, { mode: 'unconfigured', reason: 'no-service-account', items: [] }, event);
   }
 
   try {
@@ -154,7 +155,6 @@ export const handler = async event => {
     return response(200, {
       mode: 'google',
       rootFolderId: ROOT_FOLDER_ID,
-      serviceAccount: email,
       storageQuota: {
         // 서비스 계정은 남의 드라이브 총 용량을 못 본다. 쓴 만큼만 실제 값이고
         // 총 용량은 화면 설정값(기본 200GB)을 그대로 쓴다.
@@ -168,13 +168,10 @@ export const handler = async event => {
   } catch (error) {
     // 404/403 은 거의 폴더를 서비스 계정과 공유하지 않은 경우다.
     const shareIssue = error.status === 404 || error.status === 403;
+    console.error('[drive-files] 목록 실패:', error.status || '', error.message);
     return response(200, {
       mode: 'unconfigured',
       reason: shareIssue ? 'not-shared' : 'error',
-      message: shareIssue
-        ? `지정 폴더를 서비스 계정(${email || '설정한 계정'})과 공유해 주세요.`
-        : error.message,
-      serviceAccount: email,
       items: [],
     }, event);
   }

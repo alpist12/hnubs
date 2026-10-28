@@ -472,7 +472,13 @@ async function fetchFiles() {
     }
     // 아직 준비가 안 됐으면 무엇이 빠졌는지 화면에 띄운다. 조용히 샘플로 넘어가면
     // 가짜 폴더를 진짜로 착각하게 된다.
-    if (driveRes && driveRes.mode === 'unconfigured') state.driveNotice = driveRes.message || '';
+    if (driveRes && driveRes.mode === 'unconfigured') {
+      state.driveNotice = {
+        'no-service-account': 'Netlify 환경변수 GOOGLE_DRIVE_SERVICE_ACCOUNT 가 아직 비어 있어요.',
+        'token': '서비스 계정 키를 읽지 못했어요. Netlify 환경변수의 JSON 을 확인해 주세요.',
+        'not-shared': '지정 폴더를 서비스 계정 이메일과 공유해 주세요. (뷰어 권한이면 충분해요)',
+      }[driveRes.reason] || '연결을 확인하지 못했어요. 잠시 뒤 다시 시도해 주세요.';
+    }
 
     // 3. Node Backend API (내 컴퓨터에서 server.js 를 띄웠을 때)
     if (state.hasBackend) {
