@@ -757,7 +757,7 @@ function driveView(){
    둘 다 '만드는' 작업이라 한 탭 아래 둔다. */
 const MAKER_TABS = [['script', 'AI 대본 분석'], ['shorts', '쇼츠']];
 /* 주간 일정표와 촬영 일정은 같은 '일정' 탭 안에 둔다 (메이커스페이스와 같은 방식). */
-const SCHEDULE_TABS = [['weekly', '주간 일정표'], ['shoots', '촬영 일정'], ['radio', '라디오'], ['personal', '개인 일정']];
+const SCHEDULE_TABS = [['weekly', '주간 일정표'], ['shoots', '촬영 일정'], ['radio', '라디오'], ['personal', '개인 일정'], ['projects', '프로젝트']];
 
 function subTabBar(list, current, attr, label){
   const tabs = list.map(([k, text]) => {
@@ -942,9 +942,50 @@ function radioView(){
   ${radioPickCard()}`;
 }
 
+function projectCrewIds(p){
+  const ids=p?.memberIds||[];
+  if(ids.length) return ids;
+  return (p?.members||[]).map(m=>m?.id||m).filter(Boolean);
+}
+function projectsView(){
+  const list=Object.entries(projects).sort((a,b)=>(a[1].createdAt||0)-(b[1].createdAt||0));
+  const cards=list.map(([id,p])=>{
+    const crew=projectCrewIds(p).map(memberById).filter(Boolean);
+    const shoots=schedules.filter(s=>s.raw?.projectId===id);
+    const done=shoots.filter(s=>s.status==='완료').length;
+    return `<article style="${CARD};padding:18px;display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:flex-start;gap:10px">
+        <span aria-hidden="true" style="flex:0 0 auto;width:40px;height:40px;border-radius:13px;background:linear-gradient(140deg, #E3EAFF, #EDE6FF);color:#3F4FD0;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800">${esc(initial(p.name||id))}</span>
+        <span style="flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:2px">
+          <strong style="font-size:17px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(p.name||id)}</strong>
+          <span style="font-size:12.5px;color:#64708F">촬영 ${shoots.length}건${shoots.length?` · 완료 ${done}건`:''}</span>
+        </span>
+        <button type="button" data-edit-open="project|${esc(id)}" aria-label="${esc(p.name||id)} 수정" title="수정" style="flex:0 0 auto;width:32px;height:32px;border:0;border-radius:10px;background:#F2F4FB;color:#3F55D6;display:inline-flex;align-items:center;justify-content:center;cursor:pointer">${EDIT_ICON}</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <span style="font-size:12px;font-weight:700;color:#8A93AE">참여 인원 ${crew.length}명</span>
+        ${crew.length?`<span style="display:flex;padding-left:7px">${faces(crew.map(m=>m[0]),6)}</span>`:'<span style="font-size:12.5px;color:#A5ABBF">아직 없음</span>'}
+      </div>
+    </article>`;
+  }).join('');
+
+  return `
+  <section style="position:relative;overflow:hidden;border-radius:22px;background:linear-gradient(115deg, #3E5FD9 0%, #5A5FE0 50%, #7C5FD8 100%);color:#FFFFFF;padding:20px clamp(20px, 2.4vw, 28px);box-shadow:0 18px 40px rgba(72,82,200,0.26);display:flex;flex-wrap:wrap;gap:16px 24px;align-items:center;justify-content:space-between">
+    <svg aria-hidden="true" width="560" height="560" viewBox="0 0 560 560" style="position:absolute;right:22%;top:-260px;opacity:0.14;pointer-events:none"><g fill="none" stroke="#FFFFFF" stroke-width="1.5"><circle cx="280" cy="280" r="90"/><circle cx="280" cy="280" r="150"/><circle cx="280" cy="280" r="210"/><circle cx="280" cy="280" r="270"/></g></svg>
+    <div style="position:relative;display:flex;flex-direction:column;gap:2px;min-width:0">
+      <span style="font-size:13.5px;color:#DCE2FF">${list.length}개 작품</span>
+      <h1 style="margin:0;font-size:28px;font-weight:800;letter-spacing:-0.02em">프로젝트</h1>
+      <span style="font-size:14.5px;color:#EEF0FF">방송제·마디영상처럼 묶어서 진행하는 작품을 관리해요.</span>
+    </div>
+    <button data-project-new="1" style="position:relative;display:inline-flex;align-items:center;gap:7px;height:44px;padding:0 18px;border:0;border-radius:13px;background:#FFFFFF;color:#3F4FD0;font-family:inherit;font-size:14.5px;font-weight:800;cursor:pointer;box-shadow:0 8px 18px rgba(20,24,60,0.18)">+ 프로젝트 추가</button>
+  </section>
+  ${list.length?`<div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(260px, 1fr));gap:14px">${cards}</div>`
+    :`<section style="${CARD};padding:40px 20px;text-align:center;color:#64708F;font-size:14px">아직 만든 프로젝트가 없어요.<br>오른쪽 위 ‘프로젝트 추가’를 눌러 시작하세요.</section>`}`;
+}
+
 function scheduleView(){
   return `${subTabBar(SCHEDULE_TABS, state.scheduleTab, 'schedule-tab', '일정')}
-  ${state.scheduleTab === 'shoots' ? shootsView() : state.scheduleTab === 'radio' ? radioView() : state.scheduleTab === 'personal' ? personalView() : weeklyView()}`;
+  ${state.scheduleTab === 'shoots' ? shootsView() : state.scheduleTab === 'radio' ? radioView() : state.scheduleTab === 'personal' ? personalView() : state.scheduleTab === 'projects' ? projectsView() : weeklyView()}`;
 }
 
 function makerView(){
@@ -1152,6 +1193,10 @@ const SHOOT_TILE={'예정':['linear-gradient(140deg, #E3EAFF, #EDE6FF)','#3F4FD0
 // 촬영과 방송국 일정(회의·행사)은 같은 shoots 컬렉션에 category 로만 구분해 둔다.
 const CATEGORIES=[['촬영','#E3EAFF','#2F4FC2'],['방송제','#FFF1CC','#6E5208'],['마디영상','#FDECEF','#A8324F'],['회의','#EDE6FF','#4A3FB0'],['행사','#FFE9DF','#8A3A1A'],['기타','#E3F7EE','#17603F']];
 // 구분이 비어 있거나 목록에 없는 옛 일정은 '기타'로 본다. 자리 번호로 찾으면 목록이 늘 때 깨진다.
+function projectOptions(selected=''){
+  const list=Object.entries(projects).sort((a,b)=>(a[1].createdAt||0)-(b[1].createdAt||0));
+  return `<option value="">선택 안 함</option>${list.map(([id,p])=>`<option value="${esc(id)}" ${id===selected?'selected':''}>${esc(p.name||id)}</option>`).join('')}`;
+}
 function categoryColor(name){ return CATEGORIES.find(c=>c[0]===name)||CATEGORIES.find(c=>c[0]==='기타'); }
 
 function shootMatches(s){
@@ -1534,6 +1579,7 @@ function editPickCard(){
     fields=`
       <div class="check-grid">
         <label class="field"><span>구분 *</span><select name="category">${CATEGORIES.map(c=>`<option value="${esc(c[0])}" ${c[0]===s.type?'selected':''}>${esc(c[0])}</option>`).join('')}</select></label>
+        <label class="field"><span>프로젝트</span><select name="project">${projectOptions(s.raw?.projectId||'')}</select></label>
         <label class="field"><span>날짜 *</span><input name="date" type="date" required value="${esc(s.date)}"></label>
       </div>
       <label class="field"><span>제목 *</span><input name="title" required value="${esc(s.title)}" placeholder="예: 10월 캠퍼스 뉴스"></label>
@@ -1555,6 +1601,25 @@ function editPickCard(){
         </div>
       </div>
       <label class="field"><span>메모</span><textarea name="memo" rows="2" style="min-height:68px" placeholder="준비물이나 전달 사항을 적어주세요.">${esc(s.raw?.note||'')}</textarea></label>`;
+  }else if(pick.kind==='project'){
+    const cur=projects[pick.id]||{};
+    const ids=new Set(projectCrewIds(cur));
+    title=pick.id?'프로젝트 수정':'프로젝트 추가';
+    sub=pick.id?'이름과 참여 인원을 바꿉니다.':'새 작품을 만듭니다.';
+    fields=`
+      <label class="field"><span>프로젝트 이름 *</span><input name="name" required value="${esc(cur.name||'')}" placeholder="예: 6화, 방송제"></label>
+      <div class="field">
+        <span>참여 인원</span>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(168px, 1fr));gap:6px;max-height:220px;overflow-y:auto;padding:2px">
+          ${people.map(p=>`<label class="check-card" style="min-height:40px;padding:7px 11px;gap:9px;font-size:13px;font-weight:700;cursor:pointer">
+            <input type="checkbox" name="crew" value="${esc(p[7])}" ${ids.has(p[7])?'checked':''} style="flex:0 0 auto;width:16px;height:16px;min-width:16px;margin:0">
+            <span style="min-width:0;display:flex;flex-direction:column;line-height:1.3">
+              <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(p[0])}</span>
+              <small style="font-weight:600;color:#64708F;white-space:nowrap">${esc(p[2])}</small>
+            </span>
+          </label>`).join('')}
+        </div>
+      </div>`;
   }else{
     return '';
   }
@@ -1574,7 +1639,7 @@ function editPickCard(){
         ${fields}
       </form>
       <footer style="display:flex;align-items:center;gap:8px;padding:14px 20px;border-top:1px solid #F0F2F9">
-        <button type="button" id="delete-edit-pick" style="height:42px;padding:0 16px;border:0;border-radius:12px;background:#FDECEF;color:#A8324F;font-family:inherit;font-size:14px;font-weight:800;cursor:pointer">삭제</button>
+        <button type="button" id="delete-edit-pick" ${pick.kind==='project'&&!pick.id?'hidden':''} style="height:42px;padding:0 16px;border:0;border-radius:12px;background:#FDECEF;color:#A8324F;font-family:inherit;font-size:14px;font-weight:800;cursor:pointer">삭제</button>
         <span style="margin-right:auto"></span>
         <button type="button" data-edit-close="cancel" style="height:42px;padding:0 16px;border:1px solid #E8EBF5;border-radius:12px;background:#FFFFFF;color:#4F5770;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer">취소</button>
         <button type="submit" form="edit-pick-form" id="save-edit-pick" style="height:42px;padding:0 18px;border:0;border-radius:12px;background:linear-gradient(135deg, #416FDE, #6656DA);color:#FFFFFF;font-family:inherit;font-size:14px;font-weight:800;cursor:pointer">수정</button>
@@ -1587,9 +1652,10 @@ async function saveEditPick(e){
   e.preventDefault();
   const f=e.currentTarget; if(!f.reportValidity()) return;
   const pick=state.editPick; if(!pick) return;
-  const start=Number(f.start.value.slice(0,2))+Number(f.start.value.slice(3,5))/60;
-  const end=Number(f.end.value.slice(0,2))+Number(f.end.value.slice(3,5))/60;
-  if(end<=start){ toast('종료 시간은 시작 시간보다 늦어야 합니다.'); return; }
+  const timed=pick.kind!=='project';
+  const start=timed?Number(f.start.value.slice(0,2))+Number(f.start.value.slice(3,5))/60:0;
+  const end=timed?Number(f.end.value.slice(0,2))+Number(f.end.value.slice(3,5))/60:0;
+  if(timed&&end<=start){ toast('종료 시간은 시작 시간보다 늦어야 합니다.'); return; }
   const btn=$('#save-edit-pick');
   if(btn){ btn.disabled=true; btn.textContent='저장 중…'; }
   try{
@@ -1613,10 +1679,20 @@ async function saveEditPick(e){
       await setDoc(doc(db,'shoots',pick.id),{
         date:f.date.value,title:f.title.value.trim(),category:f.category.value,
         startH:start,endH:end,location:f.place.value.trim(),note:f.memo.value.trim(),
-        castIds,cast:castIds.map(id=>({id,name:memberById(id)?.[0]||''})),
+        castIds,cast:castIds.map(id=>({id,name:memberById(id)?.[0]||''})),projectId:f.project.value,
         updatedAt:serverTimestamp()
       },{merge:true});
       state.editPick=null; render(); toast('촬영 일정을 수정했습니다.');
+    }else if(pick.kind==='project'){
+      const crew=[...f.querySelectorAll('input[name="crew"]:checked')].map(el=>el.value);
+      const ref=pick.id?doc(db,'projects',pick.id):doc(collection(db,'projects'));
+      await setDoc(ref,{
+        name:f.name.value.trim(),memberIds:crew,
+        members:crew.map(id=>({id,name:memberById(id)?.[0]||''})),
+        ...(pick.id?{}:{color:'#4C6FE6',createdAt:Date.now()}),
+        updatedAt:serverTimestamp(),
+      },{merge:true});
+      state.editPick=null; render(); toast(pick.id?'프로젝트를 수정했습니다.':'프로젝트를 만들었습니다.');
     }
   }catch(error){
     if(btn){ btn.disabled=false; btn.textContent='다시 시도'; }
@@ -1627,6 +1703,7 @@ async function saveEditPick(e){
 async function deleteEditPick(){
   const pick=state.editPick; if(!pick) return;
   const msg=pick.kind==='class'?'이 수업을 시간표에서 지울까요? 매주 반복이라 모든 주에서 사라집니다.'
+    :pick.kind==='project'?`${projects[pick.id]?.name||'이 프로젝트'}를 삭제할까요? 연결된 촬영 일정은 남고 프로젝트만 사라집니다.`
     :pick.kind==='shoot'?'이 촬영 일정을 삭제할까요?'
     :`${monthDay(pick.iso||pick.id)} 개인 일정을 지울까요?`;
   if(!confirm(msg)) return;
@@ -1642,6 +1719,9 @@ async function deleteEditPick(){
     }else if(pick.kind==='shoot'){
       await deleteDoc(doc(db,'shoots',pick.id));
       state.editPick=null; render(); toast('촬영 일정을 삭제했습니다.');
+    }else if(pick.kind==='project'){
+      await deleteDoc(doc(db,'projects',pick.id));
+      state.editPick=null; render(); toast('프로젝트를 삭제했습니다.');
     }
   }catch(error){
     if(btn){ btn.disabled=false; btn.textContent='삭제'; }
@@ -1896,7 +1976,7 @@ function render(){
   if(state.route==='analysis') state.route='weekly';
   // 대본 분석과 쇼츠는 메이커스페이스 안으로 들어갔다. 예전 주소도 그쪽으로 보낸다.
   if(state.route==='script'||state.route==='shorts'){ state.makerTab=state.route; state.route='maker'; }
-  if(['weekly','shoots','radio','personal'].includes(state.route)){ state.scheduleTab=state.route; state.route='schedule'; }
+  if(['weekly','shoots','radio','personal','projects'].includes(state.route)){ state.scheduleTab=state.route; state.route='schedule'; }
   if(!views[state.route]) state.route='home';
   $('#app').innerHTML=views[state.route]()+editPickCard();
   $$('[data-route]').forEach(b=>b.classList.toggle('active',b.dataset.route===state.route));
@@ -1936,6 +2016,7 @@ function bindView(){
   $$('[data-edit-close]').forEach(b=>b.addEventListener('click',e=>{if(b.dataset.editClose==='backdrop'&&e.target!==b)return;state.editPick=null;render();}));
   $('#edit-pick-form')?.addEventListener('submit',saveEditPick);
   $('#delete-edit-pick')?.addEventListener('click',deleteEditPick);
+  $$('[data-project-new]').forEach(b=>b.addEventListener('click',()=>{state.editPick={kind:'project',id:''};render();}));
   $$('[data-schedule-tab]').forEach(b=>b.addEventListener('click',()=>{state.scheduleTab=b.dataset.scheduleTab;render();}));
   $$('[data-shorts-reload]').forEach(b=>b.addEventListener('click',shortsProbe));
   $$('[data-shorts-setup]').forEach(b=>b.addEventListener('click',()=>{state.shortsSetup=!state.shortsSetup;render();}));
@@ -2017,7 +2098,7 @@ function bindView(){
 }
 
 function navigate(route){ if(route==='people'){state.settingsSection='people';route='settings';} if(route==='analysis')route='weekly';
-  if(['weekly','shoots','radio','personal'].includes(route)){state.scheduleTab=route;route='schedule';}
+  if(['weekly','shoots','radio','personal','projects'].includes(route)){state.scheduleTab=route;route='schedule';}
   if(route==='script'||route==='shorts'){ state.makerTab=route; route='maker'; } state.route=route; location.hash=route; closeMobileMenu(); closePopovers(); render(); scrollTo({top:0,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'}); }
 document.addEventListener('click',e=>{
   const editOpen=e.target.closest('[data-edit-open]');
@@ -2045,7 +2126,10 @@ function openShootDrawer(){
   // 담당 인원은 Ctrl 클릭을 알아야 하는 multiple select 대신 눌러서 고르는 칸으로.
   openDrawer(drawerTemplate('일정 등록',
     `<form id="shoot-form" class="form-stack">
-      <label class="field"><span>구분 *</span><select name="category">${CATEGORIES.map(c=>`<option>${c[0]}</option>`).join('')}</select></label>
+      <div class="check-grid">
+        <label class="field"><span>구분 *</span><select name="category">${CATEGORIES.map(c=>`<option>${c[0]}</option>`).join('')}</select></label>
+        <label class="field"><span>프로젝트</span><select name="project">${projectOptions()}</select></label>
+      </div>
       <label class="field"><span>제목 *</span><input name="title" required placeholder="예: 10월 캠퍼스 뉴스"></label>
       <label class="field"><span>날짜 *</span><input name="date" type="date" required value="${defaultDate}"></label>
       <div class="check-grid">
@@ -2080,7 +2164,7 @@ function openShootDrawer(){
       await setDoc(doc(collection(db,'shoots')),{
         date:f.date.value,title:f.title.value.trim(),category:f.category.value,uploadWeek:'',
         startH,endH,location:f.place.value.trim(),note:f.memo.value.trim(),
-        castIds,cast:castIds.map(id=>({id,name:memberById(id)?.[0]||''})),projectId:'',
+        castIds,cast:castIds.map(id=>({id,name:memberById(id)?.[0]||''})),projectId:f.project.value,
         createdAt:serverTimestamp(),updatedAt:serverTimestamp(),
       });
       closeDrawer(); toast(f.category.value+' 일정이 Firebase에 등록되었습니다.');
