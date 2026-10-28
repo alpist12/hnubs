@@ -522,19 +522,19 @@ button { cursor: pointer; border: none; background: transparent; }
 }
 
 .storage-bar-segmented {
-  height: 9px;
+  height: 10px;
   border-radius: 99px;
   background: rgba(255, 255, 255, 0.08);
   overflow: hidden;
   display: flex;
-  gap: 2px;
-  padding: 1px;
 }
 .seg-bar {
   height: 100%;
-  border-radius: 99px;
+  min-width: 3px;
   transition: width 0.35s ease;
 }
+.seg-bar:empty:first-child { border-radius: 99px 0 0 99px; }
+body.theme-light .storage-bar-segmented { background: #ECEEF6; }
 .storage-legend {
   display: grid;
   grid-template-columns: 1fr 1fr;
