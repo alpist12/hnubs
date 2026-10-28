@@ -1543,8 +1543,14 @@ function editPickCard(){
       <label class="field"><span>장소 *</span><input name="place" required value="${esc(s.place||'')}" placeholder="예: 본관 앞"></label>
       <div class="field">
         <span>참여 인원</span>
-        <div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(130px, 1fr));gap:6px;max-height:152px;overflow-y:auto;padding:2px">
-          ${people.map(p=>`<label class="check-card" style="min-height:38px;padding:6px 10px;font-size:13px;font-weight:700;cursor:pointer"><input type="checkbox" name="cast" value="${esc(p[7])}" ${castSet.has(p[7])?'checked':''}><span>${esc(p[0])} <small style="font-weight:600;color:#64708F">${esc(p[2])}</small></span></label>`).join('')}
+        <div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(168px, 1fr));gap:6px;max-height:168px;overflow-y:auto;padding:2px">
+          ${people.map(p=>`<label class="check-card" style="min-height:40px;padding:7px 11px;gap:9px;font-size:13px;font-weight:700;cursor:pointer">
+            <input type="checkbox" name="cast" value="${esc(p[7])}" ${castSet.has(p[7])?'checked':''} style="flex:0 0 auto;width:16px;height:16px;min-width:16px;margin:0">
+            <span style="min-width:0;display:flex;flex-direction:column;line-height:1.3">
+              <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(p[0])}</span>
+              <small style="font-weight:600;color:#64708F;white-space:nowrap">${esc(p[2])}</small>
+            </span>
+          </label>`).join('')}
         </div>
       </div>
       <label class="field"><span>메모</span><textarea name="memo" rows="2" style="min-height:68px" placeholder="준비물이나 전달 사항을 적어주세요.">${esc(s.raw?.note||'')}</textarea></label>`;
@@ -2034,8 +2040,51 @@ function openDrawer(html){$('#drawer-content').innerHTML=html;hydrateIcons($('#d
 function closeDrawer(){$('#drawer').classList.remove('open');$('#drawer').setAttribute('aria-hidden','true');setTimeout(()=>$('#drawer-backdrop').hidden=true,250)}
 function openShootDrawer(){
   const defaultDate=localIso();
-  openDrawer(drawerTemplate('일정 등록',`<form id="shoot-form" class="form-stack"><label class="field"><span>구분 *</span><select name="category">${CATEGORIES.map(c=>`<option>${c[0]}</option>`).join('')}</select></label><label class="field"><span>제목 *</span><input name="title" required placeholder="예: 10월 캠퍼스 뉴스"></label><div class="check-grid"><label class="field"><span>날짜 *</span><input name="date" type="date" required value="${defaultDate}"></label><label class="field"><span>시작 시간 *</span><input name="time" type="time" required value="14:00"></label></div><label class="field"><span>장소 *</span><input name="place" required placeholder="예: 본관 앞"></label><label class="field"><span>담당 인원</span><select name="people" multiple size="4">${people.map(p=>`<option value="${esc(p[7])}">${esc(p[0])} · ${esc(p[2])}</option>`).join('')}</select><small>Ctrl 또는 ⌘ 키를 누르면 여러 명을 선택할 수 있어요.</small></label><label class="field"><span>메모</span><textarea name="memo" placeholder="준비물이나 전달 사항을 적어주세요."></textarea></label></form>`,`<button class="secondary-button" data-action="close-drawer">취소</button><button class="primary-button" id="save-shoot">등록하기</button>`));
-  $('#save-shoot').onclick=async()=>{const f=$('#shoot-form');if(!f.reportValidity())return;const button=$('#save-shoot');button.disabled=true;button.textContent='저장 중…';const startH=Number(f.time.value.slice(0,2))+Number(f.time.value.slice(3,5))/60;const castIds=[...f.people.selectedOptions].map(o=>o.value);const ref=doc(collection(db,'shoots'));try{await setDoc(ref,{date:f.date.value,title:f.title.value.trim(),category:f.category.value,uploadWeek:'',startH,endH:Math.min(startH+2,24),location:f.place.value.trim(),note:f.memo.value.trim(),castIds,cast:castIds.map(id=>({id,name:memberById(id)?.[0]||''})),projectId:'',createdAt:serverTimestamp(),updatedAt:serverTimestamp()});closeDrawer();toast(f.category.value+' 일정이 Firebase에 등록되었습니다.');}catch(error){button.disabled=false;button.textContent='다시 시도';toast(`저장하지 못했습니다: ${error.code||error.message}`);}};
+  // 종료 시간을 직접 받는다. 예전엔 시작+2시간으로 박아 뒀다.
+  // 담당 인원은 Ctrl 클릭을 알아야 하는 multiple select 대신 눌러서 고르는 칸으로.
+  openDrawer(drawerTemplate('일정 등록',
+    `<form id="shoot-form" class="form-stack">
+      <label class="field"><span>구분 *</span><select name="category">${CATEGORIES.map(c=>`<option>${c[0]}</option>`).join('')}</select></label>
+      <label class="field"><span>제목 *</span><input name="title" required placeholder="예: 10월 캠퍼스 뉴스"></label>
+      <label class="field"><span>날짜 *</span><input name="date" type="date" required value="${defaultDate}"></label>
+      <div class="check-grid">
+        <label class="field"><span>시작 *</span><input name="start" type="time" required value="14:00"></label>
+        <label class="field"><span>종료 *</span><input name="end" type="time" required value="16:00"></label>
+      </div>
+      <label class="field"><span>장소 *</span><input name="place" required placeholder="예: 본관 앞"></label>
+      <div class="field">
+        <span>담당 인원</span>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(168px, 1fr));gap:6px;max-height:168px;overflow-y:auto;padding:2px">
+          ${people.map(p=>`<label class="check-card" style="min-height:40px;padding:7px 11px;gap:9px;font-size:13px;font-weight:700;cursor:pointer">
+            <input type="checkbox" name="cast" value="${esc(p[7])}" style="flex:0 0 auto;width:16px;height:16px;min-width:16px;margin:0">
+            <span style="min-width:0;display:flex;flex-direction:column;line-height:1.3">
+              <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(p[0])}</span>
+              <small style="font-weight:600;color:#64708F;white-space:nowrap">${esc(p[2])}</small>
+            </span>
+          </label>`).join('')}
+        </div>
+      </div>
+      <label class="field"><span>메모</span><textarea name="memo" placeholder="준비물이나 전달 사항을 적어주세요."></textarea></label>
+    </form>`,
+    `<button class="secondary-button" data-action="close-drawer">취소</button><button class="primary-button" id="save-shoot">등록하기</button>`));
+
+  $('#save-shoot').onclick=async()=>{
+    const f=$('#shoot-form'); if(!f.reportValidity())return;
+    const startH=Number(f.start.value.slice(0,2))+Number(f.start.value.slice(3,5))/60;
+    const endH=Number(f.end.value.slice(0,2))+Number(f.end.value.slice(3,5))/60;
+    if(endH<=startH){ toast('종료 시간은 시작 시간보다 늦어야 합니다.'); return; }
+    const button=$('#save-shoot'); button.disabled=true; button.textContent='저장 중…';
+    const castIds=[...f.querySelectorAll('input[name="cast"]:checked')].map(el=>el.value);
+    try{
+      await setDoc(doc(collection(db,'shoots')),{
+        date:f.date.value,title:f.title.value.trim(),category:f.category.value,uploadWeek:'',
+        startH,endH,location:f.place.value.trim(),note:f.memo.value.trim(),
+        castIds,cast:castIds.map(id=>({id,name:memberById(id)?.[0]||''})),projectId:'',
+        createdAt:serverTimestamp(),updatedAt:serverTimestamp(),
+      });
+      closeDrawer(); toast(f.category.value+' 일정이 Firebase에 등록되었습니다.');
+    }catch(error){ button.disabled=false; button.textContent='다시 시도'; toast(`저장하지 못했습니다: ${error.code||error.message}`); }
+  };
 }
 function openPersonalDrawer(memberId='', iso='', blank=false){
   const cur = !blank && memberId && iso ? availabilityRows.find(r=>r.memberId===memberId&&r.id===iso)?.data : null;
