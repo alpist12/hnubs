@@ -1150,8 +1150,9 @@ const SHOOT_STATUS={'예정':['#EAF0FF','#2F4FC2','STBY'],'진행 중':['#FFE9EC
 const SHOOT_TILE={'예정':['linear-gradient(140deg, #E3EAFF, #EDE6FF)','#3F4FD0'],'진행 중':['#FFE9EC','#B02C48'],'완료':['#F0F1F6','#4F5770']};
 
 // 촬영과 방송국 일정(회의·행사)은 같은 shoots 컬렉션에 category 로만 구분해 둔다.
-const CATEGORIES=[['촬영','#E3EAFF','#2F4FC2'],['회의','#EDE6FF','#4A3FB0'],['행사','#FFE9DF','#8A3A1A'],['기타','#E3F7EE','#17603F']];
-function categoryColor(name){ return CATEGORIES.find(c=>c[0]===name)||CATEGORIES[3]; }
+const CATEGORIES=[['촬영','#E3EAFF','#2F4FC2'],['방송제','#FFF1CC','#6E5208'],['마디영상','#FDECEF','#A8324F'],['회의','#EDE6FF','#4A3FB0'],['행사','#FFE9DF','#8A3A1A'],['기타','#E3F7EE','#17603F']];
+// 구분이 비어 있거나 목록에 없는 옛 일정은 '기타'로 본다. 자리 번호로 찾으면 목록이 늘 때 깨진다.
+function categoryColor(name){ return CATEGORIES.find(c=>c[0]===name)||CATEGORIES.find(c=>c[0]==='기타'); }
 
 function shootMatches(s){
   const q=(state.shootQuery||'').toLowerCase();
@@ -1217,7 +1218,7 @@ function shootsCalendar(items){
         <button data-shoot-month="0" style="height:36px;padding:0 12px;border-radius:10px;border:0;background:#EEF2FF;color:#3F55D6;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer">오늘</button>
       </div>
       <div style="display:flex;flex-wrap:wrap;gap:12px;font-size:12px;font-weight:600;color:#4F5770">
-        ${CATEGORIES.slice(0,3).map(([label,bg])=>`<span style="display:inline-flex;align-items:center;gap:6px"><i style="width:12px;height:12px;border-radius:4px;background:${bg}"></i>${label}</span>`).join('')}
+        ${(CATEGORIES.filter(c=>schedules.some(s=>s.type===c[0])).length?CATEGORIES.filter(c=>schedules.some(s=>s.type===c[0])):CATEGORIES).map(([label,bg])=>`<span style="display:inline-flex;align-items:center;gap:6px"><i style="width:12px;height:12px;border-radius:4px;background:${bg}"></i>${label}</span>`).join('')}
       </div>
     </div>
     <div style="display:flex;flex-wrap:wrap;align-items:flex-start;gap:16px">
