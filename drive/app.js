@@ -5,6 +5,12 @@
 // ============================================================================
 
 const DEFAULT_CLIENT_ID = '533555779141-4l2im5ih2dou2b6omh0t07kh40soh196.apps.googleusercontent.com';
+const API_BASE = (() => {
+  // workspace 의 api-config.js 와 같은 규칙. iframe 이라 부모 값도 읽어 본다.
+  try { if (parent !== window && parent.HNUBS_API !== undefined) return String(parent.HNUBS_API).replace(/\/$/, ''); } catch {}
+  return location.hostname.endsWith('github.io') ? 'https://hnubs1212.netlify.app' : '';
+})();
+
 const LOCKED_ROOT_FOLDER_ID = '1Sb255-QJM--dC_1YGzJax-VlqpWtAxif';
 
 const SVG_PATHS = {
@@ -253,6 +259,7 @@ function filterStrictlyInsideRoot(mappedItems) {
 
 const state = {
   hasBackend: false,
+  driveNotice: '',   // 구글 드라이브 연결이 아직 덜 됐을 때 띄울 안내
   alwaysConnected: true, // 내 드라이브 상시 연결 모드
   mode: 'google',
   driveName: localStorage.getItem('bs_drive_name') || '방송국 공유 드라이브',
@@ -449,7 +456,25 @@ async function fetchFiles() {
       }
     }
 
-    // 2. Node Backend API
+    // 2. Netlify 함수 — 서비스 계정으로 지정 폴더를 읽는다. 부원은 로그인하지 않는다.
+    const driveRes = await fetch(`${API_BASE}/api/drive/files`).then(r => r.ok ? r.json() : null).catch(() => null);
+    if (driveRes && driveRes.mode === 'google') {
+      state.mode = 'google';
+      state.rootFolderId = driveRes.rootFolderId || LOCKED_ROOT_FOLDER_ID;
+      if (driveRes.storageQuota) {
+        if (driveRes.storageQuota.limitGb) state.totalQuotaGb = driveRes.storageQuota.limitGb;
+        state.googleQuotaUsedGb = driveRes.storageQuota.usageGb;
+      }
+      state.items = driveRes.items || [];
+      state.driveNotice = '';
+      if (state.folder !== 'root' && !byId(state.folder)) state.folder = 'root';
+      return;
+    }
+    // 아직 준비가 안 됐으면 무엇이 빠졌는지 화면에 띄운다. 조용히 샘플로 넘어가면
+    // 가짜 폴더를 진짜로 착각하게 된다.
+    if (driveRes && driveRes.mode === 'unconfigured') state.driveNotice = driveRes.message || '';
+
+    // 3. Node Backend API (내 컴퓨터에서 server.js 를 띄웠을 때)
     if (state.hasBackend) {
       const res = await fetch('/api/files').then(r => r.json());
       if (res.error) throw new Error(res.error);
@@ -464,7 +489,7 @@ async function fetchFiles() {
       return;
     }
 
-    // 3. Always-On Cloud Sync Cache Mode (GitHub Pages)
+    // 4. 그래도 없으면 샘플/로컬 보관본
     state.mode = 'google';
     state.rootFolderId = LOCKED_ROOT_FOLDER_ID;
     state.items = loadBrowserLocalItems();
@@ -1729,6 +1754,15 @@ function render() {
 
         <!-- File List / Bento Grid -->
         <div class="file-scroll">
+          ${state.driveNotice ? `
+            <div style="margin:12px 0 14px;padding:14px 16px;border-radius:16px;background:#FFF7E3;border:1px solid #FFE6B0;display:flex;align-items:flex-start;gap:10px">
+              <span aria-hidden="true" style="flex:0 0 auto;font-size:16px">⚠️</span>
+              <span style="display:flex;flex-direction:column;gap:3px;min-width:0">
+                <strong style="font-size:13.5px;font-weight:800;color:#6E5208">구글 드라이브가 아직 연결되지 않았어요</strong>
+                <span style="font-size:12.5px;color:#8A6D1F;line-height:1.5">${esc(state.driveNotice)}</span>
+                <span style="font-size:12.5px;color:#8A6D1F">아래 목록은 실제 파일이 아니라 예시입니다.</span>
+              </span>
+            </div>` : ''}
           ${state.loading ? `
             <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 20px;gap:12px;color:var(--text-secondary)">
               <div style="font-size:15px;font-weight:700">지정된 공유 드라이브 폴더를 동기화하는 중입니다...</div>
