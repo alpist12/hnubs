@@ -2120,8 +2120,25 @@ document.addEventListener('click',e=>{
 function drawerTemplate(title,body,footer=''){return `<div class="drawer-head"><h2>${title}</h2><button class="icon-button" data-action="close-drawer" aria-label="닫기">${icon('x')}</button></div><div class="drawer-body">${body}</div>${footer?`<div class="drawer-footer">${footer}</div>`:''}`}
 function openDrawer(html){$('#drawer-content').innerHTML=html;hydrateIcons($('#drawer'));$('#drawer-backdrop').hidden=false;$('#drawer').classList.add('open');$('#drawer').setAttribute('aria-hidden','false');setTimeout(()=>$('#drawer button, #drawer input')?.focus(),80)}
 function closeDrawer(){$('#drawer').classList.remove('open');$('#drawer').setAttribute('aria-hidden','true');setTimeout(()=>$('#drawer-backdrop').hidden=true,250)}
+/* 등록 창을 열 때 미리 채울 값.
+   촬영 일정 탭에서 날짜를 골랐으면 그 날짜,
+   주간 일정표에서 칸을 골랐으면 그 날짜와 시간대까지 가져온다. */
+function shootDrawerDefaults(){
+  const slots=state.slots.map(k=>k.split('-').map(Number)).sort((a,b)=>a[0]*100+a[1]-(b[0]*100+b[1]));
+  if(state.route==='schedule'&&state.scheduleTab==='weekly'&&slots.length){
+    const [day,hour]=slots[0];
+    const lastHour=slots[slots.length-1][1];
+    const date=weekDates(state.weekOffset)[day];
+    return { date: localIso(date), start: `${pad2(hour)}:00`, end: `${pad2(Math.min(lastHour+1,23))}:00` };
+  }
+  if(state.shootDay) return { date: state.shootDay, start: '14:00', end: '16:00' };
+  if(state.personalDay&&state.scheduleTab==='personal') return { date: state.personalDay, start: '14:00', end: '16:00' };
+  return { date: localIso(), start: '14:00', end: '16:00' };
+}
+
 function openShootDrawer(){
-  const defaultDate=localIso();
+  const pre=shootDrawerDefaults();
+  const defaultDate=pre.date;
   // 종료 시간을 직접 받는다. 예전엔 시작+2시간으로 박아 뒀다.
   // 담당 인원은 Ctrl 클릭을 알아야 하는 multiple select 대신 눌러서 고르는 칸으로.
   openDrawer(drawerTemplate('일정 등록',
@@ -2133,8 +2150,8 @@ function openShootDrawer(){
       <label class="field"><span>제목 *</span><input name="title" required placeholder="예: 10월 캠퍼스 뉴스"></label>
       <label class="field"><span>날짜 *</span><input name="date" type="date" required value="${defaultDate}"></label>
       <div class="check-grid">
-        <label class="field"><span>시작 *</span><input name="start" type="time" required value="14:00"></label>
-        <label class="field"><span>종료 *</span><input name="end" type="time" required value="16:00"></label>
+        <label class="field"><span>시작 *</span><input name="start" type="time" required value="${esc(pre.start)}"></label>
+        <label class="field"><span>종료 *</span><input name="end" type="time" required value="${esc(pre.end)}"></label>
       </div>
       <label class="field"><span>장소 *</span><input name="place" required placeholder="예: 본관 앞"></label>
       <div class="field">
