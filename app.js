@@ -100,7 +100,7 @@ const AV=[['#E3EAFF','#3F4FD0'],['#E3F7EE','#1C6E4A'],['#EDE6FF','#5B45C8'],['#F
 const DOW=['일','월','화','수','목','금','토'];
 // fixedClasses.day 는 월=0 으로 저장된다. 표시는 일요일 시작, 조회는 월=0 그대로.
 const dataDay=d=>(d.getDay()+6)%7;
-const CARD='border-radius:22px;background:rgba(255,255,255,0.9);border:1px solid #FFFFFF;backdrop-filter:blur(14px);box-shadow:0 12px 34px rgba(60,72,140,0.08)';
+const CARD='border-radius:18px;background:var(--a-surface);border:1px solid var(--a-rule);box-shadow:none';
 const EDIT_ICON='<svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>';
 function initial(name){ return String(name||'?').trim().slice(0,1) || '?'; }
 function faces(names,limit=4){ return names.slice(0,limit).map((n,k)=>`<span aria-hidden="true" style="width:28px;height:28px;margin-left:-7px;border-radius:50%;border:2px solid #FFFFFF;background:${AV[k%4][0]};color:${AV[k%4][1]};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800">${esc(initial(n))}</span>`).join(''); }
@@ -131,14 +131,13 @@ function noticesView(){
     ||`<div style="padding:48px 20px;text-align:center;color:#64708F">등록된 공지가 없어요.<br><span style="font-size:13px">오른쪽 위 ‘공지 작성’으로 첫 공지를 올려 보세요.</span></div>`;
 
   return `
-  <section style="position:relative;overflow:hidden;border-radius:22px;background:linear-gradient(115deg, #3E5FD9 0%, #5A5FE0 50%, #7C5FD8 100%);color:#FFFFFF;padding:20px clamp(20px, 2.4vw, 28px);box-shadow:0 18px 40px rgba(72,82,200,0.26);display:flex;flex-wrap:wrap;gap:16px 24px;align-items:center;justify-content:space-between">
-    <svg aria-hidden="true" width="560" height="560" viewBox="0 0 560 560" style="position:absolute;right:22%;top:-260px;opacity:0.14;pointer-events:none"><g fill="none" stroke="#FFFFFF" stroke-width="1.5"><circle cx="280" cy="280" r="90"/><circle cx="280" cy="280" r="150"/><circle cx="280" cy="280" r="210"/><circle cx="280" cy="280" r="270"/></g></svg>
+  <section class="a-hero" style="display:flex;flex-wrap:wrap;gap:16px 24px;align-items:flex-end;justify-content:space-between">
     <div style="position:relative;display:flex;flex-direction:column;gap:2px;min-width:0">
-      <span style="font-size:13.5px;color:#DCE2FF">전체 ${notices.length}건 · 필독 ${notices.filter(n=>n.tag==='필독').length}건</span>
-      <h1 style="margin:0;font-size:28px;font-weight:800;letter-spacing:-0.02em">공지사항</h1>
-      <span style="font-size:14.5px;color:#EEF0FF">방송국 전체에 알릴 내용을 올리고 확인해요.</span>
+      <span style="font-size:13.5px;color:var(--a-muted)">전체 ${notices.length}건 · 필독 ${notices.filter(n=>n.tag==='필독').length}건</span>
+      <h1>공지사항</h1>
+      <span style="font-size:14.5px;color:var(--a-muted)">방송국 전체에 알릴 내용을 올리고 확인해요.</span>
     </div>
-    <button data-action="new-notice" style="position:relative;display:inline-flex;align-items:center;gap:6px;height:44px;padding:0 18px;border-radius:12px;border:0;background:#FFFFFF;color:#3F4FD0;font-family:inherit;font-size:14px;font-weight:800;cursor:pointer;box-shadow:0 6px 16px rgba(30,30,120,0.18)"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>공지 작성</button>
+    <button data-action="new-notice" style="position:relative;display:inline-flex;align-items:center;gap:6px;height:44px;padding:0 18px;border-radius:12px;border:0;background:var(--a-action);color:#FFFFFF;font-family:inherit;font-size:15px;font-weight:500;cursor:pointer;border-radius:980px"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>공지 작성</button>
   </section>
 
   <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:10px;border-radius:18px;background:rgba(255,255,255,0.9);border:1px solid #FFFFFF;box-shadow:0 8px 24px rgba(60,72,140,0.06)">
@@ -238,17 +237,17 @@ function homeView() {
   if(next){ const diff=Math.max(0,startMs(next)-nowMs); const dd=Math.floor(diff/86400000),hh=Math.floor(diff/3600000)%24,mm=Math.floor(diff/60000)%60;
     countdown = diff===0?'곧 시작':(dd>0?dd+'일 ':'')+pad2(hh)+':'+pad2(mm); }
   const nextCue = next ? `
-    <button data-detail="${esc(next.id)}" style="position:relative;flex:0 1 460px;min-width:0;display:flex;align-items:center;gap:18px;padding:16px 20px;border-radius:18px;background:rgba(255,255,255,0.14);border:1px solid rgba(255,255,255,0.28);backdrop-filter:blur(8px);color:#FFFFFF;text-align:left;font-family:inherit;cursor:pointer">
+    <button data-detail="${esc(next.id)}" style="position:relative;flex:0 1 460px;min-width:0;display:flex;align-items:center;gap:18px;padding:16px 20px;border-radius:18px;background:var(--a-surface);border:1px solid var(--a-rule);backdrop-filter:blur(8px);color:#FFFFFF;text-align:left;font-family:inherit;cursor:pointer">
       <span style="flex:0 0 auto;display:flex;flex-direction:column;gap:2px">
-        <span style="display:inline-flex;align-items:center;gap:7px;font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:800;letter-spacing:0.16em;color:#E6E9FF"><i aria-hidden="true" style="display:block;width:8px;height:8px;border-radius:50%;background:#FFC15A;box-shadow:0 0 0 4px rgba(255,193,90,0.25);animation:hn-blink 1.6s ease-in-out infinite"></i>NEXT CUE</span>
+        <span style="display:inline-flex;align-items:center;gap:7px;font-size:15px;color:var(--a-muted)"><i aria-hidden="true" style="display:block;width:7px;height:7px;border-radius:50%;background:var(--a-action)"></i>다음 촬영</span>
         <strong class="hn-num" style="font-size:32px;font-weight:800;line-height:1.1;white-space:nowrap">${countdown}</strong>
-        <span style="font-size:12.5px;color:#DCE2FF">남음</span>
+        <span style="font-size:12.5px;color:var(--a-muted)">남음</span>
       </span>
       <span aria-hidden="true" style="align-self:stretch;width:1px;background:rgba(255,255,255,0.25)"></span>
       <span style="flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:6px">
         <strong style="font-size:17px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(next.title)}</strong>
-        <span style="font-size:13px;color:#DCE2FF">${monthDay(next.date)} (${dowOf(next.date)}) ${esc(next.time)}<br>${esc(next.place||'장소 미정')}</span>
-        <span style="display:flex;align-items:center;padding-left:7px">${faces(next.people,3)}${next.people.length>3?`<span style="margin-left:12px;font-size:12.5px;color:#DCE2FF">외 ${next.people.length-3}명</span>`:''}</span>
+        <span style="font-size:13px;color:var(--a-muted)">${monthDay(next.date)} (${dowOf(next.date)}) ${esc(next.time)}<br>${esc(next.place||'장소 미정')}</span>
+        <span style="display:flex;align-items:center;padding-left:7px">${faces(next.people,3)}${next.people.length>3?`<span style="margin-left:12px;font-size:12.5px;color:var(--a-muted)">외 ${next.people.length-3}명</span>`:''}</span>
       </span>
     </button>` : '';
 
@@ -329,17 +328,16 @@ function homeView() {
   const miniCal=monthCalendar();
 
   return `
-  <section aria-label="오늘의 작업공간" style="position:relative;overflow:hidden;border-radius:22px;background:linear-gradient(115deg, #3E5FD9 0%, #5A5FE0 50%, #7C5FD8 100%);color:#FFFFFF;padding:22px clamp(20px, 2.4vw, 28px);box-shadow:0 18px 40px rgba(72,82,200,0.26);display:flex;flex-wrap:wrap;gap:18px 28px;align-items:center">
-    <svg aria-hidden="true" width="560" height="560" viewBox="0 0 560 560" style="position:absolute;right:18%;top:-250px;opacity:0.14;pointer-events:none"><g fill="none" stroke="#FFFFFF" stroke-width="1.5"><circle cx="280" cy="280" r="90"/><circle cx="280" cy="280" r="150"/><circle cx="280" cy="280" r="210"/><circle cx="280" cy="280" r="270"/></g></svg>
+  <section aria-label="오늘의 작업공간" class="a-hero" style="display:flex;flex-wrap:wrap;gap:18px 28px;align-items:flex-end">
     <div style="position:relative;flex:1 1 420px;min-width:0;display:flex;flex-direction:column;gap:14px">
       <div style="display:flex;flex-direction:column;gap:2px">
-        <span style="font-size:13.5px;color:#DCE2FF;font-weight:500">${now.getMonth()+1}월 ${now.getDate()}일 ${['일','월','화','수','목','금','토'][now.getDay()]}요일</span>
-        <h1 style="margin:0;font-size:28px;font-weight:800;letter-spacing:-0.02em">작업공간</h1>
-        <span style="font-size:14.5px;color:#EEF0FF">${heroSub}</span>
+        <span style="font-size:13.5px;color:var(--a-muted);font-weight:500">${now.getMonth()+1}월 ${now.getDate()}일 ${['일','월','화','수','목','금','토'][now.getDay()]}요일</span>
+        <h1>작업공간</h1>
+        <span style="font-size:14.5px;color:var(--a-muted)">${heroSub}</span>
       </div>
       <div style="display:flex;flex-wrap:wrap;gap:8px">
-        <button data-action="new-shoot" style="display:inline-flex;align-items:center;gap:6px;height:40px;padding:0 16px;border:0;border-radius:12px;background:#FFFFFF;color:#3F4FD0;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 6px 16px rgba(30,30,120,0.18)"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>일정 등록</button>
-        <button data-action="new-personal" style="display:inline-flex;align-items:center;height:40px;padding:0 14px;border-radius:12px;background:rgba(255,255,255,0.14);border:1px solid rgba(255,255,255,0.28);color:#FFFFFF;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer">개인 일정 등록</button>
+        <button data-action="new-shoot" class="a-btn"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>일정 등록</button>
+        <button data-action="new-personal" class="a-btn a-btn-quiet">개인 일정 등록</button>
       </div>
     </div>
     ${nextCue}
@@ -475,20 +473,19 @@ function weeklyView() {
   const rangeLabel=`${dates[0].getFullYear()}. ${pad2(dates[0].getMonth()+1)}. ${pad2(dates[0].getDate())} – ${pad2(dates[6].getMonth()+1)}. ${pad2(dates[6].getDate())}`;
 
   return `
-  <section style="position:relative;overflow:hidden;border-radius:22px;background:linear-gradient(115deg, #3E5FD9 0%, #5A5FE0 50%, #7C5FD8 100%);color:#FFFFFF;padding:20px clamp(20px, 2.4vw, 28px);box-shadow:0 18px 40px rgba(72,82,200,0.26);display:flex;flex-wrap:wrap;gap:16px 24px;align-items:center;justify-content:space-between">
-    <svg aria-hidden="true" width="560" height="560" viewBox="0 0 560 560" style="position:absolute;right:22%;top:-260px;opacity:0.14;pointer-events:none"><g fill="none" stroke="#FFFFFF" stroke-width="1.5"><circle cx="280" cy="280" r="90"/><circle cx="280" cy="280" r="150"/><circle cx="280" cy="280" r="210"/><circle cx="280" cy="280" r="270"/></g></svg>
+  <section class="a-hero" style="display:flex;flex-wrap:wrap;gap:16px 24px;align-items:flex-end;justify-content:space-between">
     <div style="position:relative;display:flex;flex-direction:column;gap:2px;min-width:0">
-      <span style="font-size:13.5px;color:#DCE2FF">촬영 가능 인원 비교</span>
-      <h1 style="margin:0;font-size:28px;font-weight:800;letter-spacing:-0.02em">주간 일정표</h1>
-      <span style="font-size:14.5px;color:#EEF0FF">칸을 눌러 여러 시간대를 고르면 오른쪽에서 함께 가능한 인원을 확인할 수 있어요.</span>
+      <span style="font-size:13.5px;color:var(--a-muted)">촬영 가능 인원 비교</span>
+      <h1>주간 일정표</h1>
+      <span style="font-size:14.5px;color:var(--a-muted)">칸을 눌러 여러 시간대를 고르면 오른쪽에서 함께 가능한 인원을 확인할 수 있어요.</span>
     </div>
     <div style="position:relative;display:flex;flex-wrap:wrap;align-items:center;gap:8px">
-      <div style="display:flex;align-items:center;gap:2px;height:42px;padding:0 4px;border-radius:12px;background:rgba(255,255,255,0.14);border:1px solid rgba(255,255,255,0.28)">
+      <div style="display:flex;align-items:center;gap:2px;height:42px;padding:0 4px;border-radius:12px;background:var(--a-surface);border:1px solid var(--a-rule)">
         <button data-week-step="-1" aria-label="이전 주" style="width:34px;height:34px;border:0;border-radius:9px;background:transparent;color:#FFFFFF;font-size:16px;cursor:pointer">‹</button>
         <strong class="hn-num" style="padding:0 6px;font-size:14px;font-weight:700;white-space:nowrap">${rangeLabel}</strong>
         <button data-week-step="1" aria-label="다음 주" style="width:34px;height:34px;border:0;border-radius:9px;background:transparent;color:#FFFFFF;font-size:16px;cursor:pointer">›</button>
       </div>
-      <button data-week-step="0" style="height:42px;padding:0 14px;border-radius:12px;border:1px solid rgba(255,255,255,0.28);background:rgba(255,255,255,0.14);color:#FFFFFF;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer">오늘</button>
+      <button data-week-step="0" style="height:42px;padding:0 14px;border-radius:12px;border:1px solid var(--a-rule);background:var(--a-surface);color:var(--a-ink);font-family:inherit;font-size:14px;font-weight:500;cursor:pointer">오늘</button>
     </div>
   </section>
 
@@ -535,7 +532,7 @@ function weeklyView() {
       </div>
       ${detail}
       <div style="margin-top:auto;padding:16px 18px 18px">
-        <button ${parsed.length?'data-action="new-shoot"':'disabled'} style="width:100%;display:flex;align-items:center;justify-content:center;gap:6px;height:46px;border:0;border-radius:12px;background:${parsed.length?'linear-gradient(135deg, #416FDE, #6656DA)':'#B9C3E6'};color:#FFFFFF;font-family:inherit;font-size:14.5px;font-weight:700;cursor:${parsed.length?'pointer':'default'};box-shadow:${parsed.length?'0 10px 22px rgba(82,100,224,0.28)':'none'}">
+        <button ${parsed.length?'data-action="new-shoot"':'disabled'} style="width:100%;display:flex;align-items:center;justify-content:center;gap:6px;height:46px;border:0;border-radius:12px;background:${parsed.length?'var(--a-action)':'#C7C7CC'};color:#FFFFFF;font-family:inherit;font-size:15px;font-weight:500;cursor:${parsed.length?'pointer':'default'};border-radius:980px">
           <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>선택 시간대로 촬영 일정 등록</button>
       </div>
     </aside>
@@ -681,16 +678,15 @@ function shortsView(){
   const st = state.shortsState || 'idle';
 
   const hero = `
-  <section style="position:relative;overflow:hidden;border-radius:22px;background:linear-gradient(115deg, #3E5FD9 0%, #5A5FE0 50%, #7C5FD8 100%);color:#FFFFFF;padding:20px clamp(20px, 2.4vw, 28px);box-shadow:0 18px 40px rgba(72,82,200,0.26);display:flex;flex-wrap:wrap;gap:16px 24px;align-items:center;justify-content:space-between;min-height:92px">
-    <svg aria-hidden="true" width="560" height="560" viewBox="0 0 560 560" style="position:absolute;right:22%;top:-260px;opacity:0.14;pointer-events:none"><g fill="none" stroke="#FFFFFF" stroke-width="1.5"><circle cx="280" cy="280" r="90"/><circle cx="280" cy="280" r="150"/><circle cx="280" cy="280" r="210"/><circle cx="280" cy="280" r="270"/></g></svg>
+  <section class="a-hero" style="display:flex;flex-wrap:wrap;gap:16px 24px;align-items:flex-end;justify-content:space-between;min-height:92px">
     <div style="position:relative;display:flex;flex-direction:column;gap:2px;min-width:0;max-width:720px">
-      <span style="font-size:13.5px;color:#DCE2FF">${st==='on'?'쇼츠 메이커 연결됨':'쇼츠 메이커'}</span>
-      <h1 style="margin:0;font-size:28px;font-weight:800;letter-spacing:-0.02em">쇼츠</h1>
-      <span style="font-size:14.5px;color:#EEF0FF">긴 공연 영상을 넣으면 짧은 쇼츠로 잘라 줘요.</span>
+      <span style="font-size:13.5px;color:var(--a-muted)">${st==='on'?'쇼츠 메이커 연결됨':'쇼츠 메이커'}</span>
+      <h1>쇼츠</h1>
+      <span style="font-size:14.5px;color:var(--a-muted)">긴 공연 영상을 넣으면 짧은 쇼츠로 잘라 줘요.</span>
     </div>
     <div style="position:relative;display:flex;flex-wrap:wrap;align-items:center;gap:8px">
-      <button data-shorts-reload="1" style="height:42px;padding:0 14px;border-radius:12px;border:1px solid rgba(255,255,255,0.28);background:rgba(255,255,255,0.14);color:#FFFFFF;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer">연결 확인</button>
-      <button data-shorts-setup="1" style="height:42px;padding:0 14px;border-radius:12px;border:1px solid rgba(255,255,255,0.28);background:rgba(255,255,255,0.14);color:#FFFFFF;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer">주소 설정</button>
+      <button data-shorts-reload="1" style="height:42px;padding:0 14px;border-radius:12px;border:1px solid var(--a-rule);background:var(--a-surface);color:var(--a-ink);font-family:inherit;font-size:14px;font-weight:500;cursor:pointer">연결 확인</button>
+      <button data-shorts-setup="1" style="height:42px;padding:0 14px;border-radius:12px;border:1px solid var(--a-rule);background:var(--a-surface);color:var(--a-ink);font-family:inherit;font-size:14px;font-weight:500;cursor:pointer">주소 설정</button>
     </div>
   </section>`;
 
@@ -724,7 +720,7 @@ function shortsView(){
         <input name="base" value="${esc(c.base)}" placeholder="http://127.0.0.1:7731" style="height:42px;padding:0 12px;border-radius:11px;border:1px solid #E6E9F3;background:#FFFFFF;font-family:inherit;font-size:14px;color:#20294D"></label>
       <label style="display:flex;flex-direction:column;gap:5px;font-size:12.5px;font-weight:700">열쇠
         <input name="key" value="${esc(c.key)}" style="height:42px;padding:0 12px;border-radius:11px;border:1px solid #E6E9F3;background:#FFFFFF;font-family:inherit;font-size:14px;color:#20294D"></label>
-      <button type="submit" style="height:42px;border:0;border-radius:11px;background:linear-gradient(135deg, #416FDE, #6656DA);color:#FFFFFF;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer">저장하고 다시 확인</button>
+      <button type="submit" style="height:42px;border:0;border-radius:11px;background:linear-gradient(135deg, #416FDE, #6656DA);color:var(--a-ink);font-family:inherit;font-size:14px;font-weight:500;cursor:pointer">저장하고 다시 확인</button>
     </form>` : '';
 
   return `${hero}
@@ -920,22 +916,21 @@ function radioView(){
   }).join('');
 
   return `
-  <section style="position:relative;overflow:hidden;border-radius:22px;background:linear-gradient(115deg, #3E5FD9 0%, #5A5FE0 50%, #7C5FD8 100%);color:#FFFFFF;padding:20px clamp(20px, 2.4vw, 28px);box-shadow:0 18px 40px rgba(72,82,200,0.26);display:flex;flex-wrap:wrap;gap:16px 24px;align-items:center;justify-content:space-between">
-    <svg aria-hidden="true" width="560" height="560" viewBox="0 0 560 560" style="position:absolute;right:22%;top:-260px;opacity:0.14;pointer-events:none"><g fill="none" stroke="#FFFFFF" stroke-width="1.5"><circle cx="280" cy="280" r="90"/><circle cx="280" cy="280" r="150"/><circle cx="280" cy="280" r="210"/><circle cx="280" cy="280" r="270"/></g></svg>
+  <section class="a-hero" style="display:flex;flex-wrap:wrap;gap:16px 24px;align-items:flex-end;justify-content:space-between">
     <div style="position:relative;display:flex;flex-direction:column;gap:2px;min-width:0">
-      <span style="font-size:13.5px;color:#DCE2FF">${esc(range)}</span>
-      <h1 style="margin:0;font-size:28px;font-weight:800;letter-spacing:-0.02em">라디오</h1>
-      <span style="font-size:14.5px;color:#EEF0FF">날짜 칸의 ‘담당 지정’을 눌러 진행자를 정해요.</span>
+      <span style="font-size:13.5px;color:var(--a-muted)">${esc(range)}</span>
+      <h1>라디오</h1>
+      <span style="font-size:14.5px;color:var(--a-muted)">날짜 칸의 ‘담당 지정’을 눌러 진행자를 정해요.</span>
     </div>
     <div style="position:relative;display:flex;align-items:center;gap:6px">
       <button data-radio-mode="1" aria-pressed="${state.radioEdit}" aria-label="${state.radioEdit ? '담당 수정 끝내기' : '담당 수정하기'}" title="${state.radioEdit ? '수정 끝내기' : '담당 수정'}"
         style="display:flex;align-items:center;justify-content:center;gap:6px;height:40px;padding:0 14px;border-radius:12px;border:1px solid ${state.radioEdit ? 'transparent' : 'rgba(255,255,255,0.28)'};background:${state.radioEdit ? '#FFFFFF' : 'rgba(255,255,255,0.14)'};color:${state.radioEdit ? '#3F4FD0' : '#FFFFFF'};font-family:inherit;font-size:14px;font-weight:700;cursor:pointer">
         <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>${state.radioEdit ? '끝내기' : '담당 수정'}
       </button>
-      <span aria-hidden="true" style="width:1px;height:24px;background:rgba(255,255,255,0.28)"></span>
-      <button data-week-step="-1" aria-label="이전 주" style="width:40px;height:40px;border-radius:12px;border:1px solid rgba(255,255,255,0.28);background:rgba(255,255,255,0.14);color:#FFFFFF;font-family:inherit;font-size:16px;cursor:pointer">‹</button>
-      <button data-week-step="0" style="height:40px;padding:0 14px;border-radius:12px;border:1px solid rgba(255,255,255,0.28);background:rgba(255,255,255,0.14);color:#FFFFFF;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer">이번 주</button>
-      <button data-week-step="1" aria-label="다음 주" style="width:40px;height:40px;border-radius:12px;border:1px solid rgba(255,255,255,0.28);background:rgba(255,255,255,0.14);color:#FFFFFF;font-family:inherit;font-size:16px;cursor:pointer">›</button>
+      <span aria-hidden="true" style="width:1px;height:24px;background:var(--a-rule)"></span>
+      <button data-week-step="-1" aria-label="이전 주" style="width:40px;height:40px;border-radius:12px;border:1px solid var(--a-rule);background:var(--a-surface);color:var(--a-ink);font-family:inherit;font-size:16px;cursor:pointer">‹</button>
+      <button data-week-step="0" style="height:40px;padding:0 14px;border-radius:12px;border:1px solid var(--a-rule);background:var(--a-surface);color:var(--a-ink);font-family:inherit;font-size:14px;font-weight:500;cursor:pointer">이번 주</button>
+      <button data-week-step="1" aria-label="다음 주" style="width:40px;height:40px;border-radius:12px;border:1px solid var(--a-rule);background:var(--a-surface);color:var(--a-ink);font-family:inherit;font-size:16px;cursor:pointer">›</button>
     </div>
   </section>
   ${grid}
@@ -970,14 +965,13 @@ function projectsView(){
   }).join('');
 
   return `
-  <section style="position:relative;overflow:hidden;border-radius:22px;background:linear-gradient(115deg, #3E5FD9 0%, #5A5FE0 50%, #7C5FD8 100%);color:#FFFFFF;padding:20px clamp(20px, 2.4vw, 28px);box-shadow:0 18px 40px rgba(72,82,200,0.26);display:flex;flex-wrap:wrap;gap:16px 24px;align-items:center;justify-content:space-between">
-    <svg aria-hidden="true" width="560" height="560" viewBox="0 0 560 560" style="position:absolute;right:22%;top:-260px;opacity:0.14;pointer-events:none"><g fill="none" stroke="#FFFFFF" stroke-width="1.5"><circle cx="280" cy="280" r="90"/><circle cx="280" cy="280" r="150"/><circle cx="280" cy="280" r="210"/><circle cx="280" cy="280" r="270"/></g></svg>
+  <section class="a-hero" style="display:flex;flex-wrap:wrap;gap:16px 24px;align-items:flex-end;justify-content:space-between">
     <div style="position:relative;display:flex;flex-direction:column;gap:2px;min-width:0">
-      <span style="font-size:13.5px;color:#DCE2FF">${list.length}개 작품</span>
-      <h1 style="margin:0;font-size:28px;font-weight:800;letter-spacing:-0.02em">프로젝트</h1>
-      <span style="font-size:14.5px;color:#EEF0FF">방송제·마디영상처럼 묶어서 진행하는 작품을 관리해요.</span>
+      <span style="font-size:13.5px;color:var(--a-muted)">${list.length}개 작품</span>
+      <h1>프로젝트</h1>
+      <span style="font-size:14.5px;color:var(--a-muted)">방송제·마디영상처럼 묶어서 진행하는 작품을 관리해요.</span>
     </div>
-    <button data-project-new="1" style="position:relative;display:inline-flex;align-items:center;gap:7px;height:44px;padding:0 18px;border:0;border-radius:13px;background:#FFFFFF;color:#3F4FD0;font-family:inherit;font-size:14.5px;font-weight:800;cursor:pointer;box-shadow:0 8px 18px rgba(20,24,60,0.18)">+ 프로젝트 추가</button>
+    <button data-project-new="1" style="position:relative;display:inline-flex;align-items:center;gap:7px;height:44px;padding:0 18px;border:0;border-radius:13px;background:var(--a-action);color:#FFFFFF;font-family:inherit;font-size:15px;font-weight:500;cursor:pointer;border-radius:980px">+ 프로젝트 추가</button>
   </section>
   ${list.length?`<div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(260px, 1fr));gap:14px">${cards}</div>`
     :`<section style="${CARD};padding:40px 20px;text-align:center;color:#64708F;font-size:14px">아직 만든 프로젝트가 없어요.<br>오른쪽 위 ‘프로젝트 추가’를 눌러 시작하세요.</section>`}`;
@@ -1165,12 +1159,11 @@ function scriptView(){
   }
 
   return `
-  <section style="position:relative;overflow:hidden;border-radius:22px;background:linear-gradient(115deg, #3E5FD9 0%, #5A5FE0 50%, #7C5FD8 100%);color:#FFFFFF;padding:20px clamp(20px, 2.4vw, 28px);box-shadow:0 18px 40px rgba(72,82,200,0.26);display:flex;flex-wrap:wrap;gap:16px 24px;align-items:center;justify-content:space-between;min-height:92px">
-    <svg aria-hidden="true" width="560" height="560" viewBox="0 0 560 560" style="position:absolute;right:22%;top:-260px;opacity:0.14;pointer-events:none"><g fill="none" stroke="#FFFFFF" stroke-width="1.5"><circle cx="280" cy="280" r="90"/><circle cx="280" cy="280" r="150"/><circle cx="280" cy="280" r="210"/><circle cx="280" cy="280" r="270"/></g></svg>
+  <section class="a-hero" style="display:flex;flex-wrap:wrap;gap:16px 24px;align-items:flex-end;justify-content:space-between;min-height:92px">
     <div style="position:relative;display:flex;flex-direction:column;gap:2px;min-width:0;max-width:720px">
-      <span style="font-size:13.5px;color:#DCE2FF">NVIDIA NIM · ${esc(state.aiHealthText||'서버 확인 중')}</span>
-      <h1 style="margin:0;font-size:28px;font-weight:800;letter-spacing:-0.02em">AI 대본 분석</h1>
-      <span style="font-size:14.5px;color:#EEF0FF">대본에서 씬·장소·등장 배역을 찾고 실제 시간표로 촬영 후보를 계산해요.</span>
+      <span style="font-size:13.5px;color:var(--a-muted)">NVIDIA NIM · ${esc(state.aiHealthText||'서버 확인 중')}</span>
+      <h1>AI 대본 분석</h1>
+      <span style="font-size:14.5px;color:var(--a-muted)">대본에서 씬·장소·등장 배역을 찾고 실제 시간표로 촬영 후보를 계산해요.</span>
     </div>
   </section>
 
@@ -1313,7 +1306,7 @@ function shootsView() {
   const count=s=>schedules.filter(x=>x.status===s).length;
   const range=schedules.length?`${monthDay(schedules[0].date)} – ${monthDay(schedules[schedules.length-1].date)}`:'등록된 일정 없음';
   const heroStats=[['전체',schedules.length],['예정',count('예정')],['완료',count('완료')]]
-    .map(([label,n])=>`<span style="display:flex;flex-direction:column;min-width:84px;padding:8px 14px;border-radius:14px;background:rgba(255,255,255,0.14);border:1px solid rgba(255,255,255,0.26);line-height:1.3"><span style="font-size:12px;color:#DCE2FF">${label}</span><strong class="hn-num" style="font-size:20px;font-weight:800">${n}<span style="font-size:12px;font-weight:600;color:#DCE2FF"> 건</span></strong></span>`).join('');
+    .map(([label,n])=>`<span style="display:flex;flex-direction:column;min-width:84px;padding:8px 14px;border-radius:14px;background:var(--a-surface);border:1px solid var(--a-rule);line-height:1.3"><span style="font-size:12px;color:var(--a-muted)">${label}</span><strong class="hn-num" style="font-size:20px;font-weight:800">${n}<span style="font-size:12px;font-weight:600;color:var(--a-muted)"> 건</span></strong></span>`).join('');
   const filters=[['all','전체',schedules.length],['예정','예정',count('예정')],['진행 중','진행 중',count('진행 중')],['완료','완료',count('완료')]]
     .map(([k,label,n])=>{ const on=state.shootFilter===k;
       return `<button role="tab" aria-selected="${on}" data-shoot-filter="${k}" style="height:34px;padding:0 12px;border-radius:9px;border:0;background:${on?'#FFFFFF':'transparent'};color:${on?'#3F4FD0':'#64708F'};box-shadow:${on?'0 2px 8px rgba(60,72,140,0.12)':'none'};font-family:inherit;font-size:13px;font-weight:700;cursor:pointer">${label} <span class="hn-num" style="opacity:0.8">${n}</span></button>`;}).join('');
@@ -1323,16 +1316,15 @@ function shootsView() {
     return `<button role="tab" aria-selected="${on}" data-shoot-category="${esc(k)}" style="height:34px;padding:0 12px;border-radius:9px;border:0;background:${on?'#FFFFFF':'transparent'};color:${on?'#3F4FD0':'#64708F'};box-shadow:${on?'0 2px 8px rgba(60,72,140,0.12)':'none'};font-family:inherit;font-size:13px;font-weight:700;cursor:pointer">${esc(label)} <span class="hn-num" style="opacity:0.8">${n}</span></button>`;}).join('');
 
   return `
-  <section style="position:relative;overflow:hidden;border-radius:22px;background:linear-gradient(115deg, #3E5FD9 0%, #5A5FE0 50%, #7C5FD8 100%);color:#FFFFFF;padding:20px clamp(20px, 2.4vw, 28px);box-shadow:0 18px 40px rgba(72,82,200,0.26);display:flex;flex-wrap:wrap;gap:16px 24px;align-items:center;justify-content:space-between">
-    <svg aria-hidden="true" width="560" height="560" viewBox="0 0 560 560" style="position:absolute;right:22%;top:-260px;opacity:0.14;pointer-events:none"><g fill="none" stroke="#FFFFFF" stroke-width="1.5"><circle cx="280" cy="280" r="90"/><circle cx="280" cy="280" r="150"/><circle cx="280" cy="280" r="210"/><circle cx="280" cy="280" r="270"/></g></svg>
+  <section class="a-hero" style="display:flex;flex-wrap:wrap;gap:16px 24px;align-items:flex-end;justify-content:space-between">
     <div style="position:relative;display:flex;flex-direction:column;gap:2px;min-width:0">
-      <span class="hn-num" style="font-size:13.5px;color:#DCE2FF">${range}</span>
-      <h1 style="margin:0;font-size:28px;font-weight:800;letter-spacing:-0.02em">일정</h1>
-      <span style="font-size:14.5px;color:#EEF0FF">촬영과 방송국 일정을 한 달력에서 봐요. 일정을 누르면 상세가 열려요.</span>
+      <span class="hn-num" style="font-size:13.5px;color:var(--a-muted)">${range}</span>
+      <h1>일정</h1>
+      <span style="font-size:14.5px;color:var(--a-muted)">촬영과 방송국 일정을 한 달력에서 봐요. 일정을 누르면 상세가 열려요.</span>
     </div>
     <div style="position:relative;display:flex;flex-wrap:wrap;align-items:center;gap:10px">
       ${heroStats}
-      <button data-action="new-shoot" style="display:inline-flex;align-items:center;gap:6px;height:44px;padding:0 18px;border-radius:12px;border:0;background:#FFFFFF;color:#3F4FD0;font-family:inherit;font-size:14px;font-weight:800;cursor:pointer;box-shadow:0 6px 16px rgba(30,30,120,0.18)"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>일정 등록</button>
+      <button data-action="new-shoot" style="display:inline-flex;align-items:center;gap:6px;height:44px;padding:0 18px;border-radius:12px;border:0;background:var(--a-action);color:#FFFFFF;font-family:inherit;font-size:15px;font-weight:500;cursor:pointer;border-radius:980px"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>일정 등록</button>
     </div>
   </section>
 
@@ -1461,21 +1453,20 @@ function personalView(){
     ||`<div style="padding:24px 16px;border-radius:16px;background:linear-gradient(120deg, #F3F5FF, #F6F2FF);text-align:center;color:#4F5770;font-size:14px">이 날은 등록된 일정이 없어요.<br>촬영 참여 가능으로 표시돼요.</div>`;
 
   return `
-  <section style="position:relative;overflow:hidden;border-radius:22px;background:linear-gradient(115deg, #3E5FD9 0%, #5A5FE0 50%, #7C5FD8 100%);color:#FFFFFF;padding:20px clamp(20px, 2.4vw, 28px);box-shadow:0 18px 40px rgba(72,82,200,0.26);display:flex;flex-wrap:wrap;gap:16px 24px;align-items:center;justify-content:space-between">
-    <svg aria-hidden="true" width="560" height="560" viewBox="0 0 560 560" style="position:absolute;right:22%;top:-260px;opacity:0.14;pointer-events:none"><g fill="none" stroke="#FFFFFF" stroke-width="1.5"><circle cx="280" cy="280" r="90"/><circle cx="280" cy="280" r="150"/><circle cx="280" cy="280" r="210"/><circle cx="280" cy="280" r="270"/></g></svg>
+  <section class="a-hero" style="display:flex;flex-wrap:wrap;gap:16px 24px;align-items:flex-end;justify-content:space-between">
     <div style="position:relative;display:flex;flex-direction:column;gap:6px;min-width:0">
-      <label style="display:inline-flex;align-items:center;gap:6px;font-size:13.5px;color:#DCE2FF">
-        <select id="personal-member" aria-label="구성원 선택" style="height:30px;padding:0 8px;border-radius:9px;border:1px solid rgba(255,255,255,0.3);background:rgba(255,255,255,0.14);color:#FFFFFF;font-family:inherit;font-size:13.5px;font-weight:700">
+      <label style="display:inline-flex;align-items:center;gap:6px;font-size:13.5px;color:var(--a-muted)">
+        <select id="personal-member" aria-label="구성원 선택" style="height:30px;padding:0 8px;border-radius:9px;border:1px solid var(--a-rule);background:var(--a-surface);color:#FFFFFF;font-family:inherit;font-size:13.5px;font-weight:700">
           ${people.map(p=>`<option value="${esc(p[7])}" ${p[7]===state.personalMemberId?'selected':''} style="color:#20294D">${esc(p[0])} · ${esc(p[2])}</option>`).join('')}
         </select>님의 일정
       </label>
-      <h1 style="margin:0;font-size:28px;font-weight:800;letter-spacing:-0.02em">개인 일정</h1>
-      <span style="font-size:14.5px;color:#EEF0FF">촬영에 참여할 수 없는 시간을 등록하면 주간 일정표의 가능 인원에 바로 반영돼요.</span>
+      <h1>개인 일정</h1>
+      <span style="font-size:14.5px;color:var(--a-muted)">촬영에 참여할 수 없는 시간을 등록하면 주간 일정표의 가능 인원에 바로 반영돼요.</span>
     </div>
     <div style="position:relative;display:flex;flex-wrap:wrap;align-items:center;gap:10px">
-      <span style="display:flex;flex-direction:column;min-width:96px;padding:8px 14px;border-radius:14px;background:rgba(255,255,255,0.14);border:1px solid rgba(255,255,255,0.26);line-height:1.3"><span style="font-size:12px;color:#DCE2FF">이번 달 일정</span><strong class="hn-num" style="font-size:20px;font-weight:800">${monthCount}<span style="font-size:12px;font-weight:600;color:#DCE2FF"> 건</span></strong></span>
-      <span style="display:flex;flex-direction:column;min-width:96px;padding:8px 14px;border-radius:14px;background:rgba(255,255,255,0.14);border:1px solid rgba(255,255,255,0.26);line-height:1.3"><span style="font-size:12px;color:#DCE2FF">수업(매주)</span><strong class="hn-num" style="font-size:20px;font-weight:800">${repeatCount}<span style="font-size:12px;font-weight:600;color:#DCE2FF"> 개</span></strong></span>
-      <button data-action="new-personal" style="display:inline-flex;align-items:center;gap:6px;height:44px;padding:0 18px;border-radius:12px;border:0;background:#FFFFFF;color:#3F4FD0;font-family:inherit;font-size:14px;font-weight:800;cursor:pointer;box-shadow:0 6px 16px rgba(30,30,120,0.18)"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>일정 추가</button>
+      <span style="display:flex;flex-direction:column;min-width:96px;padding:8px 14px;border-radius:14px;background:var(--a-surface);border:1px solid var(--a-rule);line-height:1.3"><span style="font-size:12px;color:var(--a-muted)">이번 달 일정</span><strong class="hn-num" style="font-size:20px;font-weight:800">${monthCount}<span style="font-size:12px;font-weight:600;color:var(--a-muted)"> 건</span></strong></span>
+      <span style="display:flex;flex-direction:column;min-width:96px;padding:8px 14px;border-radius:14px;background:var(--a-surface);border:1px solid var(--a-rule);line-height:1.3"><span style="font-size:12px;color:var(--a-muted)">수업(매주)</span><strong class="hn-num" style="font-size:20px;font-weight:800">${repeatCount}<span style="font-size:12px;font-weight:600;color:var(--a-muted)"> 개</span></strong></span>
+      <button data-action="new-personal" style="display:inline-flex;align-items:center;gap:6px;height:44px;padding:0 18px;border-radius:12px;border:0;background:var(--a-action);color:#FFFFFF;font-family:inherit;font-size:15px;font-weight:500;cursor:pointer;border-radius:980px"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>일정 추가</button>
     </div>
   </section>
 
@@ -1781,19 +1772,18 @@ function peopleView(){
     return `<button role="tab" aria-selected="${on}" data-people-dept="${esc(label)}" style="height:34px;padding:0 12px;border-radius:9px;border:0;background:${on?'#FFFFFF':'transparent'};color:${on?'#3F4FD0':'#64708F'};box-shadow:${on?'0 2px 8px rgba(60,72,140,0.12)':'none'};font-family:inherit;font-size:13px;font-weight:700;cursor:pointer">${esc(label)} <span class="hn-num" style="opacity:0.75">${n}</span></button>`;}).join('');
   const stats=[['전체',people.length],...Object.keys(PERSON_STATUS).map(s=>[s,people.filter(p=>p[5]===s).length])]
     .filter(([,n],i)=>i===0||n)
-    .map(([label,n])=>`<span style="display:flex;flex-direction:column;min-width:84px;padding:8px 14px;border-radius:14px;background:rgba(255,255,255,0.14);border:1px solid rgba(255,255,255,0.26);line-height:1.3"><span style="font-size:12px;color:#DCE2FF">${label}</span><strong class="hn-num" style="font-size:20px;font-weight:800">${n}<span style="font-size:12px;font-weight:600;color:#DCE2FF"> 명</span></strong></span>`).join('');
+    .map(([label,n])=>`<span style="display:flex;flex-direction:column;min-width:84px;padding:8px 14px;border-radius:14px;background:var(--a-surface);border:1px solid var(--a-rule);line-height:1.3"><span style="font-size:12px;color:var(--a-muted)">${label}</span><strong class="hn-num" style="font-size:20px;font-weight:800">${n}<span style="font-size:12px;font-weight:600;color:var(--a-muted)"> 명</span></strong></span>`).join('');
 
   return `
-  <section style="position:relative;overflow:hidden;border-radius:22px;background:linear-gradient(115deg, #3E5FD9 0%, #5A5FE0 50%, #7C5FD8 100%);color:#FFFFFF;padding:20px clamp(20px, 2.4vw, 28px);box-shadow:0 18px 40px rgba(72,82,200,0.26);display:flex;flex-wrap:wrap;gap:16px 24px;align-items:center;justify-content:space-between">
-    <svg aria-hidden="true" width="560" height="560" viewBox="0 0 560 560" style="position:absolute;right:22%;top:-260px;opacity:0.14;pointer-events:none"><g fill="none" stroke="#FFFFFF" stroke-width="1.5"><circle cx="280" cy="280" r="90"/><circle cx="280" cy="280" r="150"/><circle cx="280" cy="280" r="210"/><circle cx="280" cy="280" r="270"/></g></svg>
+  <section class="a-hero" style="display:flex;flex-wrap:wrap;gap:16px 24px;align-items:flex-end;justify-content:space-between">
     <div style="position:relative;display:flex;flex-direction:column;gap:2px;min-width:0">
-      <span style="display:inline-flex;align-items:center;gap:6px;font-size:13.5px;color:#DCE2FF"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>관리자 권한으로 보는 중</span>
-      <h1 style="margin:0;font-size:28px;font-weight:800;letter-spacing:-0.02em">인원 관리</h1>
-      <span style="font-size:14.5px;color:#EEF0FF">구성원을 검색하고 부서·직책을 관리해요.</span>
+      <span style="display:inline-flex;align-items:center;gap:6px;font-size:13.5px;color:var(--a-muted)"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>관리자 권한으로 보는 중</span>
+      <h1>인원 관리</h1>
+      <span style="font-size:14.5px;color:var(--a-muted)">구성원을 검색하고 부서·직책을 관리해요.</span>
     </div>
     <div style="position:relative;display:flex;flex-wrap:wrap;align-items:center;gap:10px">
       ${stats}
-      <button data-action="new-person" style="display:inline-flex;align-items:center;gap:6px;height:44px;padding:0 18px;border-radius:12px;border:0;background:#FFFFFF;color:#3F4FD0;font-family:inherit;font-size:14px;font-weight:800;cursor:pointer;box-shadow:0 6px 16px rgba(30,30,120,0.18)"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>구성원 등록</button>
+      <button data-action="new-person" style="display:inline-flex;align-items:center;gap:6px;height:44px;padding:0 18px;border-radius:12px;border:0;background:var(--a-action);color:#FFFFFF;font-family:inherit;font-size:15px;font-weight:500;cursor:pointer;border-radius:980px"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>구성원 등록</button>
     </div>
   </section>
 
@@ -1920,14 +1910,13 @@ function settingsView(){
     :serviceSettings(state.settingsSection);
 
   return `
-  <section style="position:relative;overflow:hidden;border-radius:22px;background:linear-gradient(115deg, #3E5FD9 0%, #5A5FE0 50%, #7C5FD8 100%);color:#FFFFFF;padding:20px clamp(20px, 2.4vw, 28px);box-shadow:0 18px 40px rgba(72,82,200,0.26);display:flex;flex-wrap:wrap;gap:16px 24px;align-items:center;justify-content:space-between">
-    <svg aria-hidden="true" width="560" height="560" viewBox="0 0 560 560" style="position:absolute;right:22%;top:-260px;opacity:0.14;pointer-events:none"><g fill="none" stroke="#FFFFFF" stroke-width="1.5"><circle cx="280" cy="280" r="90"/><circle cx="280" cy="280" r="150"/><circle cx="280" cy="280" r="210"/><circle cx="280" cy="280" r="270"/></g></svg>
+  <section class="a-hero" style="display:flex;flex-wrap:wrap;gap:16px 24px;align-items:flex-end;justify-content:space-between">
     <div style="position:relative;display:flex;flex-direction:column;gap:2px;min-width:0">
-      <span style="display:inline-flex;align-items:center;gap:6px;font-size:13.5px;color:#DCE2FF"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>관리자 권한으로 보는 중</span>
-      <h1 style="margin:0;font-size:28px;font-weight:800;letter-spacing:-0.02em">설정</h1>
-      <span style="font-size:14.5px;color:#EEF0FF">${esc(current[3])}</span>
+      <span style="display:inline-flex;align-items:center;gap:6px;font-size:13.5px;color:var(--a-muted)"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>관리자 권한으로 보는 중</span>
+      <h1>설정</h1>
+      <span style="font-size:14.5px;color:var(--a-muted)">${esc(current[3])}</span>
     </div>
-    ${state.settingsSection==='people'?`<button data-action="new-person" style="position:relative;display:inline-flex;align-items:center;gap:6px;height:44px;padding:0 18px;border-radius:12px;border:0;background:#FFFFFF;color:#3F4FD0;font-family:inherit;font-size:14px;font-weight:800;cursor:pointer;box-shadow:0 6px 16px rgba(30,30,120,0.18)"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>구성원 등록</button>`:''}
+    ${state.settingsSection==='people'?`<button data-action="new-person" style="position:relative;display:inline-flex;align-items:center;gap:6px;height:44px;padding:0 18px;border-radius:12px;border:0;background:var(--a-action);color:#FFFFFF;font-family:inherit;font-size:15px;font-weight:500;cursor:pointer;border-radius:980px"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>구성원 등록</button>`:''}
   </section>
 
   <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start">

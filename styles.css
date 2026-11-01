@@ -742,3 +742,110 @@ body {
 
 /* 쇼츠 탭에서는 Air 버튼을 숨긴다. 쇼츠 메이커의 오른쪽 아래 버튼과 겹친다. */
 body.hn-shorts .air { display: none; }
+
+/* ===========================================================
+   Apple 방향 재디자인
+   보라 그라데이션 띠와 넓은 그림자를 걷어내고, 종이(#F5F5F7)와
+   흰 면, 머리카락 선, 파랑 하나로 간다. 색이 큰 소리를 내는 곳은
+   주간 일정표의 가능 인원 칸 하나뿐이다. 이 방송국이 이 도구를
+   실제로 쓰는 자리가 거기라서다.
+   =========================================================== */
+:root {
+  --a-ink: #1D1D1F;
+  --a-paper: #F5F5F7;
+  --a-surface: #FFFFFF;
+  --a-rule: #D2D2D7;
+  --a-muted: #86868B;
+  --a-action: #0071E3;
+  --a-action-press: #0062C4;
+  --a-radius: 18px;
+}
+
+body { background: var(--a-paper); color: var(--a-ink); }
+.hn-blob { display: none; }          /* 장식용 색 번짐은 쓰지 않는다 */
+
+/* 헤더 — 애플의 상단 바처럼 얇고 조용하게 */
+.hn-header {
+  background: rgba(245, 245, 247, 0.82);
+  backdrop-filter: saturate(180%) blur(20px);
+  border-bottom: 1px solid var(--a-rule);
+  box-shadow: none;
+}
+.hn-nav button {
+  color: var(--a-muted);
+  font-weight: 400;
+  border-radius: 8px;
+}
+.hn-nav button:hover { color: var(--a-ink); background: transparent; }
+.hn-nav button.active {
+  color: var(--a-ink);
+  font-weight: 600;
+  background: transparent;
+}
+
+/* 제목 — 크고 좁게. 글자가 화면의 주인공이다. */
+.a-hero { padding: 8px 0 20px; border-bottom: 1px solid var(--a-rule); margin-bottom: 22px; }
+.a-hero h1 {
+  margin: 0;
+  font-size: clamp(32px, 4.2vw, 48px);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+  color: var(--a-ink);
+}
+.a-hero .a-sub { font-size: 17px; line-height: 1.47; color: var(--a-muted); }
+.a-hero .a-eyebrow { font-size: 15px; color: var(--a-muted); }
+
+/* 버튼 — 알약 하나, 파랑 하나 */
+.a-btn {
+  height: 40px; padding: 0 18px; border: 0; border-radius: 980px;
+  background: var(--a-action); color: #fff;
+  font-family: inherit; font-size: 15px; font-weight: 500; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 7px;
+  transition: background .18s ease;
+}
+.a-btn:hover { background: var(--a-action-press); }
+.a-btn-quiet {
+  background: var(--a-surface); color: var(--a-ink);
+  border: 1px solid var(--a-rule);
+}
+.a-btn-quiet:hover { background: #FAFAFC; }
+
+/* 숫자 요약 — 테두리 없이 간격으로만 끊는다 */
+.a-stat { display: flex; flex-direction: column; gap: 1px; }
+.a-stat span { font-size: 13px; color: var(--a-muted); }
+.a-stat b { font-size: 22px; font-weight: 600; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+
+@media (prefers-reduced-motion: reduce) {
+  .a-btn { transition: none; }
+}
+
+/* 글꼴은 하나로. 숫자용으로 두던 Plus Jakarta Sans 를 걷어낸다.
+   Pretendard 의 tabular 숫자로 충분하고, 두 얼굴이 섞이면 서로 싸운다. */
+.hn-num { font-family: inherit; font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+
+/* 하위 탭 — 알약 대신 밑줄. 애플이 탭을 다루는 방식이다. */
+[role="tablist"] {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  gap: 24px !important;
+  border-bottom: 1px solid var(--a-rule) !important;
+  border-radius: 0 !important;
+}
+[role="tablist"] > button {
+  background: transparent !important;
+  border-radius: 0 !important;
+  padding: 0 2px 12px !important;
+  height: auto !important;
+  color: var(--a-muted) !important;
+  font-weight: 400 !important;
+  border-bottom: 2px solid transparent !important;
+  margin-bottom: -1px;
+}
+[role="tablist"] > button[aria-selected="true"] {
+  color: var(--a-ink) !important;
+  font-weight: 600 !important;
+  border-bottom-color: var(--a-ink) !important;
+}
