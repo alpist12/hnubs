@@ -763,9 +763,9 @@ body.theme-light .folder-lock-badge {
   margin: 18px 26px 0;
   padding: 18px 22px;
   border-radius: 22px;
-  background: linear-gradient(115deg, #3E5FD9 0%, #5A5FE0 50%, #7C5FD8 100%);
+  background: #4B41E0;
   color: #FFFFFF;
-  box-shadow: 0 18px 40px rgba(72, 82, 200, 0.26);
+  box-shadow: none;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -773,6 +773,7 @@ body.theme-light .folder-lock-badge {
   gap: 14px 20px;
 }
 .dv-hero-rings {
+  display: none;
   position: absolute;
   right: 18%;
   top: -300px;

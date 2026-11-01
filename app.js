@@ -100,7 +100,7 @@ const AV=[['#E3EAFF','#3F4FD0'],['#E3F7EE','#1C6E4A'],['#EDE6FF','#5B45C8'],['#F
 const DOW=['일','월','화','수','목','금','토'];
 // fixedClasses.day 는 월=0 으로 저장된다. 표시는 일요일 시작, 조회는 월=0 그대로.
 const dataDay=d=>(d.getDay()+6)%7;
-const CARD='border-radius:20px;background:var(--a-surface);border:0;box-shadow:0 1px 2px rgba(26,30,39,0.06)';
+const CARD='border-radius:16px;background:var(--a-surface);border:1px solid var(--a-rule);box-shadow:none';
 const EDIT_ICON='<svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>';
 function initial(name){ return String(name||'?').trim().slice(0,1) || '?'; }
 function faces(names,limit=4){ return names.slice(0,limit).map((n,k)=>`<span aria-hidden="true" style="width:28px;height:28px;margin-left:-7px;border-radius:50%;border:2px solid #FFFFFF;background:${AV[k%4][0]};color:${AV[k%4][1]};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800">${esc(initial(n))}</span>`).join(''); }
@@ -237,7 +237,7 @@ function homeView() {
   if(next){ const diff=Math.max(0,startMs(next)-nowMs); const dd=Math.floor(diff/86400000),hh=Math.floor(diff/3600000)%24,mm=Math.floor(diff/60000)%60;
     countdown = diff===0?'곧 시작':(dd>0?dd+'일 ':'')+pad2(hh)+':'+pad2(mm); }
   const nextCue = next ? `
-    <button data-detail="${esc(next.id)}" style="position:relative;flex:0 1 460px;min-width:0;display:flex;align-items:center;gap:18px;padding:16px 20px;border-radius:var(--k-bubble);background:var(--a-surface);border:0;box-shadow:0 1px 2px rgba(26,30,39,0.06);color:var(--a-ink);text-align:left;font-family:inherit;cursor:pointer">
+    <button data-detail="${esc(next.id)}" style="position:relative;flex:0 1 460px;min-width:0;display:flex;align-items:center;gap:18px;padding:16px 20px;border-radius:16px;background:var(--a-surface);border:1px solid var(--a-rule);color:var(--a-ink);text-align:left;font-family:inherit;cursor:pointer">
       <span style="flex:0 0 auto;display:flex;flex-direction:column;gap:2px">
         <span style="display:inline-flex;align-items:center;gap:7px;font-size:15px;color:var(--a-muted)"><i aria-hidden="true" style="display:block;width:7px;height:7px;border-radius:50%;background:var(--a-action)"></i>다음 촬영</span>
         <strong class="hn-num" style="font-size:32px;font-weight:800;line-height:1.1;white-space:nowrap">${countdown}</strong>
@@ -741,7 +741,7 @@ function shortsView(){
    예전엔 이 컴퓨터에서 돌던 로컬 서버(127.0.0.1:3000)를 띄웠다.
    이제 drive/ 폴더에 같이 들어 있어서 같은 출처에서 바로 연다.
    서버 탐지도, 주소 설정도, 꺼져 있다는 안내도 필요 없다. */
-const DRIVE_VERSION = '20261028-2';
+const DRIVE_VERSION = '20261101-1';
 function driveView(){
   const hash = state.driveSettings ? '#settings' : '';
   state.driveSettings = false;
