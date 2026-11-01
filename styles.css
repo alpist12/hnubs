@@ -854,3 +854,73 @@ body { background: var(--a-paper); color: var(--a-ink); }
 .hn-brand span { color: #5A54C9; }
 
 /* 지난 시간대 칸 — 눕혀 두되 숫자는 읽혀야 한다. #A5ABBF 는 2.08:1 이었다. */
+
+/* ===========================================================
+   Kakao 방향
+   노란색은 쓰지 않는다. 대신 카카오톡 대화방 배경의 푸른 회색을
+   바탕으로 깔아 그 자리를 메운다. 흰 면이 바탕 위에서 저절로 떠서
+   그림자 없이도 층이 생긴다 — 노랑이 하던 일을 바탕색이 한다.
+   강조색은 카카오가 링크에 쓰는 파랑. 빨강·초록·주황은 쓸 수 없다,
+   가능 인원 격자에서 이미 뜻을 갖고 있어서 충돌한다.
+   =========================================================== */
+:root {
+  --a-ink: #1A1E27;
+  --a-paper: #DDE5EC;
+  --a-surface: #FFFFFF;
+  --a-rule: #CBD6E0;
+  --a-muted: #5D6572;
+  --a-action: #1B64DA;
+  --a-action-press: #1550B4;
+  --a-radius: 20px;
+  --k-bubble: 20px 20px 20px 6px;   /* 말풍선 모서리 */
+}
+
+/* 헤더 — 흰 면으로 바탕과 끊는다 */
+.hn-header {
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: saturate(140%) blur(14px);
+  border-bottom: 1px solid var(--a-rule);
+}
+.hn-nav button { font-weight: 500; }
+.hn-nav button.active { font-weight: 700; }
+
+/* 제목 — 애플처럼 크게 벌리지 않는다. 카카오는 굵고 촘촘하다. */
+.a-hero { border-bottom: 0; padding-bottom: 16px; margin-bottom: 16px; }
+.a-hero h1 {
+  font-size: clamp(26px, 3vw, 32px);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+.a-hero .a-sub, .a-hero .a-eyebrow { font-size: 15px; }
+
+/* 카드 — 테두리 대신 바탕과의 대비로 뜬다 */
+#app > section, #app > article, #app > div > section {
+  border-color: transparent !important;
+}
+
+/* 버튼 — 알약보다 조금 각진 둥근 사각형 */
+.a-btn { border-radius: 14px; height: 44px; font-size: 15px; font-weight: 700; }
+.a-btn-quiet { border-color: var(--a-rule); }
+
+/* 하위 탭 — 밑줄 대신 알약으로 되돌린다. 카카오는 알약을 쓴다. */
+[role="tablist"] {
+  border-bottom: 0 !important;
+  gap: 6px !important;
+  background: rgba(255, 255, 255, 0.6) !important;
+  padding: 5px !important;
+  border-radius: 14px !important;
+  display: inline-flex !important;
+}
+[role="tablist"] > button {
+  padding: 0 15px !important;
+  height: 36px !important;
+  border-radius: 10px !important;
+  border-bottom: 0 !important;
+  margin-bottom: 0;
+  font-weight: 600 !important;
+}
+[role="tablist"] > button[aria-selected="true"] {
+  background: var(--a-ink) !important;
+  color: #FFFFFF !important;
+  font-weight: 700 !important;
+}
