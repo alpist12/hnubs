@@ -100,6 +100,76 @@ const AV=[['#E3EAFF','#3F4FD0'],['#E3F7EE','#1C6E4A'],['#EDE6FF','#5B45C8'],['#F
 const DOW=['일','월','화','수','목','금','토'];
 // fixedClasses.day 는 월=0 으로 저장된다. 표시는 일요일 시작, 조회는 월=0 그대로.
 const dataDay=d=>(d.getDay()+6)%7;
+/* 띠의 그림 — 하프톤 점으로 그린 방송 장비.
+   kakaocorp 은 여기에 점으로 찍은 지구본 영상을 돌린다. 영상을 가져올 수는 없으니
+   같은 방식으로 직접 찍는다: 아이콘을 보이지 않는 캔버스에 한 번 그리고,
+   픽셀이 얼마나 찼는지를 읽어 그만큼 점을 키운다.
+   방송국이니 카메라 · 마이크 · 송신탑. 천천히 돌아가면서 바뀐다. */
+const HERO_ICONS = [
+  // 비디오 카메라
+  ['M3 7a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z', 'M15 11l6-4v10l-6-4z'],
+  // 마이크
+  ['M12 2a3 3 0 0 1 3 3v6a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z', 'M5 11a7 7 0 0 0 14 0', 'M12 18v4', 'M8 22h8'],
+  // 송신탑
+  ['M12 9a2 2 0 1 1 0 4 2 2 0 0 1 0-4z', 'M7.5 6.5a7 7 0 0 0 0 9', 'M16.5 6.5a7 7 0 0 1 0 9', 'M4.5 3.5a11 11 0 0 0 0 15', 'M19.5 3.5a11 11 0 0 1 0 15', 'M12 13v8'],
+];
+
+function halftoneDots(iconIndex, cols = 46) {
+  const N = 180;                      // 캔버스 한 변
+  const cv = document.createElement('canvas');
+  cv.width = cv.height = N;
+  const ctx = cv.getContext('2d', { willReadFrequently: true });
+  if (!ctx) return '';
+  ctx.scale(N / 24, N / 24);          // 아이콘은 24x24 좌표계로 그려져 있다
+  ctx.strokeStyle = '#fff';
+  ctx.lineWidth = 1.9;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  for (const d of HERO_ICONS[iconIndex % HERO_ICONS.length]) ctx.stroke(new Path2D(d));
+
+  const px = ctx.getImageData(0, 0, N, N).data;
+  const step = N / cols;
+  const out = [];
+  for (let cx = 0; cx < cols; cx++) {
+    for (let cy = 0; cy < cols; cy++) {
+      // 한 칸 안의 알파 평균. 많이 찼으면 큰 점.
+      let sum = 0, count = 0;
+      const x0 = Math.floor(cx * step), y0 = Math.floor(cy * step);
+      for (let x = x0; x < x0 + step && x < N; x += 2) {
+        for (let y = y0; y < y0 + step && y < N; y += 2) {
+          sum += px[(y * N + x) * 4 + 3]; count++;
+        }
+      }
+      const k = count ? sum / count / 255 : 0;
+      if (k < 0.02) continue;
+      const r = (0.6 + Math.min(1, k * 1.6) * 2.4).toFixed(2);
+      // 가운데에서 바깥으로 번진다. cx+cy 순서면 한쪽 모서리에서 쓸려 오는 모양이 된다.
+      const mid = cols / 2;
+      const dist = Math.hypot(cx - mid, cy - mid) / mid;
+      const delay = (dist * 0.42).toFixed(2);
+      out.push(`<circle cx="${(cx * step + step / 2).toFixed(1)}" cy="${(cy * step + step / 2).toFixed(1)}" r="${r}" style="--d:${delay}s"/>`);
+    }
+  }
+  return `<svg class="a-art" aria-hidden="true" viewBox="0 0 ${N} ${N}">${out.join('')}</svg>`;
+}
+
+/* 띠 배경 — 가장자리를 채우는 옅은 점판. 가운데 그림을 받쳐 준다. */
+function heroField() {
+  const W = 1200, H = 340, STEP = 26, out = [];
+  for (let x = 0; x < W; x += STEP) {
+    for (let y = 0; y < H; y += STEP) {
+      out.push(`<circle cx="${x + 13}" cy="${y + 13}" r="1.5"/>`);
+    }
+  }
+  return `<svg class="a-field" aria-hidden="true" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid slice">${out.join('')}</svg>`;
+}
+
+function heroDots() {
+  // 화면을 열 때마다 다른 장비가 나온다. 날짜로 고르니 하루 안에서는 안 바뀐다.
+  const i = new Date().getDate() % HERO_ICONS.length;
+  return heroField() + halftoneDots(i);
+}
+
 const CARD='border-radius:16px;background:var(--a-surface);border:1px solid var(--a-rule);box-shadow:none';
 const EDIT_ICON='<svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>';
 function initial(name){ return String(name||'?').trim().slice(0,1) || '?'; }
@@ -132,6 +202,7 @@ function noticesView(){
 
   return `
   <section class="a-hero" style="display:flex;flex-wrap:wrap;gap:16px 24px;align-items:flex-end;justify-content:space-between">
+    ${heroDots()}
     <div style="position:relative;display:flex;flex-direction:column;gap:2px;min-width:0">
       <span style="font-size:13.5px;color:var(--a-muted)">전체 ${notices.length}건 · 필독 ${notices.filter(n=>n.tag==='필독').length}건</span>
       <h1>공지사항</h1>
@@ -329,6 +400,7 @@ function homeView() {
 
   return `
   <section aria-label="오늘의 작업공간" class="a-hero" style="display:flex;flex-wrap:wrap;gap:18px 28px;align-items:flex-end">
+    ${heroDots()}
     <div style="position:relative;flex:1 1 420px;min-width:0;display:flex;flex-direction:column;gap:14px">
       <div style="display:flex;flex-direction:column;gap:2px">
         <span style="font-size:13.5px;color:var(--a-muted);font-weight:500">${now.getMonth()+1}월 ${now.getDate()}일 ${['일','월','화','수','목','금','토'][now.getDay()]}요일</span>
@@ -477,6 +549,7 @@ function weeklyView() {
 
   return `
   <section class="a-hero" style="display:flex;flex-wrap:wrap;gap:16px 24px;align-items:flex-end;justify-content:space-between">
+    ${heroDots()}
     <div style="position:relative;display:flex;flex-direction:column;gap:2px;min-width:0">
       <span style="font-size:13.5px;color:var(--a-muted)">촬영 가능 인원 비교</span>
       <h1>주간 일정표</h1>
@@ -682,6 +755,7 @@ function shortsView(){
 
   const hero = `
   <section class="a-hero" style="display:flex;flex-wrap:wrap;gap:16px 24px;align-items:flex-end;justify-content:space-between;min-height:92px">
+    ${heroDots()}
     <div style="position:relative;display:flex;flex-direction:column;gap:2px;min-width:0;max-width:720px">
       <span style="font-size:13.5px;color:var(--a-muted)">${st==='on'?'쇼츠 메이커 연결됨':'쇼츠 메이커'}</span>
       <h1>쇼츠</h1>
@@ -920,6 +994,7 @@ function radioView(){
 
   return `
   <section class="a-hero" style="display:flex;flex-wrap:wrap;gap:16px 24px;align-items:flex-end;justify-content:space-between">
+    ${heroDots()}
     <div style="position:relative;display:flex;flex-direction:column;gap:2px;min-width:0">
       <span style="font-size:13.5px;color:var(--a-muted)">${esc(range)}</span>
       <h1>라디오</h1>
@@ -969,6 +1044,7 @@ function projectsView(){
 
   return `
   <section class="a-hero" style="display:flex;flex-wrap:wrap;gap:16px 24px;align-items:flex-end;justify-content:space-between">
+    ${heroDots()}
     <div style="position:relative;display:flex;flex-direction:column;gap:2px;min-width:0">
       <span style="font-size:13.5px;color:var(--a-muted)">${list.length}개 작품</span>
       <h1>프로젝트</h1>
@@ -1163,6 +1239,7 @@ function scriptView(){
 
   return `
   <section class="a-hero" style="display:flex;flex-wrap:wrap;gap:16px 24px;align-items:flex-end;justify-content:space-between;min-height:92px">
+    ${heroDots()}
     <div style="position:relative;display:flex;flex-direction:column;gap:2px;min-width:0;max-width:720px">
       <span style="font-size:13.5px;color:var(--a-muted)">NVIDIA NIM · ${esc(state.aiHealthText||'서버 확인 중')}</span>
       <h1>AI 대본 분석</h1>
@@ -1320,6 +1397,7 @@ function shootsView() {
 
   return `
   <section class="a-hero" style="display:flex;flex-wrap:wrap;gap:16px 24px;align-items:flex-end;justify-content:space-between">
+    ${heroDots()}
     <div style="position:relative;display:flex;flex-direction:column;gap:2px;min-width:0">
       <span class="hn-num" style="font-size:13.5px;color:var(--a-muted)">${range}</span>
       <h1>일정</h1>
@@ -1457,6 +1535,7 @@ function personalView(){
 
   return `
   <section class="a-hero" style="display:flex;flex-wrap:wrap;gap:16px 24px;align-items:flex-end;justify-content:space-between">
+    ${heroDots()}
     <div style="position:relative;display:flex;flex-direction:column;gap:6px;min-width:0">
       <label style="display:inline-flex;align-items:center;gap:6px;font-size:13.5px;color:var(--a-muted)">
         <select id="personal-member" aria-label="구성원 선택" style="height:30px;padding:0 8px;border-radius:9px;border:1px solid var(--a-rule);background:var(--a-surface);color:var(--a-ink);font-family:inherit;font-size:13.5px;font-weight:600">
@@ -1779,6 +1858,7 @@ function peopleView(){
 
   return `
   <section class="a-hero" style="display:flex;flex-wrap:wrap;gap:16px 24px;align-items:flex-end;justify-content:space-between">
+    ${heroDots()}
     <div style="position:relative;display:flex;flex-direction:column;gap:2px;min-width:0">
       <span style="display:inline-flex;align-items:center;gap:6px;font-size:13.5px;color:var(--a-muted)"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>관리자 권한으로 보는 중</span>
       <h1>인원 관리</h1>
@@ -1914,6 +1994,7 @@ function settingsView(){
 
   return `
   <section class="a-hero" style="display:flex;flex-wrap:wrap;gap:16px 24px;align-items:flex-end;justify-content:space-between">
+    ${heroDots()}
     <div style="position:relative;display:flex;flex-direction:column;gap:2px;min-width:0">
       <span style="display:inline-flex;align-items:center;gap:6px;font-size:13.5px;color:var(--a-muted)"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>관리자 권한으로 보는 중</span>
       <h1>설정</h1>

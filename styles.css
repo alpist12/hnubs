@@ -953,3 +953,86 @@ body { background: var(--a-paper); color: var(--a-ink); }
   color: #111111;
 }
 .a-hero [data-detail] { margin: 0 auto; }
+
+/* 띠의 그림 — 하프톤 점.
+   kakaocorp 은 여기에 점으로 찍은 지구본 영상을 돌린다. 영상을 가져올 수 없으니
+   아이콘을 캔버스에 그려 픽셀을 읽고 그만큼 점을 키우는 식으로 직접 찍는다.
+   배경 점판이 가장자리를 채우고, 가운데에 방송 장비가 떠오른다. */
+.a-hero { position: relative; overflow: hidden; isolation: isolate; }
+
+.a-field, .a-art {
+  position: absolute;
+  pointer-events: none;
+  z-index: -1;
+  fill: #FFFFFF;
+}
+.a-field {
+  inset: 0; width: 100%; height: 100%;
+  opacity: 0.16;
+  -webkit-mask-image: radial-gradient(ellipse 52% 66% at 50% 50%, transparent 30%, #000 100%);
+  mask-image: radial-gradient(ellipse 52% 66% at 50% 50%, transparent 30%, #000 100%);
+}
+/* 장비 그림은 오른쪽에 크게. 글자는 왼쪽에 앉는다. */
+.a-art {
+  right: 2%;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 84%;
+  width: auto;
+  aspect-ratio: 1;
+  opacity: 0.42;
+}
+.a-art circle {
+  transform-origin: center;
+  transform-box: fill-box;
+  animation:
+    a-assemble .62s cubic-bezier(.2,.9,.25,1) var(--d, 0s) both,
+    a-breathe 5.2s ease-in-out calc(var(--d, 0s) + .62s) infinite;
+}
+@keyframes a-assemble {
+  from { transform: scale(0); opacity: 0; }
+  to   { transform: scale(0.55); opacity: .55; }
+}
+@keyframes a-breathe {
+  0%, 100% { transform: scale(0.55); opacity: .55; }
+  50%      { transform: scale(1);    opacity: 1; }
+}
+
+/* 배경 점판도 같이 깔린다 — 그림보다 먼저, 더 조용하게 */
+.a-field { animation: a-fade .8s ease both; }
+@keyframes a-fade { from { opacity: 0 } to { opacity: .16 } }
+
+/* 글자는 밑에서 올라온다. kakaocorp 의 본문 전환이 500ms 라 거기 맞춘다. */
+.a-hero h1 { animation: a-rise .5s cubic-bezier(.2,.8,.3,1) .06s both; }
+.a-hero .a-eyebrow { animation: a-rise .5s cubic-bezier(.2,.8,.3,1) both; }
+.a-hero .a-sub { animation: a-rise .5s cubic-bezier(.2,.8,.3,1) .12s both; }
+.a-hero > div:last-child { animation: a-rise .5s cubic-bezier(.2,.8,.3,1) .18s both; }
+@keyframes a-rise {
+  from { opacity: 0; transform: translateY(14px); }
+}
+
+/* 글자는 왼쪽 정렬로 되돌린다. 그림이 오른쪽을 맡으니 가운데 정렬은 부딪힌다. */
+.a-hero { text-align: left; }
+.a-hero > div { align-items: flex-start !important; text-align: left; margin: 0; }
+.a-hero > div:last-child { justify-content: flex-start !important; }
+.a-hero h1, .a-hero .a-sub, .a-hero .a-eyebrow { max-width: 30ch; }
+
+@media (max-width: 760px) {
+  .a-art { opacity: 0.26; right: -60px; }
+}
+
+/* 눌렀을 때 — 사람이 한 행동에는 반응한다 */
+.a-btn:active { transform: scale(0.97); }
+[role="tablist"] > button { transition: background .16s ease, color .16s ease; }
+
+/* 창이 열릴 때 — 어디서 나왔는지 보여 준다 */
+[role="dialog"] { animation: a-pop .18s cubic-bezier(.2,.8,.3,1) both; }
+@keyframes a-pop { from { opacity: 0; transform: scale(.96); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .a-art circle { animation: none; transform: scale(.8); opacity: .8; }
+  .a-field { animation: none; opacity: .16; }
+  .a-hero h1, .a-hero .a-sub, .a-hero .a-eyebrow, .a-hero > div:last-child { animation: none; }
+  [role="dialog"] { animation: none; }
+  .a-btn:active { transform: none; }
+}
