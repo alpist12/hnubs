@@ -237,13 +237,13 @@ function homeView() {
   if(next){ const diff=Math.max(0,startMs(next)-nowMs); const dd=Math.floor(diff/86400000),hh=Math.floor(diff/3600000)%24,mm=Math.floor(diff/60000)%60;
     countdown = diff===0?'곧 시작':(dd>0?dd+'일 ':'')+pad2(hh)+':'+pad2(mm); }
   const nextCue = next ? `
-    <button data-detail="${esc(next.id)}" style="position:relative;flex:0 1 460px;min-width:0;display:flex;align-items:center;gap:18px;padding:16px 20px;border-radius:18px;background:var(--a-surface);border:1px solid var(--a-rule);backdrop-filter:blur(8px);color:#FFFFFF;text-align:left;font-family:inherit;cursor:pointer">
+    <button data-detail="${esc(next.id)}" style="position:relative;flex:0 1 460px;min-width:0;display:flex;align-items:center;gap:18px;padding:16px 20px;border-radius:18px;background:var(--a-surface);border:1px solid var(--a-rule);color:var(--a-ink);text-align:left;font-family:inherit;cursor:pointer">
       <span style="flex:0 0 auto;display:flex;flex-direction:column;gap:2px">
         <span style="display:inline-flex;align-items:center;gap:7px;font-size:15px;color:var(--a-muted)"><i aria-hidden="true" style="display:block;width:7px;height:7px;border-radius:50%;background:var(--a-action)"></i>다음 촬영</span>
         <strong class="hn-num" style="font-size:32px;font-weight:800;line-height:1.1;white-space:nowrap">${countdown}</strong>
         <span style="font-size:12.5px;color:var(--a-muted)">남음</span>
       </span>
-      <span aria-hidden="true" style="align-self:stretch;width:1px;background:rgba(255,255,255,0.25)"></span>
+      <span aria-hidden="true" style="align-self:stretch;width:1px;background:var(--a-rule)"></span>
       <span style="flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:6px">
         <strong style="font-size:17px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(next.title)}</strong>
         <span style="font-size:13px;color:var(--a-muted)">${monthDay(next.date)} (${dowOf(next.date)}) ${esc(next.time)}<br>${esc(next.place||'장소 미정')}</span>
@@ -430,7 +430,7 @@ function weeklyView() {
       else if(n>2){ bg='#FFFAEC'; fg='#7A5E14'; }
       if(shoot){ bg='linear-gradient(90deg, #F0F3FF, #F4F0FF)'; fg='#3A4590'; }
       const past=isPast(iso,h);
-      if(past){ bg='#F3F4F8'; fg='#A5ABBF'; }
+      if(past){ bg='#F3F4F8'; fg='#64686F'; }   // #A5ABBF 는 2.08:1 로 안 읽혔다
       if(on){ bg='linear-gradient(135deg, #4C6FE6, #7C5FD8)'; fg='#FFFFFF'; }
       const aria=`${DOW[d]}요일 ${h}시, 가능 ${n}명${shoot?`, 촬영 ${esc(shoot.title)}`:''}`;
       cells+=`<button data-week-slot="${key}" aria-pressed="${on}" aria-label="${aria}" title="${aria}" style="height:38px;border-radius:10px;border:0;background:${bg};color:${fg};box-shadow:${on?'0 6px 14px rgba(90,95,224,0.32)':'none'};font-family:'Plus Jakarta Sans','Noto Sans KR',sans-serif;font-size:12.5px;font-weight:700;cursor:pointer;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;padding:0 6px">${shoot?esc(shoot.title):`${n}명`}</button>`;
@@ -481,9 +481,9 @@ function weeklyView() {
     </div>
     <div style="position:relative;display:flex;flex-wrap:wrap;align-items:center;gap:8px">
       <div style="display:flex;align-items:center;gap:2px;height:42px;padding:0 4px;border-radius:12px;background:var(--a-surface);border:1px solid var(--a-rule)">
-        <button data-week-step="-1" aria-label="이전 주" style="width:34px;height:34px;border:0;border-radius:9px;background:transparent;color:#FFFFFF;font-size:16px;cursor:pointer">‹</button>
+        <button data-week-step="-1" aria-label="이전 주" style="width:34px;height:34px;border:0;border-radius:9px;background:transparent;color:var(--a-ink);font-size:16px;cursor:pointer">‹</button>
         <strong class="hn-num" style="padding:0 6px;font-size:14px;font-weight:700;white-space:nowrap">${rangeLabel}</strong>
-        <button data-week-step="1" aria-label="다음 주" style="width:34px;height:34px;border:0;border-radius:9px;background:transparent;color:#FFFFFF;font-size:16px;cursor:pointer">›</button>
+        <button data-week-step="1" aria-label="다음 주" style="width:34px;height:34px;border:0;border-radius:9px;background:transparent;color:var(--a-ink);font-size:16px;cursor:pointer">›</button>
       </div>
       <button data-week-step="0" style="height:42px;padding:0 14px;border-radius:12px;border:1px solid var(--a-rule);background:var(--a-surface);color:var(--a-ink);font-family:inherit;font-size:14px;font-weight:500;cursor:pointer">오늘</button>
     </div>
@@ -532,7 +532,7 @@ function weeklyView() {
       </div>
       ${detail}
       <div style="margin-top:auto;padding:16px 18px 18px">
-        <button ${parsed.length?'data-action="new-shoot"':'disabled'} style="width:100%;display:flex;align-items:center;justify-content:center;gap:6px;height:46px;border:0;border-radius:12px;background:${parsed.length?'var(--a-action)':'#C7C7CC'};color:#FFFFFF;font-family:inherit;font-size:15px;font-weight:500;cursor:${parsed.length?'pointer':'default'};border-radius:980px">
+        <button ${parsed.length?'data-action="new-shoot"':'disabled'} style="width:100%;display:flex;align-items:center;justify-content:center;gap:6px;height:46px;border:0;border-radius:12px;background:${parsed.length?'var(--a-action)':'#8E8E93'};color:#FFFFFF;font-family:inherit;font-size:15px;font-weight:500;cursor:${parsed.length?'pointer':'default'};border-radius:980px">
           <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>선택 시간대로 촬영 일정 등록</button>
       </div>
     </aside>

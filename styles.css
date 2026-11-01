@@ -755,7 +755,7 @@ body.hn-shorts .air { display: none; }
   --a-paper: #F5F5F7;
   --a-surface: #FFFFFF;
   --a-rule: #D2D2D7;
-  --a-muted: #86868B;
+  --a-muted: #6E6E73;   /* #86868B 는 종이 위 3.33:1 로 WCAG AA 미달 */
   --a-action: #0071E3;
   --a-action-press: #0062C4;
   --a-radius: 18px;
@@ -849,3 +849,8 @@ body { background: var(--a-paper); color: var(--a-ink); }
   font-weight: 600 !important;
   border-bottom-color: var(--a-ink) !important;
 }
+
+/* 브랜드 옆 'workspace' 는 13px 에 4.16:1 이라 본문 기준에 못 미쳤다. 한 단계 진하게. */
+.hn-brand span { color: #5A54C9; }
+
+/* 지난 시간대 칸 — 눕혀 두되 숫자는 읽혀야 한다. #A5ABBF 는 2.08:1 이었다. */
