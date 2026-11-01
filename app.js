@@ -425,15 +425,18 @@ function weeklyView() {
       const n=pool.filter(p=>memberAvailable(p[7],iso,dataDay(dateObj),h)).length;
       const shoot=schedules.find(s=>s.date===iso&&Number(s.startH)<h+1&&Number(s.endH)>h);
       const on=slots.includes(key);
-      let bg='#FFF4F6', fg='#A13F5A';
-      if(total&&n===total){ bg='#F0FAF5'; fg='#2A7553'; }
-      else if(n>2){ bg='#FFFAEC'; fg='#7A5E14'; }
-      if(shoot){ bg='linear-gradient(90deg, #F0F3FF, #F4F0FF)'; fg='#3A4590'; }
+      // 다 되는 날은 확실히 초록, 빠듯한 날은 확실히 빨강. 중간은 비워 둔다.
+      const ratio=total?n/total:0;
+      let bg='#FBE9EC', fg='#8E2437';
+      if(ratio>=1){ bg='#D8F0E2'; fg='#14673A'; }
+      else if(ratio>=0.75){ bg='#E9F6EE'; fg='#1C6E45'; }
+      else if(ratio>=0.4){ bg='#FDF3DC'; fg='#6E5208'; }
+      if(shoot){ bg='#E7EAFB'; fg='#2F3C96'; }
       const past=isPast(iso,h);
       if(past){ bg='#F3F4F8'; fg='#64686F'; }   // #A5ABBF 는 2.08:1 로 안 읽혔다
-      if(on){ bg='linear-gradient(135deg, #4C6FE6, #7C5FD8)'; fg='#FFFFFF'; }
+      if(on){ bg='var(--a-action)'; fg='#FFFFFF'; }
       const aria=`${DOW[d]}요일 ${h}시, 가능 ${n}명${shoot?`, 촬영 ${esc(shoot.title)}`:''}`;
-      cells+=`<button data-week-slot="${key}" aria-pressed="${on}" aria-label="${aria}" title="${aria}" style="height:38px;border-radius:10px;border:0;background:${bg};color:${fg};box-shadow:${on?'0 6px 14px rgba(90,95,224,0.32)':'none'};font-family:'Plus Jakarta Sans','Noto Sans KR',sans-serif;font-size:12.5px;font-weight:700;cursor:pointer;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;padding:0 6px">${shoot?esc(shoot.title):`${n}명`}</button>`;
+      cells+=`<button data-week-slot="${key}" aria-pressed="${on}" aria-label="${aria}" title="${aria}" style="height:46px;border-radius:10px;border:0;background:${bg};color:${fg};font-family:inherit;font-size:${shoot?'12.5px':'17px'};font-weight:${shoot?600:500};letter-spacing:-0.02em;font-variant-numeric:tabular-nums;cursor:pointer;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;padding:0 6px;transition:background .12s ease">${shoot?esc(shoot.title):(past?'':n)}</button>`;
     });
   });
 
@@ -818,7 +821,7 @@ function radioPickCard(){
     return `<section style="display:flex;flex-direction:column;gap:8px">
       <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
         <span style="padding:3px 10px;border-radius:99px;background:${bg};color:${fg};font-size:12.5px;font-weight:800">${esc(dept)}</span>
-        <span style="font-size:12.5px;font-weight:700;color:${n?'#2A7553':'#8A93AE'}">${n ? `${n}명 선택` : '아직 없음'}</span>
+        <span style="font-size:12.5px;font-weight:700;color:${n?'#2A7553':'#6E6E73'}">${n ? `${n}명 선택` : '아직 없음'}</span>
       </div>
       <div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(140px, 1fr));gap:8px">${own.map(p => chipFor(p, false)).join('')}
         <button type="button" data-radio-other="${esc(dept)}" aria-pressed="${open}"
@@ -893,10 +896,10 @@ function radioView(){
         <span style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:#64708F">${DOW[dateObj.getDay()]} ${dateObj.getDate()}일
           ${off ? '<span style="padding:1px 7px;border-radius:99px;background:#E6E8F0;color:#5A6480;font-size:11px;font-weight:800">휴방</span>' : ''}</span>
         ${off
-          ? `<strong style="font-size:14.5px;font-weight:700;color:#A5ABBF">방송 없음</strong>`
+          ? `<strong style="font-size:14.5px;font-weight:700;color:var(--a-muted)">방송 없음</strong>`
           : cast.length
             ? `<strong style="font-size:14.5px;font-weight:800;color:#20294D;line-height:1.4">${cast.map(c => esc(c.name || '이름 미등록')).join(', ')}</strong>`
-            : `<strong style="font-size:14.5px;font-weight:700;color:#8A93AE">담당 미정</strong>`}
+            : `<strong style="font-size:14.5px;font-weight:700;color:var(--a-muted)">담당 미정</strong>`}
         ${off ? '' : `<span style="font-size:12px;color:${free.length ? '#64708F' : '#A13F5A'}">이 시간 가능 ${free.length}명</span>`}
         ${state.radioEdit ? `<div style="display:flex;gap:6px">
           ${off ? '' : `<button data-radio-edit="${iso}|${slot.key}" style="flex:1 1 auto;height:32px;border:0;border-radius:10px;background:#E3EAFF;color:#3F4FD0;font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer">담당 ${cast.length ? '수정' : '지정'}</button>`}
@@ -924,7 +927,7 @@ function radioView(){
     </div>
     <div style="position:relative;display:flex;align-items:center;gap:6px">
       <button data-radio-mode="1" aria-pressed="${state.radioEdit}" aria-label="${state.radioEdit ? '담당 수정 끝내기' : '담당 수정하기'}" title="${state.radioEdit ? '수정 끝내기' : '담당 수정'}"
-        style="display:flex;align-items:center;justify-content:center;gap:6px;height:40px;padding:0 14px;border-radius:12px;border:1px solid ${state.radioEdit ? 'transparent' : 'rgba(255,255,255,0.28)'};background:${state.radioEdit ? '#FFFFFF' : 'rgba(255,255,255,0.14)'};color:${state.radioEdit ? '#3F4FD0' : '#FFFFFF'};font-family:inherit;font-size:14px;font-weight:700;cursor:pointer">
+        style="display:flex;align-items:center;justify-content:center;gap:6px;height:40px;padding:0 14px;border-radius:12px;border:1px solid ${state.radioEdit ? 'transparent' : 'var(--a-rule)'};background:${state.radioEdit ? 'var(--a-action)' : 'var(--a-surface)'};color:${state.radioEdit ? '#FFFFFF' : 'var(--a-ink)'};font-family:inherit;font-size:14px;font-weight:700;cursor:pointer">
         <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>${state.radioEdit ? '끝내기' : '담당 수정'}
       </button>
       <span aria-hidden="true" style="width:1px;height:24px;background:var(--a-rule)"></span>
@@ -958,8 +961,8 @@ function projectsView(){
         <button type="button" data-edit-open="project|${esc(id)}" aria-label="${esc(p.name||id)} 수정" title="수정" style="flex:0 0 auto;width:32px;height:32px;border:0;border-radius:10px;background:#F2F4FB;color:#3F55D6;display:inline-flex;align-items:center;justify-content:center;cursor:pointer">${EDIT_ICON}</button>
       </div>
       <div style="display:flex;flex-direction:column;gap:6px">
-        <span style="font-size:12px;font-weight:700;color:#8A93AE">참여 인원 ${crew.length}명</span>
-        ${crew.length?`<span style="display:flex;padding-left:7px">${faces(crew.map(m=>m[0]),6)}</span>`:'<span style="font-size:12.5px;color:#A5ABBF">아직 없음</span>'}
+        <span style="font-size:12px;font-weight:700;color:var(--a-muted)">참여 인원 ${crew.length}명</span>
+        ${crew.length?`<span style="display:flex;padding-left:7px">${faces(crew.map(m=>m[0]),6)}</span>`:'<span style="font-size:12.5px;color:var(--a-muted)">아직 없음</span>'}
       </div>
     </article>`;
   }).join('');
@@ -1014,8 +1017,8 @@ function scriptView(){
 
   const steps=['대본 선택','분석 설정','AI 분석','일정 후보'].map((s,i)=>{ const on=i===step, done=i<step;
     return `<button ${reach[i]?`data-ai-step="${i}"`:'disabled'} style="display:flex;align-items:center;gap:8px;padding:0;border:0;background:none;font-family:inherit;cursor:${reach[i]?'pointer':'default'};opacity:${reach[i]?1:.45}">
-      <span class="hn-num" style="width:24px;height:24px;border-radius:50%;background:${on||done?'linear-gradient(135deg, #4C6FE6, #7C5FD8)':'#E6EAF2'};color:${on||done?'#FFFFFF':'#8A93AE'};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800">${done?'✓':i+1}</span>
-      <b style="font-size:13.5px;font-weight:${on?700:600};color:${on?'#20294D':'#8A93AE'}">${s}</b>
+      <span class="hn-num" style="width:24px;height:24px;border-radius:50%;background:${on||done?'var(--a-action)':'#E6EAF2'};color:${on||done?'#FFFFFF':'#55585F'};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800">${done?'✓':i+1}</span>
+      <b style="font-size:13.5px;font-weight:${on?700:600};color:${on?'#20294D':'#6E6E73'}">${s}</b>
     </button>${i<3?'<span aria-hidden="true" style="flex:0 1 36px;height:2px;background:#E6EAF2"></span>':''}`;}).join('');
 
   const navBtn=(dir,label,enabled)=>`<button ${enabled?`data-ai-step="${step+dir}"`:'disabled'} style="height:44px;padding:0 18px;border:0;border-radius:12px;background:${dir>0?(enabled?'linear-gradient(135deg, #416FDE, #6656DA)':'#B9C3E6'):'#F2F4FB'};color:${dir>0?'#FFFFFF':'#4F5770'};font-family:inherit;font-size:14px;font-weight:700;cursor:${enabled?'pointer':'default'}">${label}</button>`;
@@ -1456,7 +1459,7 @@ function personalView(){
   <section class="a-hero" style="display:flex;flex-wrap:wrap;gap:16px 24px;align-items:flex-end;justify-content:space-between">
     <div style="position:relative;display:flex;flex-direction:column;gap:6px;min-width:0">
       <label style="display:inline-flex;align-items:center;gap:6px;font-size:13.5px;color:var(--a-muted)">
-        <select id="personal-member" aria-label="구성원 선택" style="height:30px;padding:0 8px;border-radius:9px;border:1px solid var(--a-rule);background:var(--a-surface);color:#FFFFFF;font-family:inherit;font-size:13.5px;font-weight:700">
+        <select id="personal-member" aria-label="구성원 선택" style="height:30px;padding:0 8px;border-radius:9px;border:1px solid var(--a-rule);background:var(--a-surface);color:var(--a-ink);font-family:inherit;font-size:13.5px;font-weight:600">
           ${people.map(p=>`<option value="${esc(p[7])}" ${p[7]===state.personalMemberId?'selected':''} style="color:#20294D">${esc(p[0])} · ${esc(p[2])}</option>`).join('')}
         </select>님의 일정
       </label>
