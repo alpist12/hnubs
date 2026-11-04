@@ -1036,3 +1036,23 @@ body { background: var(--a-paper); color: var(--a-ink); }
   [role="dialog"] { animation: none; }
   .a-btn:active { transform: none; }
 }
+
+/* ── 크기 차이로 밀도를 만든다 ──────────────────────────────
+   kakaocorp 은 제목 40px 옆에 본문 15px 를 둔다. 중간 단계가 거의 없다.
+   우리 쪽은 제목만 크고 그 아래가 전부 13~18px 라 한 덩어리로 보였다.
+   섹션 제목과 숫자를 끌어올려 층을 만든다. */
+#app h2 {
+  font-size: clamp(20px, 2.2vw, 28px);
+  font-weight: 700;
+  letter-spacing: -1px;
+}
+#app h3 { font-size: 18px; font-weight: 700; letter-spacing: -0.6px; }
+
+/* 통계 숫자 — 대시보드의 주인공은 숫자다 */
+#app .hn-num { letter-spacing: -0.04em; }
+
+/* 섹션 사이에 숨 쉴 자리 */
+.hn-main > section,
+.hn-main > article,
+.hn-main > div { margin-bottom: 4px; }
+.hn-main { display: flex; flex-direction: column; gap: clamp(18px, 2.4vw, 30px); }

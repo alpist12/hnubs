@@ -330,9 +330,19 @@ function homeView() {
   const next7Days=[...new Set(next7.map(s=>dowOf(s.date)))].join(' · ');
   const activeMembers=people.filter(p=>p[5]==='활동 중').length;
   const pct=people.length?Math.round(activeMembers/people.length*100):0;
-  const tile=(bg,fg,glyph,label,value,unit,extra='')=>`<div style="display:flex;align-items:center;gap:14px;padding:16px 18px;border-radius:18px;background:rgba(255,255,255,0.88);border:1px solid #FFFFFF;box-shadow:0 8px 24px rgba(60,72,140,0.06)">
-    <span aria-hidden="true" style="flex:0 0 44px;height:44px;border-radius:14px;background:${bg};color:${fg};display:flex;align-items:center;justify-content:center"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${glyph}</svg></span>
-    <span style="flex:1 1 auto;min-width:0;display:flex;flex-direction:column"><span style="font-size:13px;color:#64708F">${label}</span><span style="display:flex;align-items:baseline;gap:3px"><strong class="hn-num" style="font-size:24px;font-weight:800">${value}</strong><span style="font-size:13px;color:#64708F">${unit}</span></span></span>${extra}</div>`;
+  // 아이콘 옆에 36px 숫자를 두니 230px 칸에서 줄이 깨졌다. 위아래로 쌓는다 —
+  // 아이콘 · 이름은 위에, 숫자는 아래에 혼자. 대시보드에서 먼저 읽히는 건 숫자다.
+  const tile=(bg,fg,glyph,label,value,unit,extra='')=>`<div style="${CARD};padding:18px 20px;display:flex;flex-direction:column;gap:14px">
+    <span style="display:flex;align-items:center;gap:10px;min-width:0">
+      <span aria-hidden="true" style="flex:0 0 32px;height:32px;border-radius:10px;background:${bg};color:${fg};display:flex;align-items:center;justify-content:center"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${glyph}</svg></span>
+      <span style="flex:1 1 auto;min-width:0;font-size:14px;color:var(--a-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${label}</span>
+    </span>
+    <span style="display:flex;align-items:flex-end;justify-content:space-between;gap:10px">
+      <span style="display:flex;align-items:baseline;gap:5px;min-width:0">
+        <strong class="hn-num" style="font-size:40px;font-weight:700;line-height:1">${value}</strong>
+        <span style="font-size:13.5px;color:var(--a-muted);white-space:nowrap">${unit}</span>
+      </span>${extra}</span>
+  </div>`;
 
   // --- 타임라인 ---
   const START=9, SPAN=14;
