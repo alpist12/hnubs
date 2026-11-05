@@ -259,6 +259,7 @@ function filterStrictlyInsideRoot(mappedItems) {
 
 const state = {
   hasBackend: false,
+  editor: null,      // 편집 화면. { id, name, mode, text, rows, cols, dirty, loading }
   driveNotice: '',   // 구글 드라이브 연결이 아직 덜 됐을 때 띄울 안내
   alwaysConnected: true, // 내 드라이브 상시 연결 모드
   mode: 'google',
@@ -953,6 +954,200 @@ async function createFolderOrDoc(mode, name, content = '', description = '') {
   }
 }
 
+/* 파일 종류별로 편집 방법이 갈린다.
+   text : md · txt · csv · json · srt — 그대로 글자로 고친다
+   sheet: xlsx · xls — SheetJS 로 읽어 표로 고친다
+   none : hwp · hwpx — 한글 고유 바이너리라 브라우저에서 열 방법이 없다.
+          읽고 쓰는 공개 라이브러리가 없어서 내려받아 한글에서 여는 수밖에 없다. */
+const TEXT_EXT = ['md', 'txt', 'csv', 'tsv', 'json', 'srt', 'vtt', 'log'];
+const SHEET_EXT = ['xlsx', 'xls', 'xlsm'];
+const NO_EDIT_EXT = ['hwp', 'hwpx'];
+
+const fileExt = name => String(name || '').split('.').pop().toLowerCase();
+
+function editorMode(name, mimeType) {
+  const e = fileExt(name);
+  if (SHEET_EXT.includes(e)) return 'sheet';
+  if (NO_EDIT_EXT.includes(e)) return 'none';
+  if (TEXT_EXT.includes(e)) return 'text';
+  if (mimeType === 'application/vnd.google-apps.document') return 'text';
+  if (String(mimeType || '').startsWith('text/')) return 'text';
+  return 'none';
+}
+
+/* SheetJS 는 쓸 때만 받는다. 표 파일을 안 여는 사람에게 300KB 를 지울 이유가 없다. */
+let sheetLibPromise = null;
+function loadSheetLib() {
+  if (window.XLSX) return Promise.resolve(window.XLSX);
+  if (!sheetLibPromise) {
+    sheetLibPromise = new Promise((resolve, reject) => {
+      const el = document.createElement('script');
+      el.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+      el.onload = () => resolve(window.XLSX);
+      el.onerror = () => reject(new Error('표 편집기를 불러오지 못했습니다.'));
+      document.head.appendChild(el);
+    });
+  }
+  return sheetLibPromise;
+}
+
+/** 파일 원본을 가져온다. 글자로 쓸지 바이트로 쓸지는 부르는 쪽이 정한다. */
+async function fetchFileBody(item, as) {
+  if (state.accessToken) {
+    const res = await fetch(`https://www.googleapis.com/drive/v3/files/${item.id}?alt=media`, {
+      headers: { Authorization: `Bearer ${state.accessToken}` },
+    });
+    if (!res.ok) throw new Error(`원본을 받지 못했습니다 (${res.status})`);
+    return as === 'buffer' ? res.arrayBuffer() : res.text();
+  }
+  if (state.hasBackend) {
+    if (as === 'buffer') {
+      const res = await fetch(`/api/files/${item.id}/download?inline=1`);
+      if (!res.ok) throw new Error(`원본을 받지 못했습니다 (${res.status})`);
+      return res.arrayBuffer();
+    }
+    const res = await fetch(`/api/files/${item.id}/content`).then(r => r.json());
+    if (res.error) throw new Error(res.error);
+    return res.content || '';
+  }
+  // 백엔드가 없으면 브라우저에 들고 있는 내용뿐이다.
+  if (as === 'buffer') {
+    const blob = state.blobMap[item.id];
+    if (!blob) throw new Error('이 파일의 원본이 이 브라우저에 없습니다.');
+    return fetch(blob).then(r => r.arrayBuffer());
+  }
+  return item.content || '';
+}
+
+window.openEditorTab = async (id) => {
+  const item = byId(id);
+  if (!item) return;
+  const mode = editorMode(item.name, item.mimeType);
+  state.editor = { id, name: item.name, mode, text: '', rows: [], cols: 0, dirty: false, loading: mode !== 'none' };
+  state.detailId = null;
+  render();
+  if (mode === 'none') return;
+
+  try {
+    if (mode === 'sheet') {
+      const [XLSX, buf] = await Promise.all([loadSheetLib(), fetchFileBody(item, 'buffer')]);
+      const wb = XLSX.read(buf, { type: 'array' });
+      const sheet = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '', blankrows: false });
+      const cols = rows.reduce((m, r) => Math.max(m, r.length), 1);
+      // 빈 줄 몇 개는 둬야 뒤에 이어 적을 수 있다.
+      for (let i = 0; i < 3; i += 1) rows.push(Array(cols).fill(''));
+      state.editor = { ...state.editor, rows: rows.map(r => { const c = [...r]; c.length = cols; return [...c].map(v => v ?? ''); }), cols, sheetName: wb.SheetNames[0], loading: false };
+    } else {
+      state.editor = { ...state.editor, text: await fetchFileBody(item, 'text'), loading: false };
+    }
+  } catch (err) {
+    state.editor = { ...state.editor, loading: false, error: err.message };
+  }
+  render();
+};
+
+window.closeEditorTab = () => {
+  if (state.editor?.dirty && !confirm('저장하지 않은 수정이 있습니다. 닫을까요?')) return;
+  state.editor = null;
+  render();
+};
+
+window.markEditorDirty = () => {
+  if (state.editor && !state.editor.dirty) { state.editor.dirty = true; render(); }
+};
+
+window.setCell = (r, c, value) => {
+  const ed = state.editor; if (!ed) return;
+  ed.rows[r][c] = value;
+  if (!ed.dirty) { ed.dirty = true; render(); }
+};
+
+window.addSheetRow = () => {
+  const ed = state.editor; if (!ed) return;
+  ed.rows.push(Array(ed.cols).fill(''));
+  ed.dirty = true; render();
+};
+
+window.saveEditorTab = async () => {
+  const ed = state.editor; if (!ed) return;
+  const btn = document.getElementById('editor-save');
+  if (btn) { btn.disabled = true; btn.textContent = '저장 중…'; }
+  try {
+    if (ed.mode === 'sheet') {
+      const XLSX = await loadSheetLib();
+      // 끝의 빈 줄은 떨군다. 안 그러면 저장할 때마다 파일이 길어진다.
+      let rows = ed.rows.slice();
+      while (rows.length && rows[rows.length - 1].every(v => String(v).trim() === '')) rows.pop();
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(rows), ed.sheetName || 'Sheet1');
+      // 표 파일은 바이너리라 patchItem 의 글자 경로로 올릴 수 없다. 내려받게 한다.
+      XLSX.writeFile(wb, ed.name);
+      ed.dirty = false;
+      toast('표를 파일로 내려받았습니다. 드라이브에는 그 파일을 올려 주세요.');
+    } else {
+      const box = document.getElementById('editor-text');
+      await patchItem(ed.id, { content: box ? box.value : ed.text }, '저장했습니다');
+      ed.dirty = false;
+    }
+  } catch (err) {
+    toast('저장하지 못했습니다: ' + err.message);
+  }
+  if (btn) { btn.disabled = false; btn.textContent = ed.mode === 'sheet' ? '파일로 내려받기' : '저장'; }
+  render();
+};
+
+function editorScreen() {
+  const ed = state.editor;
+  const label = { text: '텍스트', sheet: '표', none: '편집 불가' }[ed.mode];
+
+  let body;
+  if (ed.loading) {
+    body = `<div style="flex:1;display:grid;place-items:center;color:var(--text-secondary);font-size:14px">불러오는 중…</div>`;
+  } else if (ed.error) {
+    body = `<div style="flex:1;display:grid;place-items:center;padding:40px;text-align:center;color:#A8324F;font-size:14px">${esc(ed.error)}</div>`;
+  } else if (ed.mode === 'none') {
+    const hwp = NO_EDIT_EXT.includes(fileExt(ed.name));
+    body = `<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:40px;text-align:center">
+      <span aria-hidden="true" style="width:56px;height:56px;border-radius:18px;background:#F1F3F9;color:#5A6480;display:grid;place-items:center">${iconSvg('fileText', 26)}</span>
+      <strong style="font-size:17px;font-weight:800">${hwp ? '한글 문서는 여기서 고칠 수 없어요' : '이 형식은 여기서 고칠 수 없어요'}</strong>
+      <p style="margin:0;max-width:46ch;font-size:13.5px;line-height:1.6;color:var(--text-secondary)">${hwp
+        ? 'hwp 는 한글 고유 형식이라 브라우저에서 읽고 쓸 방법이 없습니다. 내려받아 한글에서 고친 뒤 다시 올려 주세요.'
+        : '텍스트(md · txt · csv · json)와 표(xlsx · xls)만 여기서 고칠 수 있습니다.'}</p>
+      <button onclick="downloadItemById('${ed.id}')" style="height:40px;padding:0 18px;border:0;border-radius:11px;background:#416FDE;color:#fff;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer">내려받기</button>
+    </div>`;
+  } else if (ed.mode === 'sheet') {
+    const head = Array.from({ length: ed.cols }, (_, c) =>
+      `<th style="position:sticky;top:0;z-index:1;min-width:120px;padding:8px 10px;background:#F8F9FD;border:1px solid #E6E9F3;font-size:12px;font-weight:700;color:var(--text-secondary);text-align:left">${String.fromCharCode(65 + (c % 26))}</th>`).join('');
+    const rows = ed.rows.map((row, r) => `<tr>
+      <th style="position:sticky;left:0;z-index:1;width:44px;padding:6px 8px;background:#F8F9FD;border:1px solid #E6E9F3;font-size:12px;font-weight:600;color:var(--text-muted);text-align:right">${r + 1}</th>
+      ${Array.from({ length: ed.cols }, (_, c) => `<td style="padding:0;border:1px solid #E6E9F3"><input value="${esc(String(row[c] ?? ''))}" oninput="setCell(${r},${c},this.value)" style="width:100%;min-width:120px;height:34px;padding:0 10px;border:0;background:transparent;font-family:inherit;font-size:13.5px;color:var(--text-primary);outline-offset:-2px"></td>`).join('')}
+    </tr>`).join('');
+    body = `<div style="flex:1;min-height:0;overflow:auto;padding:0 22px 20px">
+      <table style="border-collapse:separate;border-spacing:0"><thead><tr><th style="position:sticky;left:0;top:0;z-index:2;width:44px;background:#F8F9FD;border:1px solid #E6E9F3"></th>${head}</tr></thead><tbody>${rows}</tbody></table>
+      <button onclick="addSheetRow()" style="margin-top:10px;height:34px;padding:0 14px;border:1px dashed #C9D0E4;border-radius:10px;background:transparent;color:#4F5770;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer">+ 줄 추가</button>
+    </div>`;
+  } else {
+    body = `<div style="flex:1;min-height:0;display:flex;padding:0 22px 20px">
+      <textarea id="editor-text" oninput="markEditorDirty()" spellcheck="false"
+        style="flex:1;width:100%;resize:none;padding:18px;border:1px solid #E6E9F3;border-radius:14px;background:#FFFFFF;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13.5px;line-height:1.7;color:var(--text-primary);outline:none">${esc(ed.text)}</textarea>
+    </div>`;
+  }
+
+  const canSave = !ed.loading && !ed.error && ed.mode !== 'none';
+  return `<div style="flex:1 1 auto;width:100%;min-width:0;height:100dvh;display:flex;flex-direction:column;background:var(--bg-main)">
+    <header style="flex-shrink:0;display:flex;align-items:center;gap:12px;padding:16px 22px;border-bottom:1px solid #ECEEF6">
+      <button onclick="closeEditorTab()" aria-label="닫고 목록으로" style="width:38px;height:38px;border:0;border-radius:11px;background:#F2F4FB;color:#4F5770;display:grid;place-items:center;cursor:pointer">${iconSvg('chevronLeft', 20)}</button>
+      <span style="flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:2px">
+        <strong style="font-size:17px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(ed.name)}</strong>
+        <small style="font-size:12.5px;color:var(--text-secondary)">${label} 편집${ed.dirty ? ' · 저장 안 됨' : ''}</small>
+      </span>
+      ${canSave ? `<button id="editor-save" onclick="saveEditorTab()" style="height:40px;padding:0 18px;border:0;border-radius:12px;background:${ed.dirty ? '#416FDE' : '#C7CBDA'};color:#fff;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer">${ed.mode === 'sheet' ? '파일로 내려받기' : '저장'}</button>` : ''}
+    </header>
+    ${body}
+  </div>`;
+}
+
 async function openEditorSheet(item) {
   try {
     if (state.accessToken) {
@@ -1579,6 +1774,8 @@ function render() {
     file: '일반 파일'
   };
 
+  if (state.editor) { appEl.innerHTML = editorScreen(); return; }
+
   appEl.innerHTML = `
     <div class="app-shell"
       ondragover="event.preventDefault(); setDragging(true)"
@@ -1811,7 +2008,7 @@ function render() {
                         <div class="row-name">
                           ${it.starred ? `<span style="display:flex;color:#F59E0B;flex-shrink:0">${iconSvg('starFill', 13)}</span>` : ''}
                           <span style="overflow:hidden;text-overflow:ellipsis">${esc(it.name)}</span>
-                          ${it.editable ? `<span class="edit-tag">직접편집</span>` : ''}
+                          ${editorMode(it.name, it.mimeType) !== 'none' ? `<span class="edit-tag">편집</span>` : ''}
                         </div>
                         <div class="row-desc-sub">
                           ${esc(it.description || formatMeta(it))}
@@ -2065,11 +2262,7 @@ window.openCreateDocSheet = () => {
   render();
 };
 
-window.openEditorById = (id) => {
-  const item = byId(id);
-  if (!item) return;
-  openEditorSheet(item);
-};
+window.openEditorById = (id) => openEditorTab(id);
 
 window.saveEditorSheet = async () => {
   const sh = state.sheet;
