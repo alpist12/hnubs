@@ -5,7 +5,7 @@
 ```
 GitHub Pages (정식 사이트)        Netlify (API 전용)              Firebase
 화면·정적 파일             →     /api/* (NVIDIA 키, 관리자 비번)  →  Firestore (일정)
-alpist12.github.io/scheduler      hnubs1212.netlify.app            기존 그대로
+alpist12.github.io/scheduler      hnubs.netlify.app            기존 그대로
 ```
 
 Netlify 는 안내 페이지 한 장(`netlify-public/`)만 올리고 나머지는 전부 함수다.
@@ -67,13 +67,13 @@ Site configuration → Environment variables 에 **세 개**를 넣는다:
 넣은 뒤 Deploys → Trigger deploy. 확인:
 
 ```bash
-curl -s https://hnubs1212.netlify.app/api/health
+curl -s https://hnubs.netlify.app/api/health
 ```
 
 `configured` 가 `true` 면 키까지 들어간 것이다. CORS 까지 보려면:
 
 ```bash
-curl -sD - -o /dev/null -H "Origin: https://alpist12.github.io"   https://hnubs1212.netlify.app/api/health | grep -i access-control
+curl -sD - -o /dev/null -H "Origin: https://alpist12.github.io"   https://hnubs.netlify.app/api/health | grep -i access-control
 ```
 
 > **빌드 분은 월 300분이고 하드 리밋이다.** 화면은 GitHub Pages 가 맡으므로
@@ -95,7 +95,7 @@ curl -sD - -o /dev/null -H "Origin: https://alpist12.github.io"   https://hnubs1
 `api-config.js` 한 줄이 화면이 어느 API 를 부를지 정한다.
 
 ```js
-window.HNUBS_API = location.hostname.endsWith('github.io') ? 'https://hnubs1212.netlify.app' : '';
+window.HNUBS_API = location.hostname.endsWith('github.io') ? 'https://hnubs.netlify.app' : '';
 ```
 
 로컬에서는 빈 문자열 → 같은 출처. GitHub Pages 에서는 Netlify 절대주소.

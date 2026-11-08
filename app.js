@@ -835,7 +835,7 @@ function shortsView(){
    예전엔 이 컴퓨터에서 돌던 로컬 서버(127.0.0.1:3000)를 띄웠다.
    이제 drive/ 폴더에 같이 들어 있어서 같은 출처에서 바로 연다.
    서버 탐지도, 주소 설정도, 꺼져 있다는 안내도 필요 없다. */
-const DRIVE_VERSION = '20261109-1';
+const DRIVE_VERSION = '20261109-2';
 function driveView(){
   const hash = state.driveSettings ? '#settings' : '';
   state.driveSettings = false;
@@ -1951,7 +1951,7 @@ const SETTINGS_NAV=[
 const adminUnlocked = () => sessionStorage.getItem('hnubs:admin') === 'ok';
 
 async function adminVerify(password){
-  const base = apiBase() || 'https://hnubs1212.netlify.app';
+  const base = apiBase() || 'https://hnubs.netlify.app';
   const nonce = `verify-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
   try {
     const res = await fetch(`${base}/api/maintenance`, {

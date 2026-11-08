@@ -12,4 +12,4 @@
  */
 /* 정식 사이트는 GitHub Pages 이고, /api/* 만 Netlify 가 맡는다.
    로컬(빈 문자열)에서는 같은 출처에서 찾으므로 AI 기능만 쉰다. */
-window.HNUBS_API = location.hostname.endsWith('github.io') ? 'https://hnubs1212.netlify.app' : '';
+window.HNUBS_API = location.hostname.endsWith('github.io') ? 'https://hnubs.netlify.app' : '';

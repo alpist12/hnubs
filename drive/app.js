@@ -8,7 +8,7 @@ const DEFAULT_CLIENT_ID = '533555779141-4l2im5ih2dou2b6omh0t07kh40soh196.apps.go
 const API_BASE = (() => {
   // workspace 의 api-config.js 와 같은 규칙. iframe 이라 부모 값도 읽어 본다.
   try { if (parent !== window && parent.HNUBS_API !== undefined) return String(parent.HNUBS_API).replace(/\/$/, ''); } catch {}
-  return location.hostname.endsWith('github.io') ? 'https://hnubs1212.netlify.app' : '';
+  return location.hostname.endsWith('github.io') ? 'https://hnubs.netlify.app' : '';
 })();
 
 const LOCKED_ROOT_FOLDER_ID = '1Sb255-QJM--dC_1YGzJax-VlqpWtAxif';
