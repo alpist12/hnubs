@@ -566,14 +566,14 @@ function toast(msg) {
 // UPLOAD ENGINE
 // ============================================================================
 
-function uploadFilesReal(fileList, replaceId = null) {
-  if (!state.hasBackend && !state.accessToken) { toast('Google Drive에서 업로드해 주세요. 연결된 목록은 읽기 전용입니다.'); return; }
+async function uploadFilesReal(fileList, replaceId = null) {
+  if (!state.hasBackend && !state.accessToken && !API_BASE) { toast('지금은 올릴 수 없어요. 구글 드라이브에서 직접 올려 주세요.'); return; }
   const files = Array.from(fileList || []);
   if (!files.length) return;
   const targetFolder = state.nav === 'drive' ? state.folder : 'root';
   state.sheet = null;
 
-  files.forEach(file => {
+  files.forEach(async file => {
     const uId = 'up_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
     const totalMb = Math.max(0.01, Number((file.size / (1024 * 1024)).toFixed(2)));
     const kind = detectKind(file.name, file.type);
@@ -673,6 +673,30 @@ function uploadFilesReal(fileList, replaceId = null) {
       };
       xhr.open('POST', '/api/upload', true);
       xhr.send(formData);
+      return;
+    }
+
+    // 배포본: Netlify 함수로 올린다.
+    if (API_BASE) {
+      if (file.size > DRIVE_WRITE_MAX) {
+        upObj.state = 'error';
+        toast(`${Math.round(DRIVE_WRITE_MAX / 1024 / 1024)}MB 까지만 올릴 수 있어요. 큰 영상은 구글 드라이브에서 직접 올려 주세요.`);
+        render();
+        return;
+      }
+      try {
+        upObj.progress = 20; render();
+        const dataBase64 = await fileToBase64(file);
+        upObj.progress = 55; render();
+        await driveWrite({ action: 'upload', name: file.name, parent: state.folder, mimeType: file.type, dataBase64 });
+        upObj.progress = 100; upObj.state = 'done'; render();
+        toast(`${file.name} 을(를) 올렸습니다.`);
+        await fetchFiles();
+      } catch (err) {
+        upObj.state = 'error';
+        toast('업로드 실패: ' + err.message);
+        render();
+      }
       return;
     }
 
@@ -891,6 +915,17 @@ async function createFolderOrDoc(mode, name, content = '', description = '') {
       return;
     }
 
+    if (API_BASE && mode !== 'doc') {
+      try {
+        await driveWrite({ action: 'mkdir', name, parent });
+        toast(`${name} 폴더를 만들었습니다.`);
+        await fetchFiles();
+      } catch (err) {
+        toast('폴더를 만들지 못했습니다: ' + err.message);
+      }
+      return;
+    }
+
     if (state.hasBackend) {
       const endpoint = mode === 'doc' ? '/api/documents' : '/api/folders';
       const res = await fetch(endpoint, {
@@ -992,6 +1027,29 @@ function loadSheetLib() {
 }
 
 /** 파일 원본을 가져온다. 글자로 쓸지 바이트로 쓸지는 부르는 쪽이 정한다. */
+/* 쓰기는 Netlify 함수 한 곳으로 모은다.
+   업로드 4MB 제한은 Netlify 요청 본문 한계(6MB) 때문이다 — base64 로 싸면 4/3 배가 된다.
+   큰 영상은 구글 드라이브에서 직접 올리는 수밖에 없다. */
+const DRIVE_WRITE_MAX = 4 * 1024 * 1024;
+
+async function driveWrite(payload) {
+  const res = await fetch(`${API_BASE}/api/drive/write`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(body.error || `실패 (${res.status})`);
+  return body;
+}
+
+const fileToBase64 = file => new Promise((resolve, reject) => {
+  const r = new FileReader();
+  r.onload = () => resolve(String(r.result).split(',')[1] || '');
+  r.onerror = () => reject(new Error('파일을 읽지 못했습니다.'));
+  r.readAsDataURL(file);
+});
+
 async function fetchFileBody(item, as) {
   if (state.accessToken) {
     const res = await fetch(`https://www.googleapis.com/drive/v3/files/${item.id}?alt=media`, {
