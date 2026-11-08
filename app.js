@@ -1,6 +1,6 @@
 (async function startWorkspace(){
 const { initializeApp } = await import('https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js');
-const { collection, collectionGroup, deleteDoc, doc, getFirestore, onSnapshot, serverTimestamp, setDoc } = await import('https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js');
+const { collection, collectionGroup, deleteDoc, doc, getDocs, getFirestore, onSnapshot, serverTimestamp, setDoc } = await import('https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js');
 
 const firebaseApp = initializeApp({
   apiKey: 'AIzaSyDXmeiQpRSZshFA1_BgZ2z_8AKLy6_Nc8M',
@@ -11,6 +11,16 @@ const firebaseApp = initializeApp({
   appId: '1:955574947722:web:50d14833ae966ea0698273',
 });
 const db = getFirestore(firebaseApp, 'default');
+// 같은 출처의 시뮬레이터가 일정과 동일한 Firebase 연결로 구도를 공유한다.
+window.HNUBSCameraStore = {
+  async list() {
+    const snapshot = await getDocs(collection(db, 'cameraScenes'));
+    return snapshot.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b) => (b.createdAt || 0) - (a.createdAt || 0));
+  },
+  async save(name, scene) {
+    await setDoc(doc(collection(db, 'cameraScenes')), { name, scene, createdAt: Date.now(), updatedAt: serverTimestamp() });
+  },
+};
 
 /* 익명 로그인.
    지금 Firestore 규칙은 인증 없이 읽기·쓰기를 다 허용해서, 주소만 알면 부원 일정이 열린다.
@@ -825,7 +835,7 @@ function shortsView(){
    예전엔 이 컴퓨터에서 돌던 로컬 서버(127.0.0.1:3000)를 띄웠다.
    이제 drive/ 폴더에 같이 들어 있어서 같은 출처에서 바로 연다.
    서버 탐지도, 주소 설정도, 꺼져 있다는 안내도 필요 없다. */
-const DRIVE_VERSION = '20261106-1';
+const DRIVE_VERSION = '20261109-1';
 function driveView(){
   const hash = state.driveSettings ? '#settings' : '';
   state.driveSettings = false;
@@ -838,7 +848,8 @@ function driveView(){
 /* ===== 메이커스페이스 =====
    대본에서 촬영거리를 뽑는 일(대본 분석)과 영상에서 쇼츠를 뽑는 일(쇼츠)은
    둘 다 '만드는' 작업이라 한 탭 아래 둔다. */
-const MAKER_TABS = [['script', 'AI 대본 분석'], ['shorts', '쇼츠']];
+const MAKER_TABS = [['script', 'AI 대본 분석'], ['shorts', '쇼츠'], ['camera', '카메라 구도']];
+let cameraModule = null, cameraLoading = null, cameraCleanup = null, cameraError = '';
 /* 주간 일정표와 촬영 일정은 같은 '일정' 탭 안에 둔다 (메이커스페이스와 같은 방식). */
 const SCHEDULE_TABS = [['weekly', '주간 일정표'], ['shoots', '촬영 일정'], ['radio', '라디오'], ['personal', '개인 일정'], ['projects', '프로젝트']];
 
@@ -1073,7 +1084,7 @@ function scheduleView(){
 
 function makerView(){
   return `${subTabBar(MAKER_TABS, state.makerTab, 'maker-tab', '메이커스페이스')}
-  ${state.makerTab === 'shorts' ? shortsView() : scriptView()}`;
+  ${state.makerTab === 'shorts' ? shortsView() : state.makerTab === 'camera' ? cameraModule ? cameraModule.cameraView() : `<section class="panel" role="status">${cameraError || '카메라 구도 시뮬레이터를 불러오는 중…'}</section>` : scriptView()}`;
 }
 
 function scriptView(){
@@ -2058,10 +2069,18 @@ function render(){
   // 시간 분석은 주간 일정표와 같은 계산이라 없앴다. 옛 주소는 그쪽으로 보낸다.
   if(state.route==='analysis') state.route='weekly';
   // 대본 분석과 쇼츠는 메이커스페이스 안으로 들어갔다. 예전 주소도 그쪽으로 보낸다.
-  if(state.route==='script'||state.route==='shorts'){ state.makerTab=state.route; state.route='maker'; }
+  if(['script','shorts','camera'].includes(state.route)){ state.makerTab=state.route; state.route='maker'; }
   if(['weekly','shoots','radio','personal','projects'].includes(state.route)){ state.scheduleTab=state.route; state.route='schedule'; }
   if(!views[state.route]) state.route='home';
+  document.body.classList.toggle('hn-camera', state.route === 'maker' && state.makerTab === 'camera');
+  // 다른 일정의 실시간 갱신이 촬영 배치와 입력 중인 저장 이름을 초기화하지 않게 한다.
+  if (state.route === 'maker' && state.makerTab === 'camera' && cameraCleanup && $('#simulator')) { renderNotifications(); return; }
+  cameraCleanup?.(); cameraCleanup = null;
   $('#app').innerHTML=views[state.route]()+editPickCard();
+  if (state.route === 'maker' && state.makerTab === 'camera') {
+    if (cameraModule) cameraCleanup = cameraModule.mountCamera($('#simulator'), window.HNUBSCameraStore);
+    else if (!cameraLoading) cameraLoading = import('./camera/app.mjs?v=20261106-3').then(module=>{cameraModule=module;render();}).catch(()=>{cameraError='시뮬레이터를 불러오지 못했습니다. 페이지를 새로고침해 주세요.';render();});
+  }
   $$('[data-route]').forEach(b=>b.classList.toggle('active',b.dataset.route===state.route));
   document.body.classList.toggle('hn-shorts', state.route==='maker' && state.makerTab==='shorts');
   renderNotifications();
@@ -2182,7 +2201,7 @@ function bindView(){
 
 function navigate(route){ if(route==='people'){state.settingsSection='people';route='settings';} if(route==='analysis')route='weekly';
   if(['weekly','shoots','radio','personal','projects'].includes(route)){state.scheduleTab=route;route='schedule';}
-  if(route==='script'||route==='shorts'){ state.makerTab=route; route='maker'; } state.route=route; location.hash=route; closeMobileMenu(); closePopovers(); render(); scrollTo({top:0,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'}); }
+  if(['script','shorts','camera'].includes(route)){ state.makerTab=route; route='maker'; } state.route=route; location.hash=route; closeMobileMenu(); closePopovers(); render(); scrollTo({top:0,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'}); }
 document.addEventListener('click',e=>{
   const editOpen=e.target.closest('[data-edit-open]');
   if(editOpen){

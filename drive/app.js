@@ -112,30 +112,10 @@ const SORTS = [
 ];
 
 function getSeedItems() {
-  return [
-    { id: 'f0', name: '00_공용자료', kind: 'folder', mimeType: 'application/vnd.google-apps.folder', parent: 'root', size: 0, date: '2026.09.30 10:12', by: '서창민', starred: false, shared: true, trashed: false, description: '방송국 전체 부원 공용 로고, 폰트, 템플릿 보관함', editable: false },
-    { id: 'f1', name: '01_촬영자료', kind: 'folder', mimeType: 'application/vnd.google-apps.folder', parent: 'root', size: 0, date: '2026.10.06 13:20', by: '강주형', starred: true, shared: false, trashed: false, description: '원본 카메라 및 드론 촬영본 아카이브', editable: false },
-    { id: 'f2', name: '02_편집자료', kind: 'folder', mimeType: 'application/vnd.google-apps.folder', parent: 'root', size: 0, date: '2026.10.05 18:40', by: '이수진', starred: false, shared: false, trashed: false, description: '가편집본 및 최종 마스터링 영상', editable: false },
-    { id: 'f3', name: '03_그래픽', kind: 'folder', mimeType: 'application/vnd.google-apps.folder', parent: 'root', size: 0, date: '2026.10.02 11:05', by: '박도윤', starred: false, shared: false, trashed: false, description: '자막 템플릿, 썸네일, 타이틀 PSD/AI', editable: false },
-    { id: 'f4', name: '04_음원', kind: 'folder', mimeType: 'application/vnd.google-apps.folder', parent: 'root', size: 0, date: '2026.09.24 15:30', by: '김하늘', starred: false, shared: false, trashed: false, description: 'BGM, 효과음 및 현장 동시녹음 파일', editable: false },
-    { id: 'f5', name: '05_문서', kind: 'folder', mimeType: 'application/vnd.google-apps.folder', parent: 'root', size: 0, date: '2026.09.18 09:47', by: '서창민', starred: false, shared: false, trashed: false, description: '방송 기획안, 큐시트, 대본, 회의록', editable: false },
-    { id: 'f11', name: '2026_축제', kind: 'folder', mimeType: 'application/vnd.google-apps.folder', parent: 'f1', size: 0, date: '2026.10.06 13:20', by: '강주형', starred: true, shared: true, trashed: false, description: '2026 가을 대동제 촬영 프로젝트', editable: false },
-    { id: 'f12', name: '2026_신년특집', kind: 'folder', mimeType: 'application/vnd.google-apps.folder', parent: 'f1', size: 0, date: '2026.09.12 14:10', by: '강주형', starred: false, shared: false, trashed: false, description: '신년특집 인터뷰 및 스케치', editable: false },
-    { id: 'd11', name: '촬영_일정표_10월.csv', kind: 'doc', mimeType: 'text/csv', parent: 'f1', size: 0.24, date: '2026.10.01 09:30', by: '서창민', starred: false, shared: true, trashed: false, description: '10월 촬영 장비 배정 및 부원 스케줄표', editable: true, content: '날짜,구분,담당자,장비,장소,비고\n2026-10-05,리허설 촬영,강주형/이수진,Sony FX3 + 24-70GM,대강당,오후 2시 집합\n2026-10-06,본무대 메인캠,강주형,Sony FX6,본관 앞 특설무대,삼각대 및 무선송수신기 필수\n2026-10-06,드론 항공촬영,박도윤,DJI Mavic 3 Pro,운동장 상공,비행승인 완료\n2026-10-07,하이라이트 편집,이수진,편집실 1번 맥스튜디오,방송국 편집실,자막 템플릿 v3 적용' },
-    { id: 'f111', name: '원본_메인캠', kind: 'folder', mimeType: 'application/vnd.google-apps.folder', parent: 'f11', size: 0, date: '2026.10.06 12:58', by: '강주형', starred: false, shared: false, trashed: false, description: 'A캠(FX6) 원본 클립', editable: false },
-    { id: 'f112', name: '원본_서브캠', kind: 'folder', mimeType: 'application/vnd.google-apps.folder', parent: 'f11', size: 0, date: '2026.10.06 12:41', by: '강주형', starred: false, shared: false, trashed: false, description: 'B캠(FX3) 짐벌 클립', editable: false },
-    { id: 'v1', name: '축제_메인캠_001.mp4', kind: 'video', mimeType: 'video/mp4', parent: 'f11', size: 18842, date: '2026.10.06 13:20', by: '강주형', dur: '03:42', starred: true, shared: true, trashed: false, description: '오프닝 공연 풀샷 (4K 60fps S-Log3)', editable: false },
-    { id: 'v2', name: '축제_메인캠_002.mp4', kind: 'video', mimeType: 'video/mp4', parent: 'f11', size: 22221, date: '2026.10.06 13:05', by: '강주형', dur: '05:10', starred: false, shared: false, trashed: false, description: '초대가수 무대 1부 메인캠', editable: false },
-    { id: 'v3', name: '축제_드론_001.mov', kind: 'video', mimeType: 'video/quicktime', parent: 'f11', size: 9421, date: '2026.10.06 11:47', by: '박도윤', dur: '02:18', starred: false, shared: true, trashed: false, description: '캠퍼스 전경 및 무대 야경 드론샷', editable: false },
-    { id: 'i1', name: '무대_스틸컷_012.jpg', kind: 'image', mimeType: 'image/jpeg', parent: 'f11', size: 8.4, date: '2026.10.06 10:32', by: '이수진', starred: false, shared: false, trashed: false, description: '썸네일 후보용 고화질 스틸컷', editable: false },
-    { id: 'p1', name: '축제_큐시트_v3.md', kind: 'doc', mimeType: 'text/markdown', parent: 'f11', size: 1.2, date: '2026.10.05 21:14', by: '서창민', starred: true, shared: true, trashed: false, description: '2026 방송국 축제 중계 최종 큐시트 및 대본 (직접 편집 가능)', editable: true, content: '# 🎬 2026 가을 축제 생중계 큐시트 (v3)\n\n- **일시**: 2026년 10월 6일 (화) 18:00 ~ 21:30\n- **연출(PD)**: 서창민 / **카메라**: 강주형, 박도윤 / **음향**: 김하늘 / **CG·자막**: 이수진\n\n---\n\n## 1. 오프닝 (18:00 ~ 18:15)\n1. **[VCR]** 축제 티저 영상 송출 (`01:30`)\n2. **[CAM 1]** MC 오프닝 멘트 (하단 자막: `2026 대동제 LIVE`)\n3. **[MIC 1/2]** 현장 앰비언스 -12dB 유지\n\n## 2. 동아리 본선 무대 (18:15 ~ 19:30)\n- **순서 1**: 밴드부 오프닝 (CAM 1 풀샷, CAM 2 보컬 클로즈업)\n- **순서 2**: 댄스부 공연 (짐벌 캠 투입, 셔터스피드 1/120 고정)\n\n## 3. 특집 인터뷰 & 클로징 (19:30 ~ )\n- 현장 인터뷰 질문지 확인 후 BGM 페이드인\n' },
-    { id: 'a1', name: '현장음_A_01.wav', kind: 'audio', mimeType: 'audio/wav', parent: 'f11', size: 642, date: '2026.10.05 19:02', by: '김하늘', dur: '04:15', starred: false, shared: false, trashed: false, description: '믹서 콘솔 다이렉트 24bit/48kHz 녹음본', editable: false },
-    { id: 's1', name: '타이틀_그래픽.psd', kind: 'psd', mimeType: 'image/vnd.adobe.photoshop', parent: 'f11', size: 486, date: '2026.10.04 16:55', by: '박도윤', starred: true, shared: false, trashed: false, description: '축제 로고 및 하단 바(Lower Third) 원본 레이어', editable: false },
-    { id: 'z1', name: '촬영원본_백업.zip', kind: 'zip', mimeType: 'application/zip', parent: 'f11', size: 32870, date: '2026.10.03 23:10', by: '강주형', starred: false, shared: false, trashed: false, description: '1일차 촬영 프록시 파일 전체 압축본', editable: false },
-    { id: 'e1', name: '축제_하이라이트_가편.mp4', kind: 'video', mimeType: 'video/mp4', parent: 'f2', size: 3420, date: '2026.10.05 18:40', by: '이수진', dur: '01:30', starred: false, shared: true, trashed: false, description: '1차 컷편집 완료본 (피드백 댓글 요망)', editable: false },
-    { id: 'd51', name: '방송국_장비대여_대장.txt', kind: 'doc', mimeType: 'text/plain', parent: 'f5', size: 0.08, date: '2026.10.04 11:20', by: '서창민', starred: false, shared: true, trashed: false, description: '카메라, 렌즈, 마이크 반출/반납 기록장', editable: true, content: '=== 방송국 장비 반출/반납 기록장 ===\n\n[대여중]\n1. Sony FX3 바디 #1 - 강주형 (10/05 ~ 10/07)\n2. Sennheiser MKH416 샷건마이크 - 김하늘 (10/05 ~ 10/07)\n3. DJI RS3 Pro 짐벌 - 박도윤 (10/06 당일)\n\n[점검필요]\n- 편집실 2번 오디오 인터페이스 팬 노이즈 확인 필요\n' },
-    { id: 't1', name: '축제_메인캠_테스트.mp4', kind: 'video', mimeType: 'video/mp4', parent: 'f11', size: 412, date: '2026.10.06 09:02', by: '강주형', dur: '00:12', starred: false, shared: false, trashed: true, description: '화이트밸런스 테스트 컷 (휴지통)', editable: false }
-  ];
+  // 비워 둔다. 예전에는 폴더 6개와 파일 10여 개를 넣어 뒀는데,
+  // 구글 드라이브가 연결되지 않은 상태에서도 진짜처럼 보여서
+  // 가짜 폴더를 실제 자료로 착각하게 만들었다.
+  return [];
 }
 
 function esc(str = '') {
@@ -262,9 +242,9 @@ const state = {
   editor: null,      // 편집 화면. { id, name, mode, text, rows, cols, dirty, loading }
   driveNotice: '',   // 구글 드라이브 연결이 아직 덜 됐을 때 띄울 안내
   alwaysConnected: true, // 내 드라이브 상시 연결 모드
-  mode: 'google',
+  mode: 'offline',
   driveName: localStorage.getItem('bs_drive_name') || '방송국 공유 드라이브',
-  userEmail: localStorage.getItem('bs_google_email') || 'Google Drive 상시 연결됨',
+  userEmail: '',
   rootFolderId: LOCKED_ROOT_FOLDER_ID, // 지정된 폴더만 볼 수 있도록 고정 잠금
   clientId: localStorage.getItem('bs_client_id') || DEFAULT_CLIENT_ID,
   /* 부원이 각자 구글 로그인하지 않게 한다.
@@ -300,12 +280,16 @@ const state = {
 
 function loadBrowserLocalItems() {
   try {
+    // 예전 판이 심어 둔 샘플이 브라우저에 남아 있다. 한 번만 비운다.
+    if (localStorage.getItem('bs_seed_cleared_v2') !== '1') {
+      localStorage.removeItem('bs_local_items_v1');
+      localStorage.setItem('bs_seed_cleared_v2', '1');
+      return [];
+    }
     const raw = localStorage.getItem('bs_local_items_v1');
     if (raw) return JSON.parse(raw);
   } catch (e) {}
-  const seed = getSeedItems();
-  localStorage.setItem('bs_local_items_v1', JSON.stringify(seed));
-  return seed;
+  return [];
 }
 
 function saveBrowserLocalItems(items) {
@@ -334,15 +318,15 @@ function getStorageStats() {
     ? state.googleQuotaUsedGb
     : calcUsedGb;
   const totalGb = state.totalQuotaGb || 200;
-  const pctTotal = Math.min(100, Math.max(2, Math.round((usedGb / totalGb) * 100)));
+  const pctTotal = Math.min(100, Math.max(0, Math.round((usedGb / totalGb) * 100)));
 
   const videoGb = Number((videoMb / 1024).toFixed(1));
   const archiveGb = Number((archiveMb / 1024).toFixed(1));
-  const otherGb = Number(Math.max(0.1, (mediaDocMb / 1024)).toFixed(1));
+  const otherGb = Number(Math.max(0, (mediaDocMb / 1024)).toFixed(1));
 
-  const pVideo = Math.min(100, Math.max(1, (videoGb / totalGb) * 100));
-  const pArchive = Math.min(100 - pVideo, Math.max(1, (archiveGb / totalGb) * 100));
-  const pOther = Math.min(100 - pVideo - pArchive, Math.max(1, (otherGb / totalGb) * 100));
+  const pVideo = Math.min(100, Math.max(0, (videoGb / totalGb) * 100));
+  const pArchive = Math.min(100 - pVideo, Math.max(0, (archiveGb / totalGb) * 100));
+  const pOther = Math.min(100 - pVideo - pArchive, Math.max(0, (otherGb / totalGb) * 100));
 
   return {
     usedGb,
@@ -458,7 +442,11 @@ async function fetchFiles() {
     }
 
     // 2. Netlify 함수 — 서비스 계정으로 지정 폴더를 읽는다. 부원은 로그인하지 않는다.
-    const driveRes = await fetch(`${API_BASE}/api/drive/files`).then(r => r.ok ? r.json() : null).catch(() => null);
+    // 404 나 네트워크 실패면 예전엔 null 이라 안내가 안 떴다.
+    // 배포본에서 바로 그 일이 났다 — 아무 경고 없이 목록만 비어 보였다.
+    const driveRes = await fetch(`${API_BASE}/api/drive/files`, { signal: AbortSignal.timeout(20000) })
+      .then(r => r.ok ? r.json() : { mode: 'unconfigured', reason: 'no-endpoint' })
+      .catch(() => ({ mode: 'unconfigured', reason: 'offline' }));
     if (driveRes && driveRes.mode === 'google') {
       state.mode = 'google';
       state.rootFolderId = driveRes.rootFolderId || LOCKED_ROOT_FOLDER_ID;
@@ -478,6 +466,8 @@ async function fetchFiles() {
         'no-service-account': 'Netlify 환경변수 GOOGLE_DRIVE_SERVICE_ACCOUNT 가 아직 비어 있어요.',
         'token': '서비스 계정 키를 읽지 못했어요. Netlify 환경변수의 JSON 을 확인해 주세요.',
         'not-shared': '지정 폴더를 서비스 계정 이메일과 공유해 주세요. (뷰어 권한이면 충분해요)',
+        'no-endpoint': '드라이브 API 가 아직 배포되지 않았어요. Netlify 에 /api/drive/files 가 올라가야 합니다.',
+        'offline': '드라이브 API 에 닿지 못했어요. 네트워크를 확인해 주세요.',
       }[driveRes.reason] || '연결을 확인하지 못했어요. 잠시 뒤 다시 시도해 주세요.';
     }
 
@@ -496,13 +486,16 @@ async function fetchFiles() {
       return;
     }
 
-    // 4. 그래도 없으면 샘플/로컬 보관본
-    state.mode = 'google';
+    // 연결되지 않은 서버를 실제 저장소처럼 보이게 하지 않는다.
+    state.mode = 'offline';
     state.rootFolderId = LOCKED_ROOT_FOLDER_ID;
-    state.items = loadBrowserLocalItems();
+    state.items = [];
+    state.driveNotice ||= 'Drive API에 연결하지 못했습니다. 서버 주소와 Google Drive 연결 설정을 확인한 뒤 새로고침해 주세요.';
     if (state.folder !== 'root' && !byId(state.folder)) state.folder = 'root';
   } catch (err) {
-    if (!state.items.length) state.items = loadBrowserLocalItems();
+    state.mode = 'offline';
+    state.items = [];
+    state.driveNotice = '파일 목록을 불러오지 못했습니다. 연결을 확인한 뒤 새로고침해 주세요.';
   } finally {
     state.loading = false;
     render();
@@ -524,9 +517,9 @@ function connectGoogleDirectGIS() {
   localStorage.setItem('bs_root_folder_id', LOCKED_ROOT_FOLDER_ID);
   localStorage.setItem('bs_total_quota_gb', String(quotaVal));
 
-  toast('설정이 저장되었으며 상시 연결 상태가 유지됩니다.');
+  toast('설정을 저장했습니다. 실제 연결을 확인합니다.');
     state.sheet = null;
-    render();
+    fetchFiles();
 }
 
 function byId(id) {
@@ -574,6 +567,7 @@ function toast(msg) {
 // ============================================================================
 
 function uploadFilesReal(fileList, replaceId = null) {
+  if (!state.hasBackend && !state.accessToken) { toast('Google Drive에서 업로드해 주세요. 연결된 목록은 읽기 전용입니다.'); return; }
   const files = Array.from(fileList || []);
   if (!files.length) return;
   const targetFolder = state.nav === 'drive' ? state.folder : 'root';
@@ -774,6 +768,7 @@ async function saveMemo(id) {
 window.saveMemo = saveMemo;
 
 async function patchItem(id, payload, successMsg) {
+  if (!state.hasBackend && !state.accessToken) { toast('Google Drive에서 수정해 주세요. 연결된 목록은 읽기 전용입니다.'); return false; }
   try {
     if (state.accessToken) {
       const metadata = {};
@@ -851,6 +846,7 @@ async function patchItem(id, payload, successMsg) {
 }
 
 async function createFolderOrDoc(mode, name, content = '', description = '') {
+  if (!state.hasBackend && !state.accessToken) { toast('Google Drive에서 새 파일이나 폴더를 만들어 주세요.'); return false; }
   try {
     const parent = state.nav === 'drive' ? state.folder : 'root';
     if (state.accessToken) {
@@ -982,7 +978,11 @@ function loadSheetLib() {
   if (!sheetLibPromise) {
     sheetLibPromise = new Promise((resolve, reject) => {
       const el = document.createElement('script');
-      el.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+      // 0.18.5 는 프로토타입 오염(CVE-2023-30533)이 있고 고쳐진 판은 cdnjs 에 없다.
+      // SheetJS 공식 CDN 에서 받고, 파일이 바뀌면 아예 안 돌아가게 해시를 박아 둔다.
+      el.src = 'https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js';
+      el.integrity = 'sha384-EnyY0/GSHQGSxSgMwaIPzSESbqoOLSexfnSMN2AP+39Ckmn92stwABZynq1JyzdT';
+      el.crossOrigin = 'anonymous';
       el.onload = () => resolve(window.XLSX);
       el.onerror = () => reject(new Error('표 편집기를 불러오지 못했습니다.'));
       document.head.appendChild(el);
@@ -1173,6 +1173,7 @@ async function openEditorSheet(item) {
 }
 
 async function permanentDeleteItem(id) {
+  if (!state.hasBackend && !state.accessToken) { toast('Google Drive에서 삭제해 주세요.'); return; }
   try {
     if (state.accessToken) {
       await fetch(`https://www.googleapis.com/drive/v3/files/${id}`, {
@@ -1695,12 +1696,12 @@ function buildSheetHTML() {
     const st = getStorageStats();
     inner = `
       <div style="display:flex;align-items:center;justify-content:space-between;padding:2px 4px 10px">
-        <span style="font-size:18px;font-weight:700">⚙️ 내 드라이브 상시 연결 및 용량 설정</span>
-        <span class="conn-badge google">상시 연결 활성</span>
+        <span style="font-size:18px;font-weight:700">Google Drive 연결 및 용량 설정</span>
+        <span class="conn-badge">${state.mode==='google'?'연결됨':'연결 필요'}</span>
       </div>
 
       <div style="padding:14px;border-radius:14px;background:#F0FDF4;border:1px solid #BBF7D0;margin-bottom:14px;display:flex;flex-direction:column;gap:5px">
-        <div style="font-size:13.5px;font-weight:700;color:#15803D">✅ 내 구글 드라이브 상시 연결 중 (${esc(state.userEmail)})</div>
+        <div style="font-size:13.5px;font-weight:700;color:#285b46">${state.mode==='google'?'Google Drive 목록 연결됨 · 읽기 전용':'Google Drive 연결을 완료해 주세요'}</div>
         <div style="font-size:12px;color:#166534">현재 사용량: <strong>${st.usedGb} GB</strong> / 총 용량 <strong>${st.totalGb} GB</strong> (여유 ${st.freeGb} GB)</div>
       </div>
 
@@ -1712,10 +1713,7 @@ function buildSheetHTML() {
         <label class="form-label">드라이브 총 할당 용량 (GB)</label>
         <input id="cfg-quota-gb" type="number" class="form-input" value="${esc(state.totalQuotaGb)}" placeholder="예: 200 (Google One 200GB 요금제 기준)">
       </div>
-      <div class="form-group">
-        <label class="form-label">Google OAuth Client ID <span style="color:#16A34A;font-weight:600">(상시 등록됨)</span></label>
-        <input id="cfg-client-id" class="form-input" value="${esc(state.clientId || DEFAULT_CLIENT_ID)}">
-      </div>
+      <p style="margin-bottom:14px">${esc(state.driveNotice || 'Google Drive의 지정 폴더를 서버를 통해 읽습니다. 파일 업로드와 수정은 Google Drive에서 진행해 주세요.')}</p>
       <div class="form-group">
         <label class="form-label">공유 지정 폴더 ID <span style="color:#DC2626;font-weight:700">(외부 폴더 차단 · 전용 폴더 고정 잠금)</span></label>
         <input id="cfg-folder-id" class="form-input" value="${esc(LOCKED_ROOT_FOLDER_ID)}" readonly style="background:#F1F5F9;color:#475569;font-family:ui-monospace,monospace;cursor:not-allowed">
@@ -1724,7 +1722,8 @@ function buildSheetHTML() {
 
       <div class="btn-row">
         <button class="btn-secondary" onclick="saveConfigOnly()">설정 저장</button>
-        <button class="btn-primary" onclick="saveAndConnectGoogle()">구글 토큰 즉시 동기화</button>
+        <button class="btn-primary" onclick="saveAndConnectGoogle()">연결 다시 확인</button>
+        <a class="btn-secondary" href="https://drive.google.com/drive/folders/${LOCKED_ROOT_FOLDER_ID}" target="_blank" rel="noopener noreferrer">Google Drive 열기</a>
       </div>
     `;
   }
@@ -1948,7 +1947,7 @@ function render() {
         <div class="mobile-storage-bar">
           <div style="display:flex;align-items:center;gap:8px">
             <span class="live-dot"></span>
-            <span style="font-weight:700">저장소 상태 (상시 연결)</span>
+            <span style="font-weight:700">${state.mode==='google'?'Google Drive 연결됨':'Google Drive 연결 필요'}</span>
           </div>
           <div style="font-variant-numeric:tabular-nums;color:#93C5FD;font-weight:800">
             ${st.usedGb} GB / 총 용량 ${st.totalGb} GB
@@ -1963,7 +1962,8 @@ function render() {
               <span style="display:flex;flex-direction:column;gap:3px;min-width:0">
                 <strong style="font-size:13.5px;font-weight:800;color:#6E5208">구글 드라이브가 아직 연결되지 않았어요</strong>
                 <span style="font-size:12.5px;color:#8A6D1F;line-height:1.5">${esc(state.driveNotice)}</span>
-                <span style="font-size:12.5px;color:#8A6D1F">아래 목록은 실제 파일이 아니라 예시입니다.</span>
+                <a href="https://drive.google.com/drive/folders/${LOCKED_ROOT_FOLDER_ID}" target="_blank" rel="noopener noreferrer">Google Drive에서 지정 폴더 열기</a>
+                <button type="button" class="btn-secondary" onclick="fetchFiles()">연결 다시 확인</button>
               </span>
             </div>` : ''}
           ${state.loading ? `
@@ -1973,8 +1973,8 @@ function render() {
           ` : list.length === 0 ? `
             <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:76px 32px;text-align:center;background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:20px">
               <div style="width:60px;height:60px;border-radius:50%;background:rgba(59,130,246,0.14);color:#60A5FA;display:flex;align-items:center;justify-content:center;margin-bottom:4px">${iconSvg('folder', 28)}</div>
-              <span style="font-size:16.5px;font-weight:800">${state.query || state.typeFilter !== 'all' ? '조건에 맞는 파일이 없습니다' : state.nav === 'trash' ? '휴지통이 비어 있습니다' : '이 폴더는 비어 있습니다'}</span>
-              <span style="font-size:13px;color:var(--text-secondary)">${state.query || state.typeFilter !== 'all' ? '검색어나 카테고리 필터를 초기화해 보세요.' : '상단 업로드 버튼을 누르거나 파일을 화면에 끌어다 놓으세요.'}</span>
+              <span style="font-size:16.5px;font-weight:800">${state.mode !== 'google' ? '아직 파일 목록을 불러오지 못했습니다' : state.query || state.typeFilter !== 'all' ? '조건에 맞는 파일이 없습니다' : state.nav === 'trash' ? '휴지통이 비어 있습니다' : '이 폴더는 비어 있습니다'}</span>
+              <span style="font-size:13px;color:var(--text-secondary)">${state.mode !== 'google' ? '연결 안내를 확인하거나 Google Drive에서 직접 파일을 열어 주세요.' : state.query || state.typeFilter !== 'all' ? '검색어나 카테고리 필터를 초기화해 보세요.' : !state.hasBackend && !state.accessToken ? 'Google Drive에서 파일을 추가한 뒤 목록을 새로고침해 주세요.' : '상단 업로드 버튼을 누르거나 파일을 화면에 끌어다 놓으세요.'}</span>
             </div>
           ` : state.view === 'list' ? `
             <div class="file-list">

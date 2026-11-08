@@ -13,7 +13,7 @@
  * 화면은 그 응답을 보고 안내를 띄우고 샘플로 돌아간다.
  */
 import { preflight, rateLimited, response, tooMany } from './_shared.mjs';
-import { googleToken, serviceAccountEmail } from './_google.mjs';
+import { googleToken } from './_google.mjs';
 
 const ROOT_FOLDER_ID = '1Sb255-QJM--dC_1YGzJax-VlqpWtAxif';
 const SCOPE = 'https://www.googleapis.com/auth/drive.readonly';
@@ -94,7 +94,7 @@ async function listSubtree(token) {
       let pageToken = '';
       do {
         const params = new URLSearchParams({
-          q: `'${parent}' in parents and mimeType != 'application/vnd.google-apps.shortcut'`,
+          q: `'${parent}' in parents and trashed = false and mimeType != 'application/vnd.google-apps.shortcut'`,
           fields: FIELDS,
           pageSize: '1000',
           orderBy: 'folder,modifiedTime desc',
@@ -128,12 +128,11 @@ async function listSubtree(token) {
 
 export const handler = async event => {
   const pre = preflight(event); if (pre) return pre;
+  if (event.httpMethod !== 'GET') return response(405, { error: 'GET 요청만 지원합니다.' }, event);
 
   // 목록 전체를 반복해서 긁어 가지 못하게 막는다.
   const wait = rateLimited(event, 'drive-files', 30, 60_000);
   if (wait) return tooMany(wait, event);
-
-  const email = (() => { try { return serviceAccountEmail(); } catch { return ''; } })();
 
   let token;
   try {
@@ -148,6 +147,10 @@ export const handler = async event => {
   }
 
   try {
+    const root = await fetch(`https://www.googleapis.com/drive/v3/files/${ROOT_FOLDER_ID}?fields=id,mimeType,trashed&supportsAllDrives=true`, { headers: { authorization: `Bearer ${token}` } });
+    if (!root.ok) { const error = new Error('지정 폴더에 접근하지 못했습니다.'); error.status = root.status; throw error; }
+    const folder = await root.json();
+    if (folder.trashed || folder.mimeType !== 'application/vnd.google-apps.folder') { const error = new Error('지정 폴더를 찾지 못했습니다.'); error.status = 404; throw error; }
     const files = await listSubtree(token);
     const items = files.map(mapFile);
     const usedBytes = files.reduce((sum, f) => sum + Number(f.size || 0), 0);

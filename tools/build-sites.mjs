@@ -6,6 +6,7 @@ import { build } from 'esbuild';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const dist = resolve(root, 'dist');
 const client = resolve(dist, 'client');
+await build({entryPoints:[resolve(root,'camera/scene3d.mjs')],outfile:resolve(root,'camera/scene3d.bundle.mjs'),bundle:true,minify:true,format:'esm',platform:'browser',target:'es2022'});
 
 rmSync(dist, { recursive: true, force: true });
 mkdirSync(client, { recursive: true });
@@ -21,6 +22,7 @@ for (const name of [
   '.nojekyll',
 ]) cpSync(resolve(root, name), resolve(client, name));
 cpSync(resolve(root, 'drive'), resolve(client, 'drive'), { recursive: true });
+cpSync(resolve(root, 'camera'), resolve(client, 'camera'), { recursive: true });
 
 mkdirSync(resolve(dist, 'server'), { recursive: true });
 await build({

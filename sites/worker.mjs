@@ -1,5 +1,6 @@
 import { handler as maintenance } from '../api/maintenance.mjs';
 import { handler as health } from '../api/health.mjs';
+import { handler as driveFiles } from '../api/drive-files.mjs';
 import { handler as chat } from '../api/chat.mjs';
 import { handler as chatJob } from '../api/chat-job.mjs';
 import { handler as chatBackground } from '../api/chat-run-background.mjs';
@@ -59,6 +60,7 @@ function route(path, method) {
   if (method === 'OPTIONS') method = 'POST';
   if (path === '/api/maintenance') return maintenance;
   if (path === '/api/health') return health;
+  if (path === '/api/drive/files') return driveFiles;
   if (path === '/api/chat' && method === 'POST') return chat;
   if (/^\/api\/chat\/jobs\/[^/]+$/.test(path)) return chatJob;
   if (path === '/api/analysis/jobs' && method === 'POST') return analysisStart;

@@ -19,5 +19,7 @@ assert.equal((await help.json()).provider, 'local');
 
 const local = await worker.fetch(new Request('https://hnubs.example/app.js'), env, {});
 assert.equal(await local.text(), 'local');
+const drive = await worker.fetch(new Request('https://hnubs.example/api/drive/files'), env, {});
+assert.equal((await drive.json()).reason, 'no-service-account');
 
 console.log('Sites direct API checks passed.');

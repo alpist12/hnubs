@@ -24,6 +24,19 @@ JS 파일이든 Firestore 든 어디에 넣어도 브라우저까지 내려가�
 | `/api/chat` | NVIDIA 키 |
 | `/api/analysis/*` | NVIDIA 키 |
 | `/api/maintenance` | 관리자 비밀번호 검증 |
+| `/api/drive/files` | Drive 전용 서비스 계정으로 지정 폴더 읽기 |
+
+### Google Drive 연결
+
+`GOOGLE_DRIVE_SERVICE_ACCOUNT`에 Drive 전용 서비스 계정 JSON을 서버 환경변수로
+설정하고, 지정 폴더 `1Sb255-QJM--dC_1YGzJax-VlqpWtAxif`를 그 계정 이메일에
+뷰어로 공유해야 한다. 키를 클라이언트 파일이나 저장소에 넣지 않는다.
+`api-config.js`의 실제 API 주소에도 `/api/drive/files` 함수가 배포되어 있어야 한다.
+연결 전에는 실제 목록 대신 연결 안내를 표시한다. 현재 서버 연결은 읽기 전용이며
+업로드·수정은 Google Drive에서 진행한다.
+
+메이커스페이스의 카메라 구도는 기존 Firestore `cameraScenes` 컬렉션에 공유 저장한다.
+`npm run build`는 Three.js 모듈을 묶고 사람 GLB 모델과 함께 `dist/client/camera`로 복사한다.
 
 나머지는 전부 브라우저에서 한다. 일정·인원·촬영·자동배치는 Firebase SDK 로
 Firestore 에 직접 붙고, 대본 추출(PDF·DOCX)도 브라우저에서 푼다.
