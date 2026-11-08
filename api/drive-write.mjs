@@ -138,10 +138,21 @@ export const handler = async event => {
     if (action === 'rename') {
       const id = safeId(body.id);
       if (!id) return fail(event, 400, '파일 주소가 올바르지 않습니다.');
+      if (id === ROOT_FOLDER_ID) return fail(event, 403, '지정 폴더 자체는 고칠 수 없습니다.');
       if (!(await insideRoot(token, id))) return fail(event, 403, '지정 폴더 밖의 파일은 고칠 수 없습니다.');
+
       const fields = {};
-      if (body.name !== undefined) fields.name = String(body.name).trim();
+      // 메모(description)는 누구나 단다 — 그러려고 만든 기능이다.
       if (body.description !== undefined) fields.description = String(body.description);
+      // 이름 바꾸기는 다르다. 남의 촬영본 이름을 바꿔 버리면 찾을 수 없게 된다.
+      // 지우기와 같은 급으로 보고 비밀번호를 받는다.
+      if (body.name !== undefined) {
+        const expected = process.env.SCHEDULER_ADMIN_PASSWORD;
+        if (!expected) return fail(event, 503, '이름 바꾸기는 아직 쓸 수 없습니다.');
+        if (String(body.password || '') !== expected) return fail(event, 401, '이름을 바꾸려면 관리자 비밀번호가 필요합니다.');
+        fields.name = String(body.name).trim();
+        if (!fields.name) return fail(event, 400, '이름이 비어 있습니다.');
+      }
       if (!Object.keys(fields).length) return fail(event, 400, '바꿀 내용이 없습니다.');
       return response(200, { ok: true, item: await patchFile(token, id, fields) }, event);
     }
@@ -153,6 +164,7 @@ export const handler = async event => {
       if (String(body.password || '') !== expected) return fail(event, 401, '관리자 비밀번호가 맞지 않습니다.');
       const id = safeId(body.id);
       if (!id) return fail(event, 400, '파일 주소가 올바르지 않습니다.');
+      if (id === ROOT_FOLDER_ID) return fail(event, 403, '지정 폴더 자체는 지울 수 없습니다.');
       if (!(await insideRoot(token, id))) return fail(event, 403, '지정 폴더 밖의 파일은 지울 수 없습니다.');
       // 휴지통으로만 보낸다. 완전 삭제는 여기서 하지 않는다.
       return response(200, { ok: true, item: await patchFile(token, id, { trashed: true }) }, event);
