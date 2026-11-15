@@ -532,7 +532,7 @@ function weeklyView() {
 
   let cells='';
   hours.forEach(h=>{
-    cells+=`<span class="hn-num" style="display:flex;align-items:center;justify-content:flex-end;padding-right:8px;font-size:12px;font-weight:600;color:#64708F">${pad2(h)}:00</span>`;
+    cells+=`<span class="a-cell-time hn-num">${pad2(h)}:00</span>`;
     dates.forEach((dateObj,d)=>{
       const iso=localIso(dateObj), key=`${d}-${h}`;
       const n=pool.filter(p=>memberAvailable(p[7],iso,dataDay(dateObj),h)).length;
@@ -549,7 +549,9 @@ function weeklyView() {
       if(past){ bg='#F3F4F8'; fg='#64686F'; }   // #A5ABBF 는 2.08:1 로 안 읽혔다
       if(on){ bg='var(--a-action)'; fg='#FFFFFF'; }
       const aria=`${DOW[d]}요일 ${h}시, 가능 ${n}명${shoot?`, 촬영 ${esc(shoot.title)}`:''}`;
-      cells+=`<button data-week-slot="${key}" aria-pressed="${on}" aria-label="${aria}" title="${aria}" style="height:46px;border-radius:10px;border:0;background:${bg};color:${fg};font-family:inherit;font-size:${shoot?'12.5px':'17px'};font-weight:${shoot?600:500};letter-spacing:-0.02em;font-variant-numeric:tabular-nums;cursor:pointer;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;padding:0 6px;transition:background .12s ease">${shoot?esc(shoot.title):(past?'':n)}</button>`;
+      // 지금 시각에 걸리는 칸에는 탤리색 줄을 긋는다. 큐시트에서 '지금 여기' 표시다.
+      const isNow = iso===today && h===new Date().getHours();
+      cells+=`<button class="a-cell${isNow?' is-now':''}" data-week-slot="${key}" aria-pressed="${on}" aria-label="${aria}" title="${aria}" style="background:${bg};color:${fg};font-size:${shoot?'12.5px':'17px'};font-weight:${shoot?600:500}">${shoot?esc(shoot.title):(past?'':n)}</button>`;
     });
   });
 
@@ -631,10 +633,10 @@ function weeklyView() {
   </div>
 
   <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:stretch">
-    <section aria-label="주간 시간표" style="flex:999 1 700px;min-width:0;${CARD};padding:16px 18px">
+    <section aria-label="주간 시간표" class="a-sheet" style="flex:999 1 700px;min-width:0;${CARD};padding:0;overflow:hidden">
       <div style="overflow-x:auto">
-        <div style="min-width:700px;display:grid;grid-template-columns:60px repeat(7, minmax(0, 1fr));gap:5px">
-          <span></span>${heads}${cells}
+        <div class="a-sheet-grid" style="min-width:700px;display:grid;grid-template-columns:62px repeat(7, minmax(0, 1fr))">
+          <span class="a-sheet-corner"></span>${heads}${cells}
         </div>
       </div>
     </section>
