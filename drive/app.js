@@ -126,6 +126,13 @@ function esc(str = '') {
     .replace(/"/g, '&quot;');
 }
 
+/* 1000GB 가 넘으면 TB 로 적는다. '총 2048 GB' 보다 '총 2 TB' 가 읽힌다. */
+function fmtCapacity(gb) {
+  const v = Number(gb) || 0;
+  if (v >= 1000) return `${(v / 1024).toFixed(v % 1024 === 0 ? 0 : 1)} TB`;
+  return `${v.toFixed(v < 10 ? 2 : 1)} GB`;
+}
+
 function fmtSize(mb) {
   const n = Number(mb) || 0;
   if (n >= 1024) return (n / 1024).toFixed(1) + ' GB';
@@ -252,7 +259,7 @@ const state = {
      Drive 자격증명은 서버가 계정 하나로 들고 있다. */
   accessToken: '',
   tokenExpiry: Number(localStorage.getItem('bs_google_token_exp') || 0),
-  totalQuotaGb: Number(localStorage.getItem('bs_total_quota_gb') || 200), // 총 용량 (기본 200GB, Google Drive 연동 시 실제 할당량 자동 반영)
+  totalQuotaGb: Number(localStorage.getItem('bs_total_quota_gb') || 2048), // 총 용량 2TB. 서비스 계정은 주인의 할당량을 못 봐서 이 값이 쓰인다
   googleQuotaUsedGb: null,
   hasCredentials: false,
   hasClientSecret: false,
@@ -317,7 +324,7 @@ function getStorageStats() {
   const usedGb = state.googleQuotaUsedGb !== null && state.googleQuotaUsedGb > 0
     ? state.googleQuotaUsedGb
     : calcUsedGb;
-  const totalGb = state.totalQuotaGb || 200;
+  const totalGb = state.totalQuotaGb || 2048;
   const pctTotal = Math.min(100, Math.max(0, Math.round((usedGb / totalGb) * 100)));
 
   const videoGb = Number((videoMb / 1024).toFixed(1));
@@ -506,7 +513,7 @@ function connectGoogleDirectGIS() {
   const clientId = (document.getElementById('cfg-client-id')?.value || state.clientId || DEFAULT_CLIENT_ID).trim();
   const driveName = (document.getElementById('cfg-drive-name')?.value || state.driveName || '방송국 공유 드라이브').trim();
   const rootFolderId = LOCKED_ROOT_FOLDER_ID;
-  const quotaVal = Number(document.getElementById('cfg-quota-gb')?.value || state.totalQuotaGb || 200);
+  const quotaVal = Number(document.getElementById('cfg-quota-gb')?.value || state.totalQuotaGb || 2048);
 
   state.clientId = clientId;
   state.driveName = driveName;
@@ -1760,7 +1767,7 @@ function buildSheetHTML() {
 
       <div style="padding:14px;border-radius:14px;background:#F0FDF4;border:1px solid #BBF7D0;margin-bottom:14px;display:flex;flex-direction:column;gap:5px">
         <div style="font-size:13.5px;font-weight:700;color:#285b46">${state.mode==='google'?'Google Drive 목록 연결됨 · 읽기 전용':'Google Drive 연결을 완료해 주세요'}</div>
-        <div style="font-size:12px;color:#166534">현재 사용량: <strong>${st.usedGb} GB</strong> / 총 용량 <strong>${st.totalGb} GB</strong> (여유 ${st.freeGb} GB)</div>
+        <div style="font-size:12px;color:#166534">현재 사용량: <strong>${fmtCapacity(st.usedGb)}</strong> / 총 용량 <strong>${fmtCapacity(st.totalGb)}</strong> (여유 ${fmtCapacity(st.freeGb)})</div>
       </div>
 
       <div class="form-group">
@@ -1892,16 +1899,16 @@ function render() {
             <div class="total-capacity-box">
               <div class="cap-col">
                 <span class="cap-label">현재 사용량</span>
-                <span class="cap-val-used">${st.usedGb} GB</span>
+                <span class="cap-val-used">${fmtCapacity(st.usedGb)}</span>
               </div>
               <div style="width:1px;height:28px;background:var(--border-strong)"></div>
               <div class="cap-col" style="align-items:flex-end">
                 <span class="cap-label">드라이브 총 용량</span>
-                <span class="cap-val-total">총 ${st.totalGb} GB</span>
+                <span class="cap-val-total">총 ${fmtCapacity(st.totalGb)}</span>
               </div>
             </div>
 
-            <div class="storage-bar-segmented" title="총 용량 ${st.totalGb} GB 중 ${st.usedGb} GB 사용 (여유 ${st.freeGb} GB)">
+            <div class="storage-bar-segmented" title="총 용량 ${fmtCapacity(st.totalGb)} 중 ${fmtCapacity(st.usedGb)} 사용 (여유 ${fmtCapacity(st.freeGb)})">
               <div class="seg-bar" style="width:${st.pVideo}%;background:#7C5FD8"></div>
               <div class="seg-bar" style="width:${st.pArchive}%;background:#4C6FE6"></div>
               <div class="seg-bar" style="width:${st.pOther}%;background:#35B98A"></div>
@@ -1911,7 +1918,7 @@ function render() {
               <div class="legend-item"><span class="legend-dot" style="background:#7C5FD8"></span>영상 ${st.videoGb}GB</div>
               <div class="legend-item"><span class="legend-dot" style="background:#4C6FE6"></span>백업·PSD ${st.archiveGb}GB</div>
               <div class="legend-item"><span class="legend-dot" style="background:#35B98A"></span>음원·문서 ${st.otherGb}GB</div>
-              <div class="legend-item"><span class="legend-dot" style="background:#C3C9DB"></span>여유 ${st.freeGb}GB</div>
+              <div class="legend-item"><span class="legend-dot" style="background:#C3C9DB"></span>여유 ${fmtCapacity(st.freeGb)}</div>
             </div>
 
           </div>
