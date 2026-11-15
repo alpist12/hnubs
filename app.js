@@ -211,7 +211,7 @@ function noticesView(){
     ||`<div style="padding:48px 20px;text-align:center;color:#64708F">등록된 공지가 없어요.<br><span style="font-size:13px">오른쪽 위 ‘공지 작성’으로 첫 공지를 올려 보세요.</span></div>`;
 
   return `
-  <section class="a-hero" style="display:flex;flex-wrap:wrap;gap:16px 24px;align-items:flex-end;justify-content:space-between">
+  <section class="a-hero a-flat" style="display:flex;flex-wrap:wrap;gap:16px 24px;align-items:flex-end;justify-content:space-between">
     ${heroDots()}
     <div style="position:relative;display:flex;flex-direction:column;gap:2px;min-width:0">
       <span style="font-size:13.5px;color:var(--a-muted)">전체 ${notices.length}건 · 필독 ${notices.filter(n=>n.tag==='필독').length}건</span>
@@ -568,7 +568,7 @@ function weeklyView() {
   const rangeLabel=`${dates[0].getFullYear()}. ${pad2(dates[0].getMonth()+1)}. ${pad2(dates[0].getDate())} – ${pad2(dates[6].getMonth()+1)}. ${pad2(dates[6].getDate())}`;
 
   return `
-  <section class="a-hero" style="display:flex;flex-wrap:wrap;gap:16px 24px;align-items:flex-end;justify-content:space-between">
+  <section class="a-hero a-flat" style="display:flex;flex-wrap:wrap;gap:16px 24px;align-items:flex-end;justify-content:space-between">
     ${heroDots()}
     <div style="position:relative;display:flex;flex-direction:column;gap:2px;min-width:0">
       <span style="font-size:13.5px;color:var(--a-muted)">촬영 가능 인원 비교</span>
@@ -774,7 +774,7 @@ function shortsView(){
   const st = state.shortsState || 'idle';
 
   const hero = `
-  <section class="a-hero" style="display:flex;flex-wrap:wrap;gap:16px 24px;align-items:flex-end;justify-content:space-between;min-height:92px">
+  <section class="a-hero a-flat" style="display:flex;flex-wrap:wrap;gap:16px 24px;align-items:flex-end;justify-content:space-between;min-height:92px">
     ${heroDots()}
     <div style="position:relative;display:flex;flex-direction:column;gap:2px;min-width:0;max-width:720px">
       <span style="font-size:13.5px;color:var(--a-muted)">${st==='on'?'쇼츠 메이커 연결됨':'쇼츠 메이커'}</span>
@@ -1014,7 +1014,7 @@ function radioView(){
   }).join('');
 
   return `
-  <section class="a-hero" style="display:flex;flex-wrap:wrap;gap:16px 24px;align-items:flex-end;justify-content:space-between">
+  <section class="a-hero a-flat" style="display:flex;flex-wrap:wrap;gap:16px 24px;align-items:flex-end;justify-content:space-between">
     ${heroDots()}
     <div style="position:relative;display:flex;flex-direction:column;gap:2px;min-width:0">
       <span style="font-size:13.5px;color:var(--a-muted)">${esc(range)}</span>
@@ -1064,7 +1064,7 @@ function projectsView(){
   }).join('');
 
   return `
-  <section class="a-hero" style="display:flex;flex-wrap:wrap;gap:16px 24px;align-items:flex-end;justify-content:space-between">
+  <section class="a-hero a-flat" style="display:flex;flex-wrap:wrap;gap:16px 24px;align-items:flex-end;justify-content:space-between">
     ${heroDots()}
     <div style="position:relative;display:flex;flex-direction:column;gap:2px;min-width:0">
       <span style="font-size:13.5px;color:var(--a-muted)">${list.length}개 작품</span>
@@ -1259,7 +1259,7 @@ function scriptView(){
   }
 
   return `
-  <section class="a-hero" style="display:flex;flex-wrap:wrap;gap:16px 24px;align-items:flex-end;justify-content:space-between;min-height:92px">
+  <section class="a-hero a-flat" style="display:flex;flex-wrap:wrap;gap:16px 24px;align-items:flex-end;justify-content:space-between;min-height:92px">
     ${heroDots()}
     <div style="position:relative;display:flex;flex-direction:column;gap:2px;min-width:0;max-width:720px">
       <span style="font-size:13.5px;color:var(--a-muted)">NVIDIA NIM · ${esc(state.aiHealthText||'서버 확인 중')}</span>
@@ -1417,7 +1417,7 @@ function shootsView() {
     return `<button role="tab" aria-selected="${on}" data-shoot-category="${esc(k)}" style="height:34px;padding:0 12px;border-radius:9px;border:0;background:${on?'#FFFFFF':'transparent'};color:${on?'#3F4FD0':'#64708F'};box-shadow:${on?'0 2px 8px rgba(60,72,140,0.12)':'none'};font-family:inherit;font-size:13px;font-weight:700;cursor:pointer">${esc(label)} <span class="hn-num" style="opacity:0.8">${n}</span></button>`;}).join('');
 
   return `
-  <section class="a-hero" style="display:flex;flex-wrap:wrap;gap:16px 24px;align-items:flex-end;justify-content:space-between">
+  <section class="a-hero a-flat" style="display:flex;flex-wrap:wrap;gap:16px 24px;align-items:flex-end;justify-content:space-between">
     ${heroDots()}
     <div style="position:relative;display:flex;flex-direction:column;gap:2px;min-width:0">
       <span class="hn-num" style="font-size:13.5px;color:var(--a-muted)">${range}</span>
@@ -1555,7 +1555,7 @@ function personalView(){
     ||`<div style="padding:24px 16px;border-radius:16px;background:linear-gradient(120deg, #F3F5FF, #F6F2FF);text-align:center;color:#4F5770;font-size:14px">이 날은 등록된 일정이 없어요.<br>촬영 참여 가능으로 표시돼요.</div>`;
 
   return `
-  <section class="a-hero" style="display:flex;flex-wrap:wrap;gap:16px 24px;align-items:flex-end;justify-content:space-between">
+  <section class="a-hero a-flat" style="display:flex;flex-wrap:wrap;gap:16px 24px;align-items:flex-end;justify-content:space-between">
     ${heroDots()}
     <div style="position:relative;display:flex;flex-direction:column;gap:6px;min-width:0">
       <label style="display:inline-flex;align-items:center;gap:6px;font-size:13.5px;color:var(--a-muted)">
@@ -1878,7 +1878,7 @@ function peopleView(){
     .map(([label,n])=>`<span style="display:flex;flex-direction:column;min-width:84px;padding:8px 14px;border-radius:14px;background:var(--a-surface);border:1px solid var(--a-rule);line-height:1.3"><span style="font-size:12px;color:var(--a-muted)">${label}</span><strong class="hn-num" style="font-size:20px;font-weight:800">${n}<span style="font-size:12px;font-weight:600;color:var(--a-muted)"> 명</span></strong></span>`).join('');
 
   return `
-  <section class="a-hero" style="display:flex;flex-wrap:wrap;gap:16px 24px;align-items:flex-end;justify-content:space-between">
+  <section class="a-hero a-flat" style="display:flex;flex-wrap:wrap;gap:16px 24px;align-items:flex-end;justify-content:space-between">
     ${heroDots()}
     <div style="position:relative;display:flex;flex-direction:column;gap:2px;min-width:0">
       <span style="display:inline-flex;align-items:center;gap:6px;font-size:13.5px;color:var(--a-muted)"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>관리자 권한으로 보는 중</span>
@@ -2014,7 +2014,7 @@ function settingsView(){
     :serviceSettings(state.settingsSection);
 
   return `
-  <section class="a-hero" style="display:flex;flex-wrap:wrap;gap:16px 24px;align-items:flex-end;justify-content:space-between">
+  <section class="a-hero a-flat" style="display:flex;flex-wrap:wrap;gap:16px 24px;align-items:flex-end;justify-content:space-between">
     ${heroDots()}
     <div style="position:relative;display:flex;flex-direction:column;gap:2px;min-width:0">
       <span style="display:inline-flex;align-items:center;gap:6px;font-size:13.5px;color:var(--a-muted)"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>관리자 권한으로 보는 중</span>

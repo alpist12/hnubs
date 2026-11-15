@@ -1067,3 +1067,43 @@ body { background: var(--a-paper); color: var(--a-ink); }
   /* 좁은 칸에서는 요일별 막대가 숫자를 밀어낸다. */
   .a-stats [aria-label="요일별 촬영 수"] { display: none !important; }
 }
+
+/* ── 안쪽 화면은 띠를 걷어낸다 ──────────────────────────────
+   kakaocorp 의 큰 띠는 한 번 들르는 홍보 사이트라 쓸 수 있다.
+   이건 하루에 스무 번 여는 도구다. 띠가 화면 위 3분의 1을 먹고
+   적는 건 화면 이름과 사용법뿐이라, 정작 보러 온 격자가 접힌 아래로 밀렸다.
+   홈만 띠를 남기고 나머지는 제목 줄 하나로 줄인다. */
+.a-hero.a-flat {
+  margin: 0 0 18px;
+  padding: 2px 0 16px;
+  background: none;
+  color: var(--a-ink);
+  text-align: left;
+  border-bottom: 1px solid var(--a-rule);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px 20px;
+  min-height: 0;
+}
+.a-hero.a-flat .a-field,
+.a-hero.a-flat .a-art { display: none; }
+.a-hero.a-flat h1 {
+  font-size: clamp(22px, 2.4vw, 28px);
+  color: var(--a-ink);
+  animation: none;
+  margin: 0;
+}
+.a-hero.a-flat .a-eyebrow,
+.a-hero.a-flat .a-sub {
+  color: var(--a-muted);
+  font-size: 14px;
+  animation: none;
+}
+.a-hero.a-flat .a-sub { display: none; }        /* 사용법은 매번 읽지 않는다 */
+.a-hero.a-flat > div:last-child { animation: none; }
+/* 띠가 아니니 글자색 뒤집기를 되돌린다 */
+.a-hero.a-flat { --a-ink: #111111; --a-muted: #5C5C5C; }
+.a-hero.a-flat .a-btn { background: var(--a-action); color: #fff; }
+.a-hero.a-flat .a-btn-quiet { background: #fff; color: #111; border: 1px solid var(--a-rule); }
