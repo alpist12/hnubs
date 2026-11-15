@@ -10,6 +10,8 @@
  * NVIDIA 키나 관리자 비밀번호는 절대 여기 두지 않는다. 이 파일은 브라우저로
  * 그대로 내려가므로 누구나 열어 볼 수 있다. 비밀값은 API 서버에만 둔다.
  */
-/* 정식 사이트는 GitHub Pages 이고, /api/* 만 Netlify 가 맡는다.
-   로컬(빈 문자열)에서는 같은 출처에서 찾으므로 AI 기능만 쉰다. */
-window.HNUBS_API = location.hostname.endsWith('github.io') ? 'https://hnubs.netlify.app' : '';
+/* GitHub Pages와 4321 정적 미리보기는 운영 API를 쓴다.
+   다른 포트의 로컬 API 개발 서버는 같은 출처를 유지한다. */
+window.HNUBS_API = location.hostname.endsWith('github.io')
+  || (['localhost', '127.0.0.1'].includes(location.hostname) && location.port === '4321')
+  ? 'https://hnubs.netlify.app' : '';

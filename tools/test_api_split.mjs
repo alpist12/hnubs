@@ -1,10 +1,22 @@
 // 화면과 API 서버가 갈라져도 동작하는지. 한 군데라도 풀리면 GitHub Pages 에서 AI 기능이 죽는다.
 import assert from 'node:assert';
 import fs from 'node:fs';
+import { runInNewContext } from 'node:vm';
 
 // ── 1) API 주소는 api-config.js 한 곳에서만 정한다
 {
   const cfg = fs.readFileSync('api-config.js', 'utf8');
+  for (const [hostname, port, expected] of [
+    ['alpist12.github.io', '', 'https://hnubs.netlify.app'],
+    ['localhost', '4321', 'https://hnubs.netlify.app'],
+    ['127.0.0.1', '4321', 'https://hnubs.netlify.app'],
+    ['localhost', '8787', ''],
+    ['hnubs.netlify.app', '', ''],
+  ]) {
+    const context = { window: {}, location: { hostname, port } };
+    runInNewContext(cfg, context);
+    assert.strictEqual(context.window.HNUBS_API, expected, `${hostname}:${port} API 주소`);
+  }
   assert(/window\.HNUBS_API\s*=/.test(cfg), 'api-config.js 가 주소를 정의하지 않는다');
   assert(!/NVIDIA|API_KEY|PASSWORD|비밀번호/i.test(cfg.replace(/\/\*[\s\S]*?\*\//g, '')),
     'api-config.js 는 브라우저로 내려간다. 비밀값을 두면 안 된다');

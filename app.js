@@ -435,7 +435,7 @@ function homeView() {
     ${nextCue}
   </section>
 
-  <section aria-label="운영 현황" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(230px, 1fr));gap:12px">
+  <section aria-label="운영 현황" class="a-stats" style="display:grid;gap:12px">
     ${tile('linear-gradient(140deg, #E3EAFF, #D6E0FF)','#3F4FD0','<rect x="3" y="6" width="13" height="12" rx="2.5"/><path d="M16 10.5l5-3v9l-5-3"/>','이번 주 촬영',weekShoots.length,`건${weekShoots.length?` · 완료 ${weekDone}건`:''}`,`<span aria-label="요일별 촬영 수" style="flex:0 0 auto;height:32px;display:flex;align-items:flex-end;gap:3px">${spark}</span>`)}
     ${tile('linear-gradient(140deg, #EDE6FF, #E1D8FF)','#5B45C8','<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/>','앞으로 7일 촬영',next7.length,`건${next7Days?` · ${next7Days}`:''}`)}
     ${tile('linear-gradient(140deg, #E3F7EE, #D3F0E2)','#1C6E4A','<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><circle cx="17" cy="9" r="2.5"/><path d="M16 14.2A5 5 0 0 1 21.5 19"/>','활동 구성원',activeMembers,`/ ${people.length}명`,`<span aria-hidden="true" style="flex:0 0 auto;width:40px;height:40px;border-radius:50%;background:conic-gradient(#3DAA78 0 ${pct}%, #E6EAF2 ${pct}% 100%);display:flex;align-items:center;justify-content:center"><i style="display:block;width:28px;height:28px;border-radius:50%;background:#FFFFFF"></i></span>`)}

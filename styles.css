@@ -1056,3 +1056,14 @@ body { background: var(--a-paper); color: var(--a-ink); }
 .hn-main > article,
 .hn-main > div { margin-bottom: 4px; }
 .hn-main { display: flex; flex-direction: column; gap: clamp(18px, 2.4vw, 30px); }
+
+/* 운영 현황 타일 — 넓으면 네 칸, 태블릿은 두 칸, 휴대폰도 두 칸.
+   예전엔 minmax(230px) 하나로 두어서 좁은 화면에서 한 칸씩 세로로 길게 늘어졌다. */
+.a-stats { grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
+@media (max-width: 720px) {
+  .a-stats { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .a-stats > div { padding: 14px 15px; gap: 10px; }
+  .a-stats .hn-num { font-size: 30px !important; }
+  /* 좁은 칸에서는 요일별 막대가 숫자를 밀어낸다. */
+  .a-stats [aria-label="요일별 촬영 수"] { display: none !important; }
+}

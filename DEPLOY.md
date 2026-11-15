@@ -92,14 +92,17 @@ curl -sD - -o /dev/null -H "Origin: https://alpist12.github.io"   https://hnubs.
 
 ## 3. 둘을 잇는 설정
 
-`api-config.js` 한 줄이 화면이 어느 API 를 부를지 정한다.
+`api-config.js`가 화면이 어느 API를 부를지 정한다.
 
 ```js
-window.HNUBS_API = location.hostname.endsWith('github.io') ? 'https://hnubs.netlify.app' : '';
+window.HNUBS_API = location.hostname.endsWith('github.io')
+  || (['localhost', '127.0.0.1'].includes(location.hostname) && location.port === '4321')
+  ? 'https://hnubs.netlify.app' : '';
 ```
 
-로컬에서는 빈 문자열 → 같은 출처. GitHub Pages 에서는 Netlify 절대주소.
-서버를 옮기면 **이 줄만** 고치면 된다.
+GitHub Pages와 4321 포트의 정적 미리보기는 `hnubs.netlify.app`을 사용한다.
+다른 포트의 로컬 API 개발 서버는 같은 출처를 유지한다.
+공유드라이브 iframe도 이 설정 파일을 읽으므로 API 주소를 따로 바꾸지 않는다.
 
 출처가 다르므로 **CORS 가 필수**다. `api/_shared.mjs` 의 `response()` 가 헤더를
 붙인다. 이게 빠지면 브라우저가 응답을 버려서 AI 기능만 조용히 죽는다.
@@ -114,9 +117,18 @@ npm run build
 cd dist/client && python -m http.server 4321
 ```
 
-`api-config.js` 가 빈 문자열이 되어 같은 출처에서 `/api/*` 를 찾는다. 정적 서버에는
-API 가 없으므로 AI 기능은 안 되지만, 일정 관리는 Firestore 에 직접 붙어 동작한다.
-점검 게이트는 `/api` 가 없으면 사이트를 잠그지만 `localhost` 는 예외로 열어 둔다.
+4321 정적 미리보기에서도 운영 API를 사용한다. Netlify의 `ALLOWED_ORIGINS`에는
+`https://alpist12.github.io`, `http://localhost:4321`, `http://127.0.0.1:4321`을 등록한다.
+일정 관리는 Firestore에 직접 붙는다. 정적 서버는 `dist/client`만 제공하여
+서버 소스나 로컬 인증 파일을 노출하지 않는다.
+
+### Drive 연결 상태 (2026-11-11)
+
+`hnubs-drive-server@hnubs-drive.iam.gserviceaccount.com`의 인증정보를
+`hnubs.netlify.app`의 `GOOGLE_DRIVE_SERVICE_ACCOUNT`에 설정했다.
+Google Cloud 프로젝트 IAM 역할은 부여하지 않았다. 비공개 키는 웹 작업 폴더와
+Git 외부에 보관한다. 업로드한 인증서 만료일은 **2027-11-11**이며 이전에 키를 교체해야 한다.
+목록 조회와 폴더 이동을 실제 데이터로 검증했다. 업로드·삭제 동작은 검증하지 않았다.
 
 ## Firestore 규칙
 
