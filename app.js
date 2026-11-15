@@ -174,6 +174,27 @@ function heroField() {
   return `<svg class="a-field" aria-hidden="true" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid slice">${out.join('')}</svg>`;
 }
 
+/* 탤리 라이트 — 지금 방송 중인지. 라디오 편성 시간을 그대로 본다.
+   휴방인 날은 켜지 않는다. 방송국에서 빨간 불은 한 가지 뜻뿐이라 여기서도 그렇게 쓴다. */
+function tallyNow(){
+  const now = new Date();
+  if (radioOff(localIso(now))) return null;
+  const mins = now.getHours() * 60 + now.getMinutes();
+  return [
+    { label: '점심방송', from: 12 * 60 + 30, to: 13 * 60 },
+    { label: '저녁방송', from: 18 * 60, to: 18 * 60 + 35 },
+  ].find(w => mins >= w.from && mins < w.to) || null;
+}
+
+function renderTally(){
+  const el = document.getElementById('tally');
+  if (!el) return;
+  const on = tallyNow();
+  el.className = `a-tally${on ? ' on' : ''}`;
+  el.innerHTML = `<i aria-hidden="true"></i>${on ? `ON AIR · ${esc(on.label)}` : 'OFF AIR'}`;
+  el.title = on ? `${on.label} 방송 중입니다.` : '지금은 방송 시간이 아닙니다.';
+}
+
 function heroDots() {
   // 화면을 열 때마다 다른 장비가 나온다. 날짜로 고르니 하루 안에서는 안 바뀐다.
   const i = new Date().getDate() % HERO_ICONS.length;
@@ -2074,7 +2095,7 @@ function render(){
   if(!views[state.route]) state.route='home';
   document.body.classList.toggle('hn-camera', state.route === 'maker' && state.makerTab === 'camera');
   // 다른 일정의 실시간 갱신이 촬영 배치와 입력 중인 저장 이름을 초기화하지 않게 한다.
-  if (state.route === 'maker' && state.makerTab === 'camera' && cameraCleanup && $('#simulator')) { renderNotifications(); return; }
+  if (state.route === 'maker' && state.makerTab === 'camera' && cameraCleanup && $('#simulator')) { renderTally(); renderNotifications(); return; }
   cameraCleanup?.(); cameraCleanup = null;
   $('#app').innerHTML=views[state.route]()+editPickCard();
   if (state.route === 'maker' && state.makerTab === 'camera') {
@@ -2083,6 +2104,7 @@ function render(){
   }
   $$('[data-route]').forEach(b=>b.classList.toggle('active',b.dataset.route===state.route));
   document.body.classList.toggle('hn-shorts', state.route==='maker' && state.makerTab==='shorts');
+  renderTally();
   renderNotifications();
   hydrateIcons(); bindView(); document.title=`${{home:'홈',schedule:'일정',maker:'메이커스페이스',drive:'공유드라이브',notices:'공지사항',people:'인원 관리',settings:'설정'}[state.route]} · HNUBS`;
 }
@@ -2099,6 +2121,8 @@ function renderNotifications(){
 
 // 홈의 NEXT CUE 카운트다운 — 홈에 있을 때만 다시 그린다.
 setInterval(()=>{ if(state.route==='home'&&!document.hidden) render(); },30000);
+// 방송이 시작·끝나는 순간에 불이 바뀌어야 뜻이 있다.
+setInterval(()=>{ if(!document.hidden) renderTally(); }, 60000);
 
 function bindView(){
   $$('[data-shoot-pick]').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();state.selectedShoot=b.dataset.shootPick;render();}));
