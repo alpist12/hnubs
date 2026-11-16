@@ -1649,3 +1649,20 @@ body.theme-light .file-row:hover { background: #F6F7FB; }
   body.theme-light .toast-container { bottom: 24px; }
 }
 @media (max-width: 768px) { body.theme-light .dv-hero { order: -2; } }
+
+/* workspace 안에서 열릴 때 — 사이드바가 두 겹이 되지 않게 드라이브 메뉴는 제목 아래 가로 탭으로 */
+body.in-workspace .sidebar { display: none; }
+body.in-workspace .dv-hero { order: -2; }
+body.in-workspace .bottom-nav {
+  position: sticky; top: 0; bottom: auto; left: auto; right: auto; z-index: 30; order: -1;
+  display: flex; gap: 4px; overflow-x: auto; padding: 8px 28px; min-height: 0;
+  background: #FFFFFF; border-top: 0; border-bottom: 1px solid #E2E4EE; box-shadow: none; scrollbar-width: none;
+}
+body.in-workspace .bottom-nav-btn { flex: 0 0 auto; flex-direction: row; gap: 6px; height: 32px; padding: 0 12px; border-radius: 6px; font-size: 13px; font-weight: 700; white-space: nowrap; color: #363B5A; }
+body.in-workspace .bottom-nav-btn:hover { background: #F6F7FB; }
+body.in-workspace .bottom-nav-btn.active { background: #1B1F3B; color: #FFFFFF; }
+body.in-workspace .bottom-nav-btn svg { width: 15px; height: 15px; }
+body.in-workspace .fab-btn { display: none; }
+body.in-workspace .file-scroll { padding-bottom: 40px; }
+@media (max-width: 768px) { body.in-workspace .bottom-nav { padding: 8px 12px; } }
+body.in-workspace .bottom-nav { height: auto; }

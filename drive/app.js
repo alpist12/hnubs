@@ -1809,6 +1809,8 @@ function render() {
 
   if (state.theme === 'light') document.body.classList.add('theme-light');
   else document.body.classList.remove('theme-light');
+  // workspace 안(iframe)에서 열리면 workspace 사이드바와 겹치지 않게 드라이브 왼쪽 메뉴를 위쪽 탭으로 돌린다
+  document.body.classList.toggle('in-workspace', window.self !== window.top);
 
   const list = getFilteredList();
   const liveItems = state.items.filter(i => !i.trashed);
