@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 300" preserveAspectRatio="xMidYMid slice" role="img" aria-label="라디오 부스 일러스트">
+  <rect width="600" height="300" fill="#DFE7FF"/>
+  <rect x="380" y="0" width="220" height="300" fill="#D4C5FF"/>
+  <!-- 음파 -->
+  <g fill="none" stroke="#2F4FE0" stroke-width="5" stroke-linecap="round">
+    <path d="M360 90a70 70 0 0 1 0 100"/><path d="M390 66a110 110 0 0 1 0 148" opacity=".6"/><path d="M420 44a150 150 0 0 1 0 192" opacity=".3"/>
+  </g>
+  <!-- 시계 -->
+  <circle cx="520" cy="72" r="38" fill="#FFFFFF" stroke="#1B1F3B" stroke-width="4"/>
+  <path d="M520 72V50M520 72l16 10" stroke="#1B1F3B" stroke-width="4" stroke-linecap="round"/>
+  <!-- 마이크 -->
+  <rect x="236" y="40" width="88" height="140" rx="44" fill="#1B1F3B"/>
+  <g stroke="#FFFFFF" stroke-width="3" opacity=".5"><path d="M250 80h60M250 100h60M250 120h60M250 140h60"/></g>
+  <path d="M220 130a60 60 0 0 0 120 0" fill="none" stroke="#1B1F3B" stroke-width="7"/>
+  <path d="M280 190v40" stroke="#1B1F3B" stroke-width="8"/>
+  <circle cx="190" cy="110" r="44" fill="none" stroke="#1B1F3B" stroke-width="4"/>
+  <circle cx="190" cy="110" r="38" fill="#FFFFFF" opacity=".55"/>
+  <path d="M234 110h10" stroke="#1B1F3B" stroke-width="4"/>
+  <!-- 콘솔 -->
+  <path d="M60 300l40-70h400l40 70z" fill="#FFFFFF" stroke="#1B1F3B" stroke-width="4" stroke-linejoin="round"/>
+  <g stroke="#1B1F3B" stroke-width="4" stroke-linecap="round"><path d="M150 248v40M200 248v40M250 248v40M300 248v40M350 248v40M400 248v40"/></g>
+  <g fill="#FFE94D" stroke="#1B1F3B" stroke-width="3"><rect x="141" y="268" width="18" height="10" rx="3"/><rect x="191" y="254" width="18" height="10" rx="3"/><rect x="241" y="272" width="18" height="10" rx="3"/><rect x="291" y="258" width="18" height="10" rx="3" fill="#2F4FE0"/><rect x="341" y="276" width="18" height="10" rx="3"/><rect x="391" y="262" width="18" height="10" rx="3"/></g>
+  <circle cx="460" cy="262" r="8" fill="#E5243B"/>
+  <!-- 헤드폰 걸이 -->
+  <path d="M90 40v30" stroke="#1B1F3B" stroke-width="4"/>
+  <path d="M60 110c0-24 14-38 30-38s30 14 30 38" fill="none" stroke="#1B1F3B" stroke-width="6" stroke-linecap="round"/>
+  <rect x="52" y="100" width="18" height="26" rx="7" fill="#2F4FE0" stroke="#1B1F3B" stroke-width="3"/><rect x="110" y="100" width="18" height="26" rx="7" fill="#2F4FE0" stroke="#1B1F3B" stroke-width="3"/>
+</svg>

@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 300" preserveAspectRatio="xMidYMid slice" role="img" aria-label="영상 편집 일러스트">
+  <rect width="600" height="300" fill="#EAE3FF"/>
+  <!-- 모니터 -->
+  <rect x="90" y="30" width="420" height="200" rx="14" fill="#1B1F3B"/>
+  <rect x="106" y="46" width="230" height="118" rx="6" fill="#DFE7FF"/>
+  <path d="M106 140l60-46 50 34 40-24 80 50v10H106z" fill="#2F4FE0"/>
+  <circle cx="290" cy="80" r="14" fill="#FFE94D"/>
+  <rect x="350" y="46" width="144" height="56" rx="6" fill="#2B3060"/>
+  <rect x="350" y="108" width="144" height="56" rx="6" fill="#2B3060"/>
+  <g fill="#D4C5FF"><rect x="362" y="58" width="60" height="8" rx="4"/><rect x="362" y="74" width="100" height="8" rx="4" opacity=".6"/><rect x="362" y="120" width="80" height="8" rx="4"/><rect x="362" y="136" width="50" height="8" rx="4" opacity=".6"/></g>
+  <!-- 타임라인 -->
+  <rect x="106" y="176" width="388" height="40" rx="6" fill="#2B3060"/>
+  <rect x="114" y="182" width="120" height="12" rx="3" fill="#2F4FE0"/><rect x="238" y="182" width="90" height="12" rx="3" fill="#D4C5FF"/><rect x="332" y="182" width="150" height="12" rx="3" fill="#2F4FE0"/>
+  <rect x="114" y="198" width="200" height="12" rx="3" fill="#126A44"/><rect x="318" y="198" width="100" height="12" rx="3" fill="#FFE94D"/>
+  <path d="M300 172v48" stroke="#E5243B" stroke-width="3"/><path d="M294 172h12l-6 8z" fill="#E5243B"/>
+  <!-- 받침 + 필름 조각 -->
+  <path d="M280 230h40l10 30h-60z" fill="#1B1F3B"/><rect x="230" y="258" width="140" height="10" rx="5" fill="#1B1F3B"/>
+  <g transform="rotate(-10 500 260)"><rect x="440" y="240" width="130" height="40" fill="#1B1F3B"/><g fill="#FFFFFF"><rect x="448" y="246" width="8" height="6"/><rect x="468" y="246" width="8" height="6"/><rect x="488" y="246" width="8" height="6"/><rect x="508" y="246" width="8" height="6"/><rect x="528" y="246" width="8" height="6"/><rect x="548" y="246" width="8" height="6"/><rect x="448" y="268" width="8" height="6"/><rect x="468" y="268" width="8" height="6"/><rect x="488" y="268" width="8" height="6"/><rect x="508" y="268" width="8" height="6"/><rect x="528" y="268" width="8" height="6"/><rect x="548" y="268" width="8" height="6"/></g></g>
+</svg>

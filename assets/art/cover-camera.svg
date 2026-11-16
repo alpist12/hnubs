@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 300" preserveAspectRatio="xMidYMid slice" role="img" aria-label="카메라 구도 일러스트">
+  <rect width="1200" height="300" fill="#EEF1FB"/>
+  <path d="M560 0h640v300H520c30-90 0-180 40-300z" fill="#E4E0FB"/>
+  <!-- 바닥 격자 -->
+  <g stroke="#C9CDDD" stroke-width="2">
+    <path d="M560 300l140-110M700 300l90-110M840 300l40-110M980 300l-10-110M1120 300l-60-110"/>
+    <path d="M600 268h560M650 236h480M690 210h420"/>
+  </g>
+  <!-- 화면 프레임(3분할) -->
+  <rect x="740" y="40" width="250" height="140" rx="8" fill="#FFFFFF" stroke="#1B1F3B" stroke-width="4"/>
+  <path d="M823 40v140M907 40v140M740 87h250M740 133h250" stroke="#2F4FE0" stroke-width="2" opacity=".35"/>
+  <g fill="#D4C5FF" stroke="#1B1F3B" stroke-width="3"><circle cx="840" cy="104" r="12"/><path d="M824 180v-42a16 16 0 0 1 32 0v42z"/><circle cx="890" cy="110" r="11"/><path d="M875 180v-36a15 15 0 0 1 30 0v36z" fill="#DFE7FF"/></g>
+  <path d="M752 52h20M752 52v14M978 52h-20M978 52v14M752 168h20M752 168v-14M978 168h-20M978 168v-14" stroke="#E5243B" stroke-width="4" stroke-linecap="round"/>
+  <!-- 카메라 + 삼각대 -->
+  <path d="M640 170l-34 130M640 170v130M640 170l34 130" stroke="#1B1F3B" stroke-width="6" stroke-linecap="round"/>
+  <rect x="596" y="120" width="90" height="56" rx="10" fill="#2F4FE0" stroke="#1B1F3B" stroke-width="4"/>
+  <circle cx="626" cy="148" r="16" fill="#FFFFFF" stroke="#1B1F3B" stroke-width="4"/><circle cx="626" cy="148" r="6" fill="#1B1F3B"/>
+  <path d="M686 134l26-12v52l-26-12z" fill="#1B1F3B"/>
+  <circle cx="672" cy="130" r="4" fill="#FFE94D"/>
+  <!-- 시야 -->
+  <path d="M712 128L740 40M712 168L740 180" stroke="#1B1F3B" stroke-width="2" stroke-dasharray="4 6"/>
+  <!-- 렌즈 다이얼 -->
+  <circle cx="1100" cy="210" r="44" fill="#FFFFFF" stroke="#1B1F3B" stroke-width="4"/>
+  <circle cx="1100" cy="210" r="22" fill="#FFE94D" stroke="#1B1F3B" stroke-width="3"/>
+  <g stroke="#1B1F3B" stroke-width="3" stroke-linecap="round"><path d="M1100 170v8M1140 210h-8M1100 250v-8M1060 210h8"/></g>
+</svg>

@@ -1950,7 +1950,7 @@ function render() {
                 <div class="dv-crumbs">
                   ${crumbs.length
                     ? crumbs.map((c, idx) => `<span class="crumb-link" onclick="navigateToFolder('${c.id}')">${esc(c.name)}</span>${idx < crumbs.length - 1 ? '<span style="opacity:0.55">›</span>' : ''}`).join('')
-                    : `<span>${esc(state.driveName)} · 로그인 없이 바로</span>`}
+                    : `<span>로그인 없이 바로 쓰는 방송국 공유 폴더</span>`}
                 </div>
                 <div class="dv-hero-title">${esc(headerTitle)}</div>
               </div>
@@ -1964,7 +1964,7 @@ function render() {
                 <span>영상</span><b>${videoCount}개</b>
               </button>
               <div class="dv-stat" title="저장소 사용량">
-                <span>사용량</span><b>${st.usedGb} / ${st.totalGb} GB</b>
+                <span>사용량</span><b>${fmtCapacity(st.usedGb)} / ${fmtCapacity(st.totalGb)}</b>
               </div>
 
               <button class="dv-upload" onclick="openSheet('upload')">${iconSvg('plus', 18)} 업로드</button>
@@ -1988,10 +1988,10 @@ function render() {
             `).join('')}
             ${state.nav === 'drive' ? `
               <button class="quick-action-pill" onclick="openCreateFolderSheet()">
-                ${iconSvg('folderPlus', 14)} + 새 폴더
+                ${iconSvg('folderPlus', 14)} 새 폴더
               </button>
               <button class="quick-action-pill" onclick="openCreateDocSheet()">
-                ${iconSvg('fileText', 14)} + 큐시트/문서 작성
+                ${iconSvg('fileText', 14)} 큐시트/문서 작성
               </button>
             ` : ''}
           </div>
@@ -2014,8 +2014,8 @@ function render() {
             <span class="live-dot"></span>
             <span style="font-weight:700">${state.mode==='google'?'Google Drive 연결됨':'Google Drive 연결 필요'}</span>
           </div>
-          <div style="font-variant-numeric:tabular-nums;color:#93C5FD;font-weight:800">
-            ${st.usedGb} GB / 총 용량 ${st.totalGb} GB
+          <div style="font-variant-numeric:tabular-nums;color:var(--text-secondary);font-weight:800">
+            ${fmtCapacity(st.usedGb)} / 총 ${fmtCapacity(st.totalGb)}
           </div>
         </div>
 

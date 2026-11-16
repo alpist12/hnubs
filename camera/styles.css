@@ -9,3 +9,29 @@
 
 @media(max-width:600px){#simulator .preview-panel{order:-1}#simulator header p{display:none}#simulator h1{font-size:20px}#simulator #placement{height:240px}#simulator header{margin-bottom:18px}}
 @media(max-width:600px){body.hn-camera .air{display:none}#simulator .view-toggle button,#simulator .presets button{min-height:44px}}
+
+/* 시안 E — workspace 와 같은 '그림 있는 워크스페이스' 느낌. 위 커버 그림 + 아이콘 타일, 흰 바탕, 평평한 패널. */
+#simulator{background:#fff;color:#1B1F3B;width:auto;max-width:1120px;margin:22px clamp(20px,3vw,36px) 0;padding:0 0 32px;border-radius:0}
+#simulator>header{position:relative;align-items:flex-end;padding:128px 0 18px;margin-bottom:22px;border-bottom:1px solid #E2E4EE}
+#simulator>header::before{content:"";position:absolute;top:0;left:0;right:0;height:104px;border-radius:12px;background:#EEF1FB url(../assets/art/cover-camera.svg) center/cover no-repeat}
+#simulator>header>div:first-child::before{content:"";display:block;width:60px;height:60px;margin:-48px 0 12px;border-radius:14px;position:relative;
+  background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232F4FE0' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14.5 4 16 7h3a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h3l1.5-3z'/%3E%3Ccircle cx='12' cy='13' r='3.5'/%3E%3C/svg%3E") center/30px no-repeat;
+  border:1px solid #E2E4EE;box-shadow:0 6px 16px rgba(27,31,59,.10)}
+#simulator h1{font-size:26px;font-weight:850;letter-spacing:-.04em;margin:0 0 2px;color:#1B1F3B}
+#simulator p{color:#565D78}
+#simulator h2{font-size:15px;font-weight:850;color:#1B1F3B}
+#simulator button{border-color:#C9CDDD;color:#1B1F3B;border-radius:6px;min-height:34px;padding:6px 12px;font-weight:700}
+#simulator button:hover{background:#F6F7FB;border-color:#363B5A}
+#simulator button.primary{background:#2F4FE0;border-color:#2F4FE0;color:#fff}
+#simulator button.primary:hover{background:#2440C2;border-color:#2440C2}
+#simulator button:focus-visible,#simulator input:focus-visible,#simulator select:focus-visible{outline:2px solid #2F4FE0;outline-offset:2px}
+#simulator ::selection{background:#2F4FE0;color:#fff}
+#simulator .stage-panel,#simulator .preview-panel,#simulator .controls,#simulator .people-section,#simulator .shoot-notes{border:1px solid #E2E4EE;border-radius:12px;box-shadow:none}
+#simulator .view-toggle [aria-pressed=true]{background:#1B1F3B;color:#fff;border-color:#1B1F3B}
+#simulator #placement{background:#F6F7FB}
+#simulator .hint,#simulator .legend{color:#565D78}
+#simulator .status{background:#F6F7FB;color:#363B5A;border-radius:6px;font-weight:700}
+#simulator .status.sharp{background:#DDF3E7;color:#126A44}
+#simulator input[type=range]{accent-color:#2F4FE0}
+@media(max-width:760px){#simulator{margin:16px 16px 0}#simulator>header{padding-top:96px;flex-direction:column;align-items:flex-start}#simulator>header::before{height:76px}#simulator>header>div:first-child::before{width:48px;height:48px;margin-top:-40px;background-size:24px}#simulator h1{font-size:21px}}
+#simulator .stage-grid>*{min-width:0}#simulator canvas{max-width:100%}

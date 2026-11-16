@@ -51,7 +51,7 @@ const icons = {
   users: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.7M16 3.3a4 4 0 0 1 0 7.4"/>',
   settings: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2h-4V21a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3 14H2.8v-4H3a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1a1.7 1.7 0 0 0 1.9.3A1.7 1.7 0 0 0 10 3v-.2h4V3a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.2v4H21a1.7 1.7 0 0 0-1.6 1z"/>',
   sparkles: '<path d="m12 3-1.2 3.8L7 8l3.8 1.2L12 13l1.2-3.8L17 8l-3.8-1.2zM5 14l-.8 2.2L2 17l2.2.8L5 20l.8-2.2L8 17l-2.2-.8zM19 13l-.7 1.8-1.8.7 1.8.7L19 18l.7-1.8 1.8-.7-1.8-.7z"/>',
-  plus: '<path d="M12 5v14M5 12h14"/>', map: '<path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3zM9 3v15M15 6v15"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>', folder: '<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>', radio: '<path d="M4 10v4h3l5 4V6L7 10H4z"/><path d="M16 9a4 4 0 0 1 0 6M19 6.5a8 8 0 0 1 0 11"/>', film: '<rect x="6" y="3" width="12" height="18" rx="2"/><path d="m10.5 9.5 4 2.5-4 2.5z"/>', map: '<path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3zM9 3v15M15 6v15"/>',
   pin: '<path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0z"/><circle cx="12" cy="10" r="2"/>',
   file: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h6"/>',
   edit: '<path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4z"/>', trash: '<path d="M3 6h18M8 6V4h8v2M19 6l-1 15H6L5 6M10 11v6M14 11v6"/>',
@@ -106,7 +106,7 @@ function memberAvailable(memberId, iso, dayIndex, time, ignoreShoots = false) {
 }
 function availabilityCount(iso, dayIndex, time) { return people.filter(p => memberAvailable(p[7], iso, dayIndex, time)).length; }
 
-const AV=[['#E3EAFF','#3F4FD0'],['#E3F7EE','#1C6E4A'],['#EDE6FF','#5B45C8'],['#FFE9DF','#9A3E1E']];
+const AV=[['var(--blue-card)','var(--blue-ink)'],['var(--mint-card)','var(--mint-ink)'],['var(--lav-card)','var(--lav-ink)'],['var(--peach-card)','var(--peach-ink)']];
 const DOW=['일','월','화','수','목','금','토'];
 // fixedClasses.day 는 월=0 으로 저장된다. 표시는 일요일 시작, 조회는 월=0 그대로.
 const dataDay=d=>(d.getDay()+6)%7;
@@ -201,7 +201,7 @@ function heroDots() {
   return heroField() + halftoneDots(i);
 }
 
-const CARD='border-radius:16px;background:var(--a-surface);border:1px solid var(--a-rule);box-shadow:none';
+const CARD='border-radius:var(--r-card);background:var(--a-surface);border:1px solid var(--a-rule);box-shadow:none';
 const EDIT_ICON='<svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>';
 function initial(name){ return String(name||'?').trim().slice(0,1) || '?'; }
 function faces(names,limit=4){ return names.slice(0,limit).map((n,k)=>`<span aria-hidden="true" style="width:28px;height:28px;margin-left:-7px;border-radius:50%;border:2px solid #FFFFFF;background:${AV[k%4][0]};color:${AV[k%4][1]};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800">${esc(initial(n))}</span>`).join(''); }
@@ -209,7 +209,7 @@ function pad2(n){ return String(n).padStart(2,'0'); }
 function monthDay(iso){ const d=new Date(`${iso}T00:00:00`); return `${d.getMonth()+1}. ${d.getDate()}`; }
 function dowOf(iso){ const d=new Date(`${iso}T00:00:00`); return DOW[d.getDay()]; }
 
-const NOTICE_TAGS=[['필독','#FDECEF','#A8324F'],['안내','#E3EAFF','#3F4FD0'],['일정','#EDE6FF','#5B45C8']];
+const NOTICE_TAGS=[['필독','var(--rose-card)','var(--rose-ink)'],['안내','var(--blue-card)','var(--blue-ink)'],['일정','var(--lav-card)','var(--lav-ink)']];
 function noticeTag(name){ return NOTICE_TAGS.find(t=>t[0]===name)||NOTICE_TAGS[1]; }
 function noticeDate(n){ return n.date||(n.createdAt?localIso(new Date(n.createdAt)):''); }
 
@@ -218,18 +218,18 @@ function noticesView(){
   const usedTags=NOTICE_TAGS.map(t=>t[0]).filter(t=>notices.some(n=>n.tag===t));
   const tabs=[['all','전체'],...usedTags.map(t=>[t,t])].map(([k,label])=>{ const on=state.noticeTag===k;
     const n=k==='all'?notices.length:notices.filter(x=>x.tag===k).length;
-    return `<button role="tab" aria-selected="${on}" data-notice-tag="${esc(k)}" style="height:34px;padding:0 12px;border-radius:9px;border:0;background:${on?'#FFFFFF':'transparent'};color:${on?'#3F4FD0':'#64708F'};box-shadow:${on?'0 2px 8px rgba(60,72,140,0.12)':'none'};font-family:inherit;font-size:13px;font-weight:700;cursor:pointer">${esc(label)} <span class="hn-num" style="opacity:0.8">${n}</span></button>`;}).join('');
+    return `<button role="tab" aria-selected="${on}" data-notice-tag="${esc(k)}" style="height:34px;padding:0 12px;border-radius:var(--r-ctl);border:0;background:${on?'#FFFFFF':'transparent'};color:${on?'var(--blue-ink)':'var(--muted)'};box-shadow:${on?'0 2px 8px rgba(60,72,140,0.12)':'none'};font-family:inherit;font-size:13px;font-weight:700;cursor:pointer">${esc(label)} <span class="hn-num" style="opacity:0.8">${n}</span></button>`;}).join('');
 
   const list=rows.map(n=>{ const [,bg,fg]=noticeTag(n.tag);
-    return `<button data-notice="${esc(n.id)}" style="width:100%;display:flex;gap:14px;padding:16px;border:0;border-radius:18px;background:#FFFFFF;box-shadow:0 6px 18px rgba(60,72,140,0.05);font-family:inherit;text-align:left;cursor:pointer;margin-bottom:8px">
-      <span aria-hidden="true" style="flex:0 0 44px;height:44px;border-radius:14px;background:${bg};color:${fg};display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:800">${esc(n.tag)}</span>
+    return `<button data-notice="${esc(n.id)}" style="width:100%;display:flex;gap:14px;padding:16px;border:0;border-radius:var(--r-card);background:#FFFFFF;box-shadow:var(--lift);font-family:inherit;text-align:left;cursor:pointer;margin-bottom:8px">
+      <span aria-hidden="true" style="flex:0 0 44px;height:44px;border-radius:var(--r-card);background:${bg};color:${fg};display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:800">${esc(n.tag)}</span>
       <span style="flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:3px">
         <strong style="font-size:15.5px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(n.title)}</strong>
-        ${n.body?`<span style="font-size:13px;color:#64708F;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${esc(n.body)}</span>`:''}
-        <span style="font-size:12px;color:#64708F">${esc(n.author||'운영진')} · ${esc(noticeDate(n))}</span>
+        ${n.body?`<span style="font-size:13px;color:var(--muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${esc(n.body)}</span>`:''}
+        <span style="font-size:12px;color:var(--muted)">${esc(n.author||'운영진')} · ${esc(noticeDate(n))}</span>
       </span>
     </button>`;}).join('')
-    ||`<div style="padding:48px 20px;text-align:center;color:#64708F">등록된 공지가 없어요.<br><span style="font-size:13px">오른쪽 위 ‘공지 작성’으로 첫 공지를 올려 보세요.</span></div>`;
+    ||`<div style="padding:40px 20px;display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center;color:var(--muted)"><img src="./assets/art/empty-notice.svg" alt="" width="140" height="102">등록된 공지가 없어요.<br><span style="font-size:13px">오른쪽 위 ‘공지 작성’으로 첫 공지를 올려 보세요.</span></div>`;
 
   return `
   <section class="a-hero a-flat" style="display:flex;flex-wrap:wrap;gap:16px 24px;align-items:flex-end;justify-content:space-between">
@@ -239,15 +239,15 @@ function noticesView(){
       <h1>공지사항</h1>
       <span style="font-size:14.5px;color:var(--a-muted)">방송국 전체에 알릴 내용을 올리고 확인해요.</span>
     </div>
-    <button data-action="new-notice" style="position:relative;display:inline-flex;align-items:center;gap:6px;height:44px;padding:0 18px;border-radius:12px;border:0;background:var(--a-action);color:#FFFFFF;font-family:inherit;font-size:15px;font-weight:500;cursor:pointer;border-radius:980px"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>공지 작성</button>
+    <button data-action="new-notice" style="position:relative;display:inline-flex;align-items:center;gap:6px;height:44px;padding:0 18px;border-radius:var(--r-ctl);border:0;background:var(--a-action);color:#FFFFFF;font-family:inherit;font-size:15px;font-weight:500;cursor:pointer"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>공지 작성</button>
   </section>
 
-  <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:10px;border-radius:18px;background:rgba(255,255,255,0.9);border:1px solid #FFFFFF;box-shadow:0 8px 24px rgba(60,72,140,0.06)">
-    <div role="tablist" aria-label="분류" style="display:flex;gap:4px;padding:4px;border-radius:12px;background:#F4F6FB">${tabs}</div>
-    <span style="margin-left:auto;font-size:13px;color:#64708F">${rows.length}건 표시</span>
+  <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:10px;border-radius:var(--r-card);background:var(--card);border:1px solid #FFFFFF;box-shadow:var(--lift)">
+    <div role="tablist" aria-label="분류" style="display:flex;gap:4px;padding:4px;border-radius:var(--r-ctl);background:var(--field)">${tabs}</div>
+    <span style="margin-left:auto;font-size:13px;color:var(--muted)">${rows.length}건 표시</span>
   </div>
 
-  <section aria-label="공지 목록" style="${CARD};padding:12px">${list}</section>`;
+  <section class="a-cue" aria-label="공지 목록" style="${CARD};padding:12px">${list}</section>`;
 }
 
 function openNoticeDetail(id){
@@ -257,7 +257,7 @@ function openNoticeDetail(id){
     `<span style="display:inline-block;padding:3px 10px;border-radius:99px;background:${bg};color:${fg};font-size:12px;font-weight:800">${esc(n.tag)}</span>
      <h2 style="margin:12px 0 4px">${esc(n.title)}</h2>
      <p style="margin:0 0 18px;color:var(--muted)">${esc(n.author||'운영진')} · ${esc(noticeDate(n))}</p>
-     <p style="margin:0;padding:14px;border-radius:14px;background:#F6F7FC;font-size:14px;line-height:1.7;color:#3A4466;white-space:pre-wrap">${esc(n.body||'내용이 없습니다.')}</p>`,
+     <p style="margin:0;padding:14px;border-radius:var(--r-card);background:var(--field);font-size:14px;line-height:1.7;color:var(--ink-2);white-space:pre-wrap">${esc(n.body||'내용이 없습니다.')}</p>`,
     `<button class="primary-button" data-action="close-drawer">확인</button>`));
 }
 
@@ -298,221 +298,150 @@ function monthCalendar(){
     const count=inMonth.filter(s=>s.date===iso).length;
     const isToday=iso===today;
     const title=count?`${month+1}월 ${day}일 · 촬영 ${count}건`:`${month+1}월 ${day}일`;
-    cells+=`<button ${count?`data-mini-day="${iso}"`:'disabled'} title="${title}" aria-label="${title}" style="position:relative;height:34px;border:0;border-radius:10px;background:${isToday?'linear-gradient(135deg, #4C6FE6, #7C5FD8)':(count?'#EEF2FF':'transparent')};color:${isToday?'#FFFFFF':(count?'#3F55D6':(i%7===0?'#C08097':'#64708F'))};font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:${count||isToday?800:500};cursor:${count?'pointer':'default'}">${day}${count?`<i aria-hidden="true" style="position:absolute;left:50%;bottom:4px;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:${isToday?'#FFFFFF':'#6B6AE6'}"></i>`:''}</button>`;
+    cells+=`<button ${count?`data-mini-day="${iso}"`:'disabled'} title="${title}" aria-label="${title}" style="position:relative;height:34px;border:0;border-radius:var(--r-ctl);background:${isToday?'var(--sel)':(count?'var(--blue-card)':'transparent')};color:${isToday?'#FFFFFF':(count?'var(--blue-ink)':(i%7===0?'var(--rose-ink)':'var(--muted)'))};font-family:inherit;font-size:13px;font-weight:${count||isToday?800:500};cursor:${count?'pointer':'default'}">${day}${count?`<i aria-hidden="true" style="position:absolute;left:50%;bottom:4px;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:${isToday?'#FFFFFF':'var(--lav-ink)'}"></i>`:''}</button>`;
   }
 
   return `<section aria-labelledby="a-cal" style="${CARD};padding:16px">
     <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px">
       <h2 id="a-cal" style="margin:0;font-size:16px;font-weight:800">${year}. ${pad2(month+1)} 방송국 일정</h2>
       <span style="display:flex;align-items:center;gap:2px">
-        <button data-mini-month="-1" aria-label="이전 달" style="width:28px;height:28px;border:0;border-radius:8px;background:#F2F4FB;color:#3A4466;cursor:pointer">‹</button>
-        <button data-mini-month="1" aria-label="다음 달" style="width:28px;height:28px;border:0;border-radius:8px;background:#F2F4FB;color:#3A4466;cursor:pointer">›</button>
+        <button data-mini-month="-1" aria-label="이전 달" style="width:28px;height:28px;border:0;border-radius:8px;background:var(--field);color:var(--ink-2);cursor:pointer">‹</button>
+        <button data-mini-month="1" aria-label="다음 달" style="width:28px;height:28px;border:0;border-radius:8px;background:var(--field);color:var(--ink-2);cursor:pointer">›</button>
       </span>
     </div>
     <div style="display:grid;grid-template-columns:repeat(7, minmax(0, 1fr));gap:3px">
-      ${DOW.map((d,i)=>`<span style="height:22px;display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:700;color:${i===0?'#A8324F':'#64708F'}">${d}</span>`).join('')}
+      ${DOW.map((d,i)=>`<span style="height:22px;display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:700;color:${i===0?'var(--rose-ink)':'var(--muted)'}">${d}</span>`).join('')}
       ${cells}
     </div>
-    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid #EEF0F6">
-      <span style="font-size:12.5px;color:#64708F">이번 달 촬영 ${inMonth.length}건</span>
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid var(--rule)">
+      <span style="font-size:12.5px;color:var(--muted)">이번 달 촬영 ${inMonth.length}건</span>
       <button class="hn-link" data-route="shoots">전체 일정 →</button>
     </div>
   </section>`;
 }
 
+// 이번 주 라디오에서 아직 담당이 비어 있는 자리 (오늘 이후, 휴방 제외)
+function radioOpenSlots(){
+  const today=localIso();
+  return weekDates().filter(d=>d.getDay()>=1&&d.getDay()<=5).flatMap(d=>{ const iso=localIso(d);
+    if(iso<today||radioOff(iso)) return [];
+    return RADIO_SLOTS.filter(sl=>!radioCast(iso,sl.key).length).map(sl=>({iso,sl})); });
+}
+// 프로젝트 커버 — 이름에 맞는 그림이 있으면 그것, 없으면 순서대로 돌려 서로 겹치지 않게 한다.
+const PROJECT_ART=['slate','drama','night','campus','rooftop','edit'];
+function projectArt(p,k){
+  const n=p.name||'';
+  if(/방송제|축제|공연|무대/.test(n)) return 'festival';
+  if(/편집|영상|뮤비|마디/.test(n) && !/화$/.test(n)) return 'edit';
+  return PROJECT_ART[k%PROJECT_ART.length];
+}
+
+// 사이드바와 위 경로 표시를 지금 데이터로 채운다
+const ROUTE_LABEL={home:'홈',drive:'공유드라이브',notices:'공지사항',settings:'설정',
+  weekly:'주간 일정표',shoots:'촬영 일정',radio:'라디오',personal:'개인 일정',projects:'프로젝트',script:'AI 대본 분석',shorts:'쇼츠',camera:'카메라 구도'};
+function renderShell(){
+  const sub=state.route==='schedule'?state.scheduleTab:state.route==='maker'?state.makerTab:state.route;
+  // 경로: 방송국 / (일정) / 지금 화면. 단계마다 같은 구분자, 마지막만 굵게.
+  const trail=['HNUBS 방송국',...(state.route==='schedule'?['일정']:[]),ROUTE_LABEL[sub]||'홈'];
+  const crumb=$('#crumb'); if(crumb) crumb.innerHTML=trail.map((t,i)=>i===trail.length-1?`<b aria-current="page">${esc(t)}</b>`:`<span>${esc(t)}</span><i aria-hidden="true">/</i>`).join('');
+  const meta=$('#ws-meta'); if(meta) meta.textContent=`부원 ${people.length}명 · 시범 운영`;
+  const nc=$('#rail-notices'); if(nc) nc.textContent=notices.length?String(notices.length):'';
+  const box=$('#rail-projects'); if(box){
+    const list=Object.entries(projects).sort((a,b)=>(a[1].createdAt||0)-(b[1].createdAt||0));
+    box.innerHTML=list.length?list.map(([id,p],k)=>{ const next=schedules.filter(s=>s.raw?.projectId===id&&s.date>=localIso()).sort((a,b)=>a.date<b.date?-1:1)[0];
+      return `<button type="button" data-route="projects" title="${esc(p.name||id)}"><i class="sq is-${projectArt(p,k)}" aria-hidden="true"></i><span>${esc(p.name||id)}</span>${next?`<em class="rail-cnt">${monthDay(next.date)}</em>`:''}</button>`; }).join('')
+      :'<p class="rail-empty">아직 프로젝트가 없어요</p>';
+  }
+}
+
 function homeView() {
-  const now=new Date(), today=localIso(now);
-  const dates=weekDates(), weekStart=localIso(dates[0]), weekEnd=localIso(dates[6]);
-  const weekShoots=schedules.filter(s=>s.date>=weekStart&&s.date<=weekEnd);
-  const nowMs=now.getTime();
+  // 시안 E — 커버 그림 위에 인사와 스티커 큐카드, 프로젝트 카드, 일정 흐름, 아래 두 칸(참여 가능 · 공지).
+  const now=new Date(), today=localIso(now), nowMs=now.getTime(), nowMin=now.getHours()*60+now.getMinutes();
   const startMs=s=>new Date(`${s.date}T${hourLabel(s.startH)}:00`).getTime();
   const upcoming=schedules.filter(s=>s.date&&startMs(s)>=nowMs).sort((a,b)=>startMs(a)-startMs(b));
   const next=upcoming[0];
-
-  // --- 히어로 ---
-  const todayShoots=schedules.filter(s=>s.date===today);
-  const heroSub=todayShoots.length
-    ? `오늘 촬영 <strong style="font-weight:700">${todayShoots.length}건</strong> · 첫 일정 ${esc(todayShoots[0].time.split(' - ')[0])}`
-    : next ? `오늘 촬영 없음 · 다음 촬영은 <strong style="font-weight:700">${dowOf(next.date)}요일 ${esc(hourLabel(next.startH))}</strong>`
-           : '등록된 촬영 일정이 없습니다';
-  let countdown='–';
-  if(next){ const diff=Math.max(0,startMs(next)-nowMs); const dd=Math.floor(diff/86400000),hh=Math.floor(diff/3600000)%24,mm=Math.floor(diff/60000)%60;
-    countdown = diff===0?'곧 시작':(dd>0?dd+'일 ':'')+pad2(hh)+':'+pad2(mm); }
-  const nextCue = next ? `
-    <button data-detail="${esc(next.id)}" style="position:relative;flex:0 1 460px;min-width:0;display:flex;align-items:center;gap:18px;padding:16px 20px;border-radius:16px;background:var(--a-surface);border:1px solid var(--a-rule);color:var(--a-ink);text-align:left;font-family:inherit;cursor:pointer">
-      <span style="flex:0 0 auto;display:flex;flex-direction:column;gap:2px">
-        <span style="display:inline-flex;align-items:center;gap:7px;font-size:15px;color:var(--a-muted)"><i aria-hidden="true" style="display:block;width:7px;height:7px;border-radius:50%;background:var(--a-action)"></i>다음 촬영</span>
-        <strong class="hn-num" style="font-size:32px;font-weight:800;line-height:1.1;white-space:nowrap">${countdown}</strong>
-        <span style="font-size:12.5px;color:var(--a-muted)">남음</span>
-      </span>
-      <span aria-hidden="true" style="align-self:stretch;width:1px;background:var(--a-rule)"></span>
-      <span style="flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:6px">
-        <strong style="font-size:17px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(next.title)}</strong>
-        <span style="font-size:13px;color:var(--a-muted)">${monthDay(next.date)} (${dowOf(next.date)}) ${esc(next.time)}<br>${esc(next.place||'장소 미정')}</span>
-        <span style="display:flex;align-items:center;padding-left:7px">${faces(next.people,3)}${next.people.length>3?`<span style="margin-left:12px;font-size:12.5px;color:var(--a-muted)">외 ${next.people.length-3}명</span>`:''}</span>
-      </span>
-    </button>` : '';
-
-  // --- 지표 ---
-  const dayCounts=dates.map(d=>weekShoots.filter(s=>s.date===localIso(d)).length);
-  const spark=dayCounts.map((n,d)=>`<i style="display:block;width:6px;height:${6+n*12}px;border-radius:3px;background:${localIso(dates[d])===today?'#C7CFEA':(n?'#6B7DF0':'#DDE2F1')}"></i>`).join('');
-  const weekDone=weekShoots.filter(s=>s.status==='완료').length;
-  const next7=schedules.filter(s=>s.date>=today&&s.date<=localIso(new Date(nowMs+7*86400000)));
-  const next7Days=[...new Set(next7.map(s=>dowOf(s.date)))].join(' · ');
-  const activeMembers=people.filter(p=>p[5]==='활동 중').length;
-  const pct=people.length?Math.round(activeMembers/people.length*100):0;
-  // 아이콘 옆에 36px 숫자를 두니 230px 칸에서 줄이 깨졌다. 위아래로 쌓는다 —
-  // 아이콘 · 이름은 위에, 숫자는 아래에 혼자. 대시보드에서 먼저 읽히는 건 숫자다.
-  const tile=(bg,fg,glyph,label,value,unit,extra='')=>`<div style="${CARD};padding:18px 20px;display:flex;flex-direction:column;gap:14px">
-    <span style="display:flex;align-items:center;gap:10px;min-width:0">
-      <span aria-hidden="true" style="flex:0 0 32px;height:32px;border-radius:10px;background:${bg};color:${fg};display:flex;align-items:center;justify-content:center"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${glyph}</svg></span>
-      <span style="flex:1 1 auto;min-width:0;font-size:14px;color:var(--a-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${label}</span>
-    </span>
-    <span style="display:flex;align-items:flex-end;justify-content:space-between;gap:10px">
-      <span style="display:flex;align-items:baseline;gap:5px;min-width:0">
-        <strong class="hn-num" style="font-size:40px;font-weight:700;line-height:1">${value}</strong>
-        <span style="font-size:13.5px;color:var(--a-muted);white-space:nowrap">${unit}</span>
-      </span>${extra}</span>
-  </div>`;
-
-  // --- 타임라인 ---
-  const START=9, SPAN=14;
-  // 선택 카드는 타임라인(이번 주)에 보이는 촬영만 가리킨다.
-  if(!weekShoots.some(s=>s.id===state.selectedShoot)) state.selectedShoot=weekShoots[0]?.id||'';
-  const palette='linear-gradient(90deg, #DCE5FF, #E6DEFF)';
-  const rows=dates.map((dateObj,d)=>{
-    const iso=localIso(dateObj);
-    const mine=weekShoots.filter(s=>s.date===iso).sort((a,b)=>a.startH-b.startH);
-    const lanes=[];
-    const clips=mine.map(c=>{
-      let lane=0; while(lanes[lane]!==undefined&&lanes[lane]>c.startH) lane++;
-      lanes[lane]=c.endH;
-      const on=state.selectedShoot===c.id, two=mine.length>1;
-      const left=Math.max(0,(c.startH-START)/SPAN*100), width=Math.max(4,Math.min(100-left,(c.endH-c.startH)/SPAN*100));
-      const aria=`${DOW[d]}요일 ${esc(c.time)} ${esc(c.title)}`;
-      return `<button data-shoot-pick="${esc(c.id)}" aria-pressed="${on}" aria-label="${aria}" title="${aria}" style="position:absolute;left:${left}%;width:${width}%;top:${two?3+lane*20:6}px;height:${two?18:32}px;box-sizing:border-box;padding:0 10px;border-radius:9px;border:0;background:${on?'linear-gradient(90deg, #4C6FE6, #7C5FD8)':palette};color:${on?'#FFFFFF':'#2F3B8F'};box-shadow:${on?'0 6px 14px rgba(90,95,224,0.35)':'none'};font-family:inherit;font-size:12px;font-weight:700;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer">${esc(c.title)}</button>`;
-    }).join('');
-    const isToday=iso===today;
-    const nowH=now.getHours()+now.getMinutes()/60;
-    const nowLeft=(Math.min(Math.max(nowH,START),START+SPAN)-START)/SPAN*100;
-    const marker=isToday?`${mine.length?'':'<span style="position:absolute;left:12px;top:10px;font-size:12.5px;font-weight:600;color:#3F55D6">오늘 · 등록된 촬영 없음</span>'}<span aria-hidden="true" style="position:absolute;top:-3px;bottom:-3px;left:${nowLeft}%;width:2px;border-radius:2px;background:#E0455F"><i style="position:absolute;top:-3px;left:-3px;width:8px;height:8px;border-radius:50%;background:#E0455F"></i></span>`:'';
-    return `<span style="display:flex;align-items:center;gap:6px;height:50px;font-size:13px;font-weight:700;color:${isToday?'#3F55D6':'#20294D'}"><span style="width:18px">${DOW[d]}</span><span class="hn-num" style="font-weight:600;color:#64708F">${dateObj.getDate()}</span></span>
-      <div style="position:relative;height:44px;margin:3px 0;border-radius:12px;background:${isToday?'rgba(82,127,240,0.08)':'#F6F7FC'};background-image:repeating-linear-gradient(90deg, rgba(100,112,143,0.10) 0 1px, transparent 1px calc(100% / 7))">${clips}${marker}</div>`;
-  }).join('');
-  const hours=[]; for(let h=START;h<START+SPAN;h+=2) hours.push(`<span class="hn-num" style="font-size:11.5px;font-weight:600;color:#64708F">${pad2(h)}:00</span>`);
-  const weekLabel=`${dates[0].getMonth()+1}월 ${dates[0].getDate()}일 – ${dates[6].getDate()}일`;
-
-  const cur=weekShoots.find(s=>s.id===state.selectedShoot);
-  const curStrip=cur?`<div style="margin-top:14px;display:flex;flex-wrap:wrap;align-items:center;gap:12px 18px;padding:14px 16px;border-radius:16px;background:linear-gradient(120deg, #F3F5FF, #F6F2FF)">
-      <span style="flex:0 0 auto;padding:6px 10px;border-radius:10px;background:#FFFFFF;color:#4F5770;font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:800;letter-spacing:0.1em">${esc(cur.status)}</span>
-      <span style="flex:1 1 220px;min-width:0;display:flex;flex-direction:column;line-height:1.4"><strong style="font-size:16px;font-weight:800">${esc(cur.title)}</strong><span style="font-size:13px;color:#64708F">${monthDay(cur.date)} (${dowOf(cur.date)}) · ${esc(cur.time)} · ${esc(cur.place||'장소 미정')}</span></span>
-      <span style="display:flex;align-items:center;padding-left:7px">${faces(cur.people)}<span style="margin-left:8px;font-size:13px;color:#64708F">${cur.people.length}명</span></span>
-      <span style="display:inline-flex;align-items:center;gap:6px">
-        <button type="button" data-edit-open="shoot|${esc(cur.id)}" aria-label="${esc(cur.title)} 수정" title="수정" style="width:36px;height:36px;border:0;border-radius:10px;background:#FFFFFF;color:#3F55D6;display:inline-flex;align-items:center;justify-content:center;cursor:pointer">${EDIT_ICON}</button>
-        <button data-detail="${esc(cur.id)}" style="display:inline-flex;align-items:center;height:36px;padding:0 12px;border:0;border-radius:10px;background:#FFFFFF;color:#3F55D6;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer">상세 보기</button>
-      </span>
-    </div>`:'';
-
-  const tiles=[['#E3EAFF','#3F4FD0'],['#FFE9DF','#9A3E1E'],['#EDE6FF','#5B45C8']];
-  const upcomingCards=upcoming.slice(0,3).map((u,k)=>`<button data-detail="${esc(u.id)}" style="display:flex;gap:12px;padding:12px;border-radius:16px;background:#FFFFFF;border:1px solid #ECEEF6;color:#20294D;font-family:inherit;text-align:left;cursor:pointer">
-      <span style="flex:0 0 50px;height:54px;border-radius:14px;background:${tiles[k][0]};color:${tiles[k][1]};display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.1"><span style="font-size:11.5px;font-weight:700">${dowOf(u.date)}</span><strong class="hn-num" style="font-size:20px;font-weight:800">${new Date(`${u.date}T00:00:00`).getDate()}</strong></span>
-      <span style="min-width:0;display:flex;flex-direction:column;gap:1px"><strong style="font-size:14.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(u.title)}</strong><span class="hn-num" style="font-size:12.5px;color:#64708F">${esc(u.time)}</span><span style="font-size:12.5px;color:#64708F;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(u.place||'장소 미정')} · ${u.people.length}명</span></span>
-    </button>`).join('')||`<div style="padding:14px;border-radius:16px;background:#FFFFFF;border:1px solid #ECEEF6;font-size:13px;color:#64708F">예정된 촬영이 없습니다.</div>`;
-
-  // --- 오른쪽: 참여 가능 ---
-  const hour=Math.max(9,Math.min(22,now.getHours()));
-  const dayIdx=(now.getDay()+6)%7;
+  const hour=Math.max(9,Math.min(22,now.getHours())), dayIdx=(now.getDay()+6)%7;
   const availableNow=people.filter(p=>memberAvailable(p[7],today,dayIdx,hour));
-  const availPct=people.length?Math.round(availableNow.length/people.length*100):0;
-  const teamRows=people.slice(0,4).map((p,k)=>{ const ok=availableNow.includes(p);
-    return `<button data-person="${esc(p[7])}" style="width:100%;display:flex;align-items:center;gap:10px;padding:6px 0;border:0;background:none;font-family:inherit;cursor:pointer;text-align:left">
-      <span aria-hidden="true" style="width:32px;height:32px;border-radius:11px;background:${AV[k%4][0]};color:${AV[k%4][1]};display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800">${esc(initial(p[0]))}</span>
-      <span style="flex:1 1 auto;min-width:0;display:flex;align-items:baseline;gap:6px"><strong style="font-size:14px;font-weight:700">${esc(p[0])}</strong><span style="font-size:12px;color:#64708F">${esc(p[2])}</span></span>
-      <span style="padding:2px 9px;border-radius:99px;background:${ok?'#E3F7EE':'#FDECEF'};color:${ok?'#1C6E4A':'#A8324F'};font-size:12px;font-weight:700">${ok?'가능':'개인 일정'}</span>
-    </button>`;}).join('')||`<p style="margin:6px 0;font-size:13px;color:#64708F">등록된 구성원이 없습니다.</p>`;
+  const greet=now.getHours()<11?'좋은 아침이에요':now.getHours()<18?'좋은 오후예요':'좋은 저녁이에요';
 
-  const noticeRows=notices.slice(0,3).map(n=>{ const [,bg,fg]=noticeTag(n.tag);
-    return `<button data-notice="${esc(n.id)}" style="width:100%;display:flex;align-items:center;gap:12px;padding:9px 2px;border:0;background:none;font-family:inherit;text-align:left;cursor:pointer">
-      <span aria-hidden="true" style="flex:0 0 34px;height:34px;border-radius:11px;background:${bg};color:${fg};display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:800">${esc(n.tag)}</span>
-      <span style="flex:1 1 auto;min-width:0;display:flex;flex-direction:column;line-height:1.35"><strong style="font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(n.title)}</strong><span style="font-size:12px;color:#64708F">${esc(n.author||'운영진')} · ${esc(noticeDate(n))}</span></span>
-    </button>`;}).join('')||`<p style="margin:6px 0 14px;font-size:13px;color:#64708F">등록된 공지가 없습니다.</p>`;
+  // 하루치 흐름: 라디오 + 촬영
+  const toMin=t=>{ const [h,m]=t.trim().split(':').map(Number); return h*60+(m||0); };
+  const dayItems=iso=>{ const d=new Date(`${iso}T00:00:00`), items=[];
+    if(d.getDay()>=1&&d.getDay()<=5&&!radioOff(iso)) RADIO_SLOTS.forEach(sl=>{ const [a,b]=sl.time.split('–');
+      items.push({from:toMin(a),to:toMin(b),time:a.trim(),title:sl.label,kind:'radio',place:'방송실',
+        who:radioCast(iso,sl.key).map(c=>c.name||'이름 미등록').join(', '),attr:'data-route="radio"'}); });
+    schedules.filter(s=>s.date===iso).forEach(s=>items.push({from:s.startH*60,to:s.endH*60,time:hourLabel(s.startH),title:s.title,kind:'shoot',
+      place:s.place||'장소 미정',who:`${s.people.length}명`,people:s.people,attr:`data-detail="${esc(s.id)}"`}));
+    return items.sort((a,b)=>a.from-b.from); };
+  const todayItems=dayItems(today);
+  const tmr=new Date(now); tmr.setDate(tmr.getDate()+1); const tmrIso=localIso(tmr);
+  const row=(f,isToday)=>{ const past=isToday&&f.to<=nowMin, on=isToday&&f.from<=nowMin&&nowMin<f.to;
+    const st=past?'<span class="w-st is-done">마침</span>':f.kind==='radio'?(f.who?'<span class="w-st is-ok">배정</span>':'<span class="w-st is-need">담당 필요</span>'):'<span class="w-st is-plan">예정</span>';
+    const who=f.people?`<span class="h-faces">${faces(f.people,3)}</span>`:`<span class="w-who">${f.who?esc(f.who):'—'}</span>`;
+    return `<button class="w-row${past?' is-past':''}${on?' is-now':''}" ${f.attr}><time class="hn-num">${esc(f.time)}</time><i class="h-kind is-${f.kind}" aria-hidden="true"></i><strong>${esc(f.title)}${on?' <em>지금</em>':''}</strong><span class="w-pl">${esc(f.place)}</span>${who}${st}</button>`; };
+  const nowRow=`<div class="w-row is-now is-gap"><time class="hn-num">${pad2(now.getHours())}:${pad2(now.getMinutes())}</time><i></i><strong>지금 — 비어 있음</strong><span class="w-pl"></span><span class="w-who">가능 ${availableNow.length}명</span><span></span></div>`;
+  let todayHtml='', placed=todayItems.some(f=>f.from<=nowMin&&nowMin<f.to);
+  todayItems.forEach(f=>{ if(!placed&&f.from>nowMin){ todayHtml+=nowRow; placed=true; } todayHtml+=row(f,true); });
+  if(!placed) todayHtml+=nowRow;
+  const tmrItems=dayItems(tmrIso);
+  const later=upcoming.filter(s=>s.date>tmrIso).slice(0,4);
+  const group=(label,count,body)=>`<div class="w-grp">${label} <span>${count}</span></div>${body}`;
+  const flow=group(`오늘 · ${monthDay(today)} ${DOW[now.getDay()]}`,todayItems.length,todayHtml)
+    +(tmrItems.length?group(`내일 · ${monthDay(tmrIso)} ${DOW[tmr.getDay()]}`,tmrItems.length,tmrItems.map(f=>row(f,false)).join('')):'')
+    +group('다가오는 촬영',later.length,later.length?later.map(s=>`<button class="w-row" data-detail="${esc(s.id)}"><time class="hn-num">${monthDay(s.date)}</time><i class="h-kind is-shoot" aria-hidden="true"></i><strong>${esc(s.title)}</strong><span class="w-pl">${esc(s.place||'장소 미정')}</span><span class="h-faces">${faces(s.people,3)}</span><span class="w-st is-plan">예정</span></button>`).join(''):'<p class="w-none">내일 이후 잡힌 촬영이 없어요</p>');
 
-  const miniCal=monthCalendar();
+  // 스티커 큐카드
+  let countdown='';
+  if(next){ const diff=Math.max(0,startMs(next)-nowMs); const dd=Math.floor(diff/86400000),hh=Math.floor(diff/3600000)%24,mm=Math.floor(diff/60000)%60;
+    countdown=diff===0?'곧 시작':(dd>0?dd+'일 ':'')+pad2(hh)+':'+pad2(mm); }
+  const sticker=next?`<button class="w-sticker" data-detail="${esc(next.id)}"><span class="w-tape" aria-hidden="true"></span>
+      <span class="w-st-lab"><i aria-hidden="true"></i>다음 촬영 · ${esc(next.title)}</span><b class="hn-num">${countdown}</b>
+      <small>${monthDay(next.date)} (${dowOf(next.date)}) ${esc(hourLabel(next.startH))} · ${esc(next.place||'장소 미정')} · ${next.people.length}명</small></button>`
+    :`<div class="w-sticker is-empty"><span class="w-tape" aria-hidden="true"></span><span class="w-st-lab">다음 촬영</span><b>아직 없어요</b><small>왼쪽 위 + 로 일정을 등록해요</small></div>`;
+
+  // 프로젝트 카드 — 실제 프로젝트 + 이번 주 라디오
+  const plist=Object.entries(projects).sort((a,b)=>(a[1].createdAt||0)-(b[1].createdAt||0)).slice(0,3);
+  const pcards=plist.map(([id,p],k)=>{ const shoots=schedules.filter(s=>s.raw?.projectId===id);
+    const nx=shoots.filter(s=>s.date>=today).sort((a,b)=>a.date<b.date?-1:1)[0];
+    const done=shoots.filter(s=>s.status==='완료').length;
+    return `<button class="w-proj" data-route="projects"><span class="w-pc" style="background-image:url(./assets/art/cover-${projectArt(p,k)}.svg)"></span>
+      <span class="w-pb"><b>${esc(p.name||id)}</b><small>${nx?`다음 촬영 ${monthDay(nx.date)}`:shoots.length?`촬영 ${shoots.length}건 · 완료 ${done}건`:'아직 잡힌 촬영 없음'}</small>
+      ${shoots.length?`<span class="w-pg" aria-label="촬영 ${shoots.length}건 중 ${done}건 완료"><i style="width:${Math.round(done/shoots.length*100)}%"></i></span>`:''}</span></button>`; }).join('');
+  const total=weekDates().filter(d=>d.getDay()>=1&&d.getDay()<=5&&!radioOff(localIso(d))).length*RADIO_SLOTS.length;
+  const openSlots=radioOpenSlots().length;
+  const filled=weekDates().filter(d=>d.getDay()>=1&&d.getDay()<=5&&!radioOff(localIso(d))).reduce((n,d)=>n+RADIO_SLOTS.filter(sl=>radioCast(localIso(d),sl.key).length).length,0);
+  const radioCard=`<button class="w-proj" data-route="radio"><span class="w-pc" style="background-image:url(./assets/art/cover-radio.svg)"></span>
+      <span class="w-pb"><b>라디오</b><small>${openSlots?`이번 주 담당 ${openSlots}자리 비어 있음`:'이번 주 담당이 모두 정해졌어요'}</small>
+      ${total?`<span class="w-pg" aria-label="이번 주 ${total}자리 중 ${filled}자리 배정"><i style="width:${Math.round(filled/total*100)}%;background:var(--mint-ink)"></i></span>`:''}</span></button>`;
+  const newCard=`<button class="w-proj is-new" data-route="projects"><span data-icon="plus"></span>${plist.length?'프로젝트 전체':'새 프로젝트'}</button>`;
+
+  // 아래 두 칸
+  const avs=people.slice().sort((a,b)=>availableNow.includes(b)-availableNow.includes(a)).slice(0,9).map((p,k)=>
+    `<button class="w-pv${availableNow.includes(p)?'':' is-off'}" data-person="${esc(p[7])}" title="${esc(p[0])} · ${availableNow.includes(p)?'가능':'개인 일정'}" style="background:${AV[k%4][0]};color:${AV[k%4][1]}">${esc(initial(p[0]))}</button>`).join('')
+    +(people.length>9?`<span class="w-pv is-more">+${people.length-9}</span>`:'');
+  const noticeBox=notices.length?notices.slice(0,3).map(n=>{ const [,bg,fg]=noticeTag(n.tag);
+      return `<button class="h-notice" data-notice="${esc(n.id)}"><span class="h-chip" style="background:${bg};color:${fg}">${esc(n.tag)}</span><span><strong>${esc(n.title)}</strong><small>${esc(n.author||'운영진')} · ${esc(noticeDate(n))}</small></span></button>`; }).join('')
+    :`<div class="w-empty-art"><img src="./assets/art/empty-notice.svg" alt="" width="84" height="60"><p>아직 올라온 공지가 없어요<br><button class="hn-link" data-action="new-notice">첫 공지 쓰기</button></p></div>`;
 
   return `
-  <section aria-label="오늘의 작업공간" class="a-hero" style="display:flex;flex-wrap:wrap;gap:18px 28px;align-items:flex-end">
-    ${heroDots()}
-    <div style="position:relative;flex:1 1 420px;min-width:0;display:flex;flex-direction:column;gap:14px">
-      <div style="display:flex;flex-direction:column;gap:2px">
-        <span style="font-size:13.5px;color:var(--a-muted);font-weight:500">${now.getMonth()+1}월 ${now.getDate()}일 ${['일','월','화','수','목','금','토'][now.getDay()]}요일</span>
-        <h1>작업공간</h1>
-        <span style="font-size:14.5px;color:var(--a-muted)">${heroSub}</span>
-      </div>
-      <div style="display:flex;flex-wrap:wrap;gap:8px">
-        <button data-action="new-shoot" class="a-btn"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>일정 등록</button>
-        <button data-action="new-personal" class="a-btn a-btn-quiet">개인 일정 등록</button>
-      </div>
-    </div>
-    ${nextCue}
+  <div class="w-cover" aria-hidden="true"><img src="./assets/art/cover-home.svg" alt=""></div>
+  <section class="w-head" aria-label="인사">
+    <span class="w-pico" aria-hidden="true"><span data-icon="radio"></span></span>
+    <div class="w-title"><h1>${greet}, HNUBS</h1><p>${now.getMonth()+1}월 ${now.getDate()}일 ${DOW[now.getDay()]}요일 · ${todayItems.filter(f=>f.kind==='shoot').length?`오늘 촬영 ${todayItems.filter(f=>f.kind==='shoot').length}건`:'오늘 촬영 없음'}, 라디오 ${todayItems.filter(f=>f.kind==='radio').length}회</p></div>
+    ${sticker}
   </section>
-
-  <section aria-label="운영 현황" class="a-stats" style="display:grid;gap:12px">
-    ${tile('linear-gradient(140deg, #E3EAFF, #D6E0FF)','#3F4FD0','<rect x="3" y="6" width="13" height="12" rx="2.5"/><path d="M16 10.5l5-3v9l-5-3"/>','이번 주 촬영',weekShoots.length,`건${weekShoots.length?` · 완료 ${weekDone}건`:''}`,`<span aria-label="요일별 촬영 수" style="flex:0 0 auto;height:32px;display:flex;align-items:flex-end;gap:3px">${spark}</span>`)}
-    ${tile('linear-gradient(140deg, #EDE6FF, #E1D8FF)','#5B45C8','<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/>','앞으로 7일 촬영',next7.length,`건${next7Days?` · ${next7Days}`:''}`)}
-    ${tile('linear-gradient(140deg, #E3F7EE, #D3F0E2)','#1C6E4A','<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><circle cx="17" cy="9" r="2.5"/><path d="M16 14.2A5 5 0 0 1 21.5 19"/>','활동 구성원',activeMembers,`/ ${people.length}명`,`<span aria-hidden="true" style="flex:0 0 auto;width:40px;height:40px;border-radius:50%;background:conic-gradient(#3DAA78 0 ${pct}%, #E6EAF2 ${pct}% 100%);display:flex;align-items:center;justify-content:center"><i style="display:block;width:28px;height:28px;border-radius:50%;background:#FFFFFF"></i></span>`)}
-    ${tile('linear-gradient(140deg, #FFEFD9, #FFE4C2)','#8A5A10','<path d="M4 10v4a1 1 0 0 0 1 1h2l5 4V5L7 9H5a1 1 0 0 0-1 1z"/><path d="M16 9a4 4 0 0 1 0 6M19 6.5a8 8 0 0 1 0 11"/>','공지사항',notices.length,`건 · 필독 ${notices.filter(n=>n.tag==='필독').length}`)}
+  <div class="w-projs">${pcards}${radioCard}${newCard}</div>
+  <section class="w-flow" aria-labelledby="w-flow-h">
+    <div class="w-flow-h"><h2 id="w-flow-h">일정 흐름</h2><button class="hn-link" data-route="weekly">주간 일정표 →</button></div>
+    ${flow}
   </section>
-
-  <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:stretch">
-    <section aria-labelledby="a-tl" style="flex:7 1 640px;min-width:0;display:flex;flex-direction:column;${CARD};padding:20px 20px 18px">
-      <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px">
-        <div style="display:flex;flex-direction:column;line-height:1.35">
-          <h2 id="a-tl" style="margin:0;font-size:18px;font-weight:800">이번 주 촬영 타임라인</h2>
-          <span style="font-size:13px;color:#64708F">${weekLabel} · 블록을 누르면 상세가 보여요</span>
-        </div>
-        <button class="hn-link" data-route="weekly" style="display:inline-flex;align-items:center;height:34px;padding:0 12px;border-radius:10px;background:#EEF2FF;font-weight:700">주간 일정표 →</button>
-      </div>
-      <div style="overflow-x:auto">
-        <div style="min-width:680px;display:grid;grid-template-columns:70px minmax(0, 1fr)">
-          <span></span>
-          <div style="height:22px;display:grid;grid-template-columns:repeat(7, minmax(0, 1fr))">${hours.join('')}</div>
-          ${rows}
-        </div>
-      </div>
-      ${curStrip}
-      <div style="margin-top:18px;display:flex;align-items:baseline;justify-content:space-between">
-        <h3 style="margin:0;font-size:15px;font-weight:800">다가오는 촬영</h3>
-        <button class="hn-link" data-route="shoots">전체 일정 →</button>
-      </div>
-      <div style="margin-top:10px;display:grid;grid-template-columns:repeat(auto-fit, minmax(210px, 1fr));gap:10px">${upcomingCards}</div>
-    </section>
-
-    <div style="flex:3 1 320px;min-width:0;display:flex;flex-direction:column;gap:16px">
-      <section aria-labelledby="a-notice" style="${CARD};padding:16px 16px 8px">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
-          <h2 id="a-notice" style="margin:0;font-size:16px;font-weight:800">공지사항 <span class="hn-num" style="display:inline-block;min-width:20px;padding:0 6px;border-radius:99px;background:#3F55D6;color:#FFFFFF;font-size:11.5px;line-height:20px;text-align:center;vertical-align:2px">${notices.length}</span></h2>
-          <button class="hn-link" data-route="notices">전체 보기</button>
-        </div>
-        ${noticeRows}
-      </section>
-
-      ${miniCal}
-
-      <section aria-labelledby="a-team" style="flex:1 1 auto;${CARD};padding:16px">
-        <div style="display:flex;align-items:center;justify-content:space-between">
-          <h2 id="a-team" style="margin:0;font-size:16px;font-weight:800">지금 참여 가능</h2>
-          <button class="hn-link" data-route="people">전체 보기</button>
-        </div>
-        <div style="display:flex;align-items:center;gap:10px;margin:8px 0 10px">
-          <span style="flex:1 1 auto;height:8px;border-radius:99px;background:#EEF0F6;overflow:hidden"><i style="display:block;width:${availPct}%;height:100%;border-radius:99px;background:linear-gradient(90deg, #4C6FE6, #7C5FD8)"></i></span>
-          <strong class="hn-num" style="font-size:14px;font-weight:800">${availableNow.length}<span style="font-weight:500;color:#64708F"> / ${people.length}명</span></strong>
-        </div>
-        <p style="margin:0 0 6px;font-size:12px;color:#64708F">개인 일정 기준 · 오늘 ${pad2(hour)}:00 시점</p>
-        ${teamRows}
-      </section>
-    </div>
+  <div class="w-duo">
+    <section aria-labelledby="w-team"><div class="h-side-h"><h2 id="w-team">지금 참여 가능</h2><button class="hn-link" data-route="people">전체</button></div>
+      <div class="w-who-row"><p class="h-big"><strong class="hn-num">${availableNow.length}</strong><span>/ ${people.length}명 · ${pad2(hour)}:00 기준</span></p><span class="w-avs">${avs}</span></div></section>
+    <section aria-labelledby="w-notice"><div class="h-side-h"><h2 id="w-notice">공지</h2><button class="hn-link" data-route="notices">전체</button></div>${noticeBox}</section>
   </div>`;
 }
+
 
 function weeklyView() {
   const dates=weekDates(state.weekOffset), today=localIso();
@@ -526,8 +455,8 @@ function weeklyView() {
 
   const heads=dates.map((d,i)=>{ const isToday=localIso(d)===today;
     return `<span style="padding:4px 0 8px;text-align:center;display:flex;flex-direction:column;line-height:1.25">
-      <strong style="font-size:13px;font-weight:700;color:${i===0?'#A8324F':'#4F5770'}">${DOW[i]}</strong>
-      <span class="hn-num" style="align-self:center;min-width:30px;padding:1px 6px;border-radius:99px;background:${isToday?'linear-gradient(135deg, #4C6FE6, #7C5FD8)':'transparent'};color:${isToday?'#FFFFFF':'#20294D'};font-size:15px;font-weight:800">${d.getDate()}</span>
+      <strong style="font-size:13px;font-weight:700;color:${i===0?'var(--rose-ink)':'var(--muted)'}">${DOW[i]}</strong>
+      <span class="hn-num" style="align-self:center;min-width:30px;padding:1px 6px;border-radius:99px;background:${isToday?'var(--sel)':'transparent'};color:${isToday?'#FFFFFF':'var(--ink)'};font-size:15px;font-weight:800">${d.getDate()}</span>
     </span>`;}).join('');
 
   let cells='';
@@ -540,13 +469,13 @@ function weeklyView() {
       const on=slots.includes(key);
       // 다 되는 날은 확실히 초록, 빠듯한 날은 확실히 빨강. 중간은 비워 둔다.
       const ratio=total?n/total:0;
-      let bg='#FBE9EC', fg='#8E2437';
-      if(ratio>=1){ bg='#D8F0E2'; fg='#14673A'; }
-      else if(ratio>=0.75){ bg='#E9F6EE'; fg='#1C6E45'; }
-      else if(ratio>=0.4){ bg='#FDF3DC'; fg='#6E5208'; }
-      if(shoot){ bg='#E7EAFB'; fg='#2F3C96'; }
+      let bg='var(--rose-card)', fg='var(--rose-ink)';
+      if(ratio>=1){ bg='var(--mint-full)'; fg='var(--mint-ink)'; }
+      else if(ratio>=0.75){ bg='var(--mint-card)'; fg='var(--mint-ink)'; }
+      else if(ratio>=0.4){ bg='var(--lav-mid)'; fg='var(--lav-ink)'; }
+      if(shoot){ bg='var(--blue-card)'; fg='var(--blue-ink)'; }
       const past=isPast(iso,h);
-      if(past){ bg='#F3F4F8'; fg='#64686F'; }   // #A5ABBF 는 2.08:1 로 안 읽혔다
+      if(past){ bg='var(--field)'; fg='var(--muted)'; }   // var(--muted) 는 2.08:1 로 안 읽혔다
       if(on){ bg='var(--a-action)'; fg='#FFFFFF'; }
       const aria=`${DOW[d]}요일 ${h}시, 가능 ${n}명${shoot?`, 촬영 ${esc(shoot.title)}`:''}`;
       // 지금 시각에 걸리는 칸에는 탤리색 줄을 긋는다. 큐시트에서 '지금 여기' 표시다.
@@ -563,30 +492,30 @@ function weeklyView() {
   const mustOk=mustMembers.length?mustMembers.every(m=>okPeople.includes(m)):null;
   const okPct=total?Math.round(okPeople.length/total*100):0;
 
-  const chips=parsed.map(([d,h])=>`<button data-week-slot="${d}-${h}" aria-label="${DOW[d]}요일 ${h}시 선택 해제" style="display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 10px 0 12px;border-radius:10px;border:0;background:linear-gradient(135deg, #4C6FE6, #7C5FD8);color:#FFFFFF;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer">${DOW[d]} ${pad2(h)}:00<span aria-hidden="true" style="opacity:0.8">×</span></button>`).join('');
+  const chips=parsed.map(([d,h])=>`<button data-week-slot="${d}-${h}" aria-label="${DOW[d]}요일 ${h}시 선택 해제" style="display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 10px 0 12px;border-radius:var(--r-ctl);border:0;background:var(--sel);color:#FFFFFF;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer">${DOW[d]} ${pad2(h)}:00<span aria-hidden="true" style="opacity:0.8">×</span></button>`).join('');
 
-  const mustChips=mustMembers.map(m=>`<span style="display:inline-flex;align-items:center;gap:2px;height:32px;padding:0 4px 0 12px;border-radius:99px;background:#EDE6FF;color:#4A3FB0;font-size:13px;font-weight:700">${esc(m[0])}<button data-must-remove="${esc(m[7])}" aria-label="필수 인원에서 빼기" style="width:24px;height:24px;border:0;border-radius:50%;background:transparent;color:#4A3FB0;cursor:pointer">×</button></span>`).join('');
+  const mustChips=mustMembers.map(m=>`<span style="display:inline-flex;align-items:center;gap:2px;height:32px;padding:0 4px 0 12px;border-radius:99px;background:var(--lav-card);color:var(--lav-ink);font-size:13px;font-weight:700">${esc(m[0])}<button data-must-remove="${esc(m[7])}" aria-label="필수 인원에서 빼기" style="width:24px;height:24px;border:0;border-radius:50%;background:transparent;color:var(--lav-ink);cursor:pointer">×</button></span>`).join('');
 
   const detail=parsed.length?`
     <div style="padding:0 18px 14px;display:flex;flex-direction:column;gap:16px">
       <div style="display:flex;flex-wrap:wrap;gap:6px">${chips}</div>
-      ${mustOk===null?'':`<div style="padding:12px 14px;border-radius:14px;background:${mustOk?'#E3F7EE':'#FFF5D9'};color:${mustOk?'#17603F':'#6E5208'};font-size:13.5px;font-weight:700">${mustOk?`✓ 필수 인원 ${mustMembers.length}명 모두 가능해요`:'! 필수 인원 중 불가능한 사람이 있어요'}</div>`}
+      ${mustOk===null?'':`<div style="padding:12px 14px;border-radius:var(--r-card);background:${mustOk?'var(--mint-card)':'var(--amber-card)'};color:${mustOk?'var(--mint-ink)':'var(--amber-ink)'};font-size:13.5px;font-weight:700">${mustOk?`✓ 필수 인원 ${mustMembers.length}명 모두 가능해요`:'! 필수 인원 중 불가능한 사람이 있어요'}</div>`}
       <div style="display:flex;flex-direction:column;gap:8px">
         <div style="display:flex;align-items:center;gap:10px">
           <strong style="flex:1 1 auto;font-size:14.5px;font-weight:800">모든 시간에 가능</strong>
-          <span class="hn-num" style="font-size:14px;font-weight:800;color:#1C6E4A">${okPeople.length}<span style="font-weight:500;color:#64708F"> / ${total}</span></span>
+          <span class="hn-num" style="font-size:14px;font-weight:800;color:var(--mint-ink)">${okPeople.length}<span style="font-weight:500;color:var(--muted)"> / ${total}</span></span>
         </div>
-        <span style="height:8px;border-radius:99px;background:#EEF0F6;overflow:hidden"><i style="display:block;height:100%;width:${okPct}%;border-radius:99px;background:linear-gradient(90deg, #3DAA78, #5CC596)"></i></span>
+        <span style="height:8px;border-radius:99px;background:var(--rule);overflow:hidden"><i style="display:block;height:100%;width:${okPct}%;border-radius:99px;background:var(--mint-ink)"></i></span>
         <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:2px">
-          ${okPeople.map((p,k)=>`<button data-person="${esc(p[7])}" style="display:inline-flex;align-items:center;gap:6px;padding:4px 10px 4px 4px;border:0;border-radius:99px;background:#F6F7FC;font-family:inherit;font-size:12.5px;font-weight:600;cursor:pointer"><span aria-hidden="true" style="width:22px;height:22px;border-radius:8px;background:${AV[k%4][0]};color:${AV[k%4][1]};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800">${esc(initial(p[0]))}</span>${esc(p[0])}</button>`).join('')||'<span style="font-size:13px;color:#64708F">모든 시간에 가능한 구성원이 없습니다.</span>'}
+          ${okPeople.map((p,k)=>`<button data-person="${esc(p[7])}" style="display:inline-flex;align-items:center;gap:6px;padding:4px 10px 4px 4px;border:0;border-radius:99px;background:var(--field);font-family:inherit;font-size:12.5px;font-weight:600;cursor:pointer"><span aria-hidden="true" style="width:22px;height:22px;border-radius:8px;background:${AV[k%4][0]};color:${AV[k%4][1]};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800">${esc(initial(p[0]))}</span>${esc(p[0])}</button>`).join('')||'<span style="font-size:13px;color:var(--muted)">모든 시간에 가능한 구성원이 없습니다.</span>'}
         </div>
       </div>
       <div style="display:flex;flex-direction:column;gap:8px">
-        <div style="display:flex;align-items:center;gap:10px"><strong style="flex:1 1 auto;font-size:14.5px;font-weight:800">일부 시간 불가</strong><span class="hn-num" style="font-size:14px;font-weight:800;color:#A8324F">${noPeople.length}</span></div>
-        <div style="display:flex;flex-wrap:wrap;gap:6px">${noPeople.map(p=>`<button data-person="${esc(p[7])}" style="padding:4px 10px;border:0;border-radius:99px;background:#FFF3F5;color:#8C3A4E;font-family:inherit;font-size:12.5px;font-weight:600;cursor:pointer">${esc(p[0])}</button>`).join('')||'<span style="font-size:13px;color:#64708F">없음</span>'}</div>
+        <div style="display:flex;align-items:center;gap:10px"><strong style="flex:1 1 auto;font-size:14.5px;font-weight:800">일부 시간 불가</strong><span class="hn-num" style="font-size:14px;font-weight:800;color:var(--rose-ink)">${noPeople.length}</span></div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">${noPeople.map(p=>`<button data-person="${esc(p[7])}" style="padding:4px 10px;border:0;border-radius:99px;background:var(--rose-card);color:var(--rose-ink);font-family:inherit;font-size:12.5px;font-weight:600;cursor:pointer">${esc(p[0])}</button>`).join('')||'<span style="font-size:13px;color:var(--muted)">없음</span>'}</div>
       </div>
     </div>`
-    :`<div style="margin:0 18px;padding:28px 16px;border-radius:16px;background:linear-gradient(120deg, #F3F5FF, #F6F2FF);text-align:center;color:#4F5770;font-size:14px">왼쪽 시간표에서 칸을 눌러 시간대를 고르세요.<br>여러 칸을 함께 고를 수 있어요.</div>`;
+    :`<div style="margin:0 18px;padding:28px 16px;border-radius:var(--r-card);background:var(--field);text-align:center;color:var(--muted);font-size:14px">왼쪽 시간표에서 칸을 눌러 시간대를 고르세요.<br>여러 칸을 함께 고를 수 있어요.</div>`;
 
   const rangeLabel=`${dates[0].getFullYear()}. ${pad2(dates[0].getMonth()+1)}. ${pad2(dates[0].getDate())} – ${pad2(dates[6].getMonth()+1)}. ${pad2(dates[6].getDate())}`;
 
@@ -599,36 +528,36 @@ function weeklyView() {
       <span style="font-size:14.5px;color:var(--a-muted)">칸을 눌러 여러 시간대를 고르면 오른쪽에서 함께 가능한 인원을 확인할 수 있어요.</span>
     </div>
     <div style="position:relative;display:flex;flex-wrap:wrap;align-items:center;gap:8px">
-      <div style="display:flex;align-items:center;gap:2px;height:42px;padding:0 4px;border-radius:12px;background:var(--a-surface);border:1px solid var(--a-rule)">
-        <button data-week-step="-1" aria-label="이전 주" style="width:34px;height:34px;border:0;border-radius:9px;background:transparent;color:var(--a-ink);font-size:16px;cursor:pointer">‹</button>
+      <div style="display:flex;align-items:center;gap:2px;height:42px;padding:0 4px;border-radius:var(--r-ctl);background:var(--a-surface);border:1px solid var(--a-rule)">
+        <button data-week-step="-1" aria-label="이전 주" style="width:34px;height:34px;border:0;border-radius:var(--r-ctl);background:transparent;color:var(--a-ink);font-size:16px;cursor:pointer">‹</button>
         <strong class="hn-num" style="padding:0 6px;font-size:14px;font-weight:700;white-space:nowrap">${rangeLabel}</strong>
-        <button data-week-step="1" aria-label="다음 주" style="width:34px;height:34px;border:0;border-radius:9px;background:transparent;color:var(--a-ink);font-size:16px;cursor:pointer">›</button>
+        <button data-week-step="1" aria-label="다음 주" style="width:34px;height:34px;border:0;border-radius:var(--r-ctl);background:transparent;color:var(--a-ink);font-size:16px;cursor:pointer">›</button>
       </div>
-      <button data-week-step="0" style="height:42px;padding:0 14px;border-radius:12px;border:1px solid var(--a-rule);background:var(--a-surface);color:var(--a-ink);font-family:inherit;font-size:14px;font-weight:500;cursor:pointer">오늘</button>
+      <button data-week-step="0" style="height:42px;padding:0 14px;border-radius:var(--r-ctl);border:1px solid var(--a-rule);background:var(--a-surface);color:var(--a-ink);font-family:inherit;font-size:14px;font-weight:500;cursor:pointer">오늘</button>
     </div>
   </section>
 
-  <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;border-radius:18px;background:rgba(255,255,255,0.9);border:1px solid #FFFFFF;box-shadow:0 8px 24px rgba(60,72,140,0.06)">
+  <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;border-radius:var(--r-card);background:var(--card);border:1px solid #FFFFFF;box-shadow:var(--lift)">
     <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px">
-      <span aria-hidden="true" style="width:32px;height:32px;border-radius:10px;background:linear-gradient(140deg, #EDE6FF, #E1D8FF);color:#5B45C8;display:flex;align-items:center;justify-content:center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span>
+      <span aria-hidden="true" style="width:32px;height:32px;border-radius:var(--r-ctl);background:var(--lav-card);color:var(--lav-ink);display:flex;align-items:center;justify-content:center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span>
       <span style="font-size:13.5px;font-weight:700">필수 인원</span>
       ${mustChips}
-      <select id="must-add" style="height:32px;padding:0 10px;border-radius:99px;border:1px dashed #B9B0EE;background:transparent;color:#5B45C8;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer">
+      <select id="must-add" style="height:32px;padding:0 10px;border-radius:99px;border:1px dashed var(--lav-card);background:transparent;color:var(--lav-ink);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer">
         <option value="">+ 추가</option>
         ${people.filter(p=>!state.mustIds.includes(p[7])).map(p=>`<option value="${esc(p[7])}">${esc(p[0])} · ${esc(p[2])}</option>`).join('')}
       </select>
       <button data-must-only="1" aria-pressed="${state.mustOnly}" title="${state.mustOnly ? '전체 인원으로 돌아가기' : '필수 인원만 놓고 보기'}"
         ${state.mustIds.length ? '' : 'disabled'}
-        style="display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:99px;border:1px solid ${state.mustOnly ? 'transparent' : '#E0E4F2'};background:${state.mustOnly ? 'linear-gradient(135deg, #4C6FE6, #7C5FD8)' : '#FFFFFF'};color:${state.mustOnly ? '#FFFFFF' : (state.mustIds.length ? '#4F5770' : '#B6BCCE')};font-family:inherit;font-size:13px;font-weight:700;cursor:${state.mustIds.length ? 'pointer' : 'default'}">
+        style="display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:99px;border:1px solid ${state.mustOnly ? 'transparent' : 'var(--rule-strong)'};background:${state.mustOnly ? 'var(--sel)' : '#FFFFFF'};color:${state.mustOnly ? '#FFFFFF' : (state.mustIds.length ? 'var(--muted)' : 'var(--rule-strong)')};font-family:inherit;font-size:13px;font-weight:700;cursor:${state.mustIds.length ? 'pointer' : 'default'}">
         <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>${state.mustOnly ? '필수 인원만 보는 중' : '필수 인원만'}
       </button>
     </div>
-    <div style="display:flex;flex-wrap:wrap;gap:14px;font-size:12.5px;font-weight:600;color:#4F5770">
-      <span style="display:inline-flex;align-items:center;gap:6px"><i style="display:block;width:14px;height:14px;border-radius:5px;background:#F0FAF5"></i>전원 가능</span>
-      <span style="display:inline-flex;align-items:center;gap:6px"><i style="display:block;width:14px;height:14px;border-radius:5px;background:#FFFAEC"></i>일부 가능</span>
-      <span style="display:inline-flex;align-items:center;gap:6px"><i style="display:block;width:14px;height:14px;border-radius:5px;background:#FFF4F6"></i>2명 이하</span>
-      <span style="display:inline-flex;align-items:center;gap:6px"><i style="display:block;width:14px;height:14px;border-radius:5px;background:linear-gradient(90deg, #F0F3FF, #F4F0FF)"></i>촬영 일정</span>
-      <span style="display:inline-flex;align-items:center;gap:6px"><i style="display:block;width:14px;height:14px;border-radius:5px;background:linear-gradient(135deg, #4C6FE6, #7C5FD8)"></i>선택</span>
+    <div style="display:flex;flex-wrap:wrap;gap:14px;font-size:12.5px;font-weight:600;color:var(--muted)">
+      <span style="display:inline-flex;align-items:center;gap:6px"><i style="display:block;width:14px;height:14px;border-radius:5px;background:var(--mint-card)"></i>전원 가능</span>
+      <span style="display:inline-flex;align-items:center;gap:6px"><i style="display:block;width:14px;height:14px;border-radius:5px;background:var(--lav-mid)"></i>일부 가능</span>
+      <span style="display:inline-flex;align-items:center;gap:6px"><i style="display:block;width:14px;height:14px;border-radius:5px;background:var(--rose-card)"></i>2명 이하</span>
+      <span style="display:inline-flex;align-items:center;gap:6px"><i style="display:block;width:14px;height:14px;border-radius:5px;background:var(--blue-card)"></i>촬영 일정</span>
+      <span style="display:inline-flex;align-items:center;gap:6px"><i style="display:block;width:14px;height:14px;border-radius:5px;background:var(--sel)"></i>선택</span>
     </div>
   </div>
 
@@ -641,17 +570,17 @@ function weeklyView() {
       </div>
     </section>
 
-    <aside aria-label="선택한 시간대" style="flex:1 1 320px;min-width:0;display:flex;flex-direction:column;${CARD}">
+    <aside class="a-cue" aria-label="선택한 시간대" style="flex:1 1 320px;min-width:0;display:flex;flex-direction:column;${CARD}">
       <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:18px 18px 12px">
         <div style="display:flex;align-items:center;gap:10px">
-          <span aria-hidden="true" style="width:38px;height:38px;border-radius:12px;background:linear-gradient(140deg, #E3EAFF, #D6E0FF);color:#3F4FD0;display:flex;align-items:center;justify-content:center"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg></span>
-          <h2 style="margin:0;font-size:17px;font-weight:800">선택한 시간대 <span class="hn-num" style="color:#3F55D6">${parsed.length}</span></h2>
+          <span aria-hidden="true" style="width:38px;height:38px;border-radius:var(--r-ctl);background:var(--blue-card);color:var(--blue-ink);display:flex;align-items:center;justify-content:center"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg></span>
+          <h2 style="margin:0;font-size:17px;font-weight:800">선택한 시간대 <span class="hn-num" style="color:var(--blue-ink)">${parsed.length}</span></h2>
         </div>
-        <button data-week-clear="1" style="height:32px;padding:0 10px;border:0;border-radius:8px;background:#F2F4FB;color:#4F5770;font-family:inherit;font-size:12.5px;font-weight:600;cursor:pointer">선택 해제</button>
+        <button data-week-clear="1" style="height:32px;padding:0 10px;border:0;border-radius:8px;background:var(--field);color:var(--muted);font-family:inherit;font-size:12.5px;font-weight:600;cursor:pointer">선택 해제</button>
       </div>
       ${detail}
       <div style="margin-top:auto;padding:16px 18px 18px">
-        <button ${parsed.length?'data-action="new-shoot"':'disabled'} style="width:100%;display:flex;align-items:center;justify-content:center;gap:6px;height:46px;border:0;border-radius:12px;background:${parsed.length?'var(--a-action)':'#8E8E93'};color:#FFFFFF;font-family:inherit;font-size:15px;font-weight:500;cursor:${parsed.length?'pointer':'default'};border-radius:980px">
+        <button ${parsed.length?'data-action="new-shoot"':'disabled'} style="width:100%;display:flex;align-items:center;justify-content:center;gap:6px;height:46px;border:0;border-radius:var(--r-ctl);background:${parsed.length?'var(--a-action)':'var(--muted)'};color:#FFFFFF;font-family:inherit;font-size:15px;font-weight:500;cursor:${parsed.length?'pointer':'default'}">
           <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>선택 시간대로 촬영 일정 등록</button>
       </div>
     </aside>
@@ -805,8 +734,8 @@ function shortsView(){
       <span style="font-size:14.5px;color:var(--a-muted)">긴 공연 영상을 넣으면 짧은 쇼츠로 잘라 줘요.</span>
     </div>
     <div style="position:relative;display:flex;flex-wrap:wrap;align-items:center;gap:8px">
-      <button data-shorts-reload="1" style="height:42px;padding:0 14px;border-radius:12px;border:1px solid var(--a-rule);background:var(--a-surface);color:var(--a-ink);font-family:inherit;font-size:14px;font-weight:500;cursor:pointer">연결 확인</button>
-      <button data-shorts-setup="1" style="height:42px;padding:0 14px;border-radius:12px;border:1px solid var(--a-rule);background:var(--a-surface);color:var(--a-ink);font-family:inherit;font-size:14px;font-weight:500;cursor:pointer">주소 설정</button>
+      <button data-shorts-reload="1" style="height:42px;padding:0 14px;border-radius:var(--r-ctl);border:1px solid var(--a-rule);background:var(--a-surface);color:var(--a-ink);font-family:inherit;font-size:14px;font-weight:500;cursor:pointer">연결 확인</button>
+      <button data-shorts-setup="1" style="height:42px;padding:0 14px;border-radius:var(--r-ctl);border:1px solid var(--a-rule);background:var(--a-surface);color:var(--a-ink);font-family:inherit;font-size:14px;font-weight:500;cursor:pointer">주소 설정</button>
     </div>
   </section>`;
 
@@ -815,7 +744,7 @@ function shortsView(){
      .hn-main 의 안쪽 여백을 음수 마진으로 걷어내 화면 끝까지 쓴다. */
   if (st === 'on') {
     return `<section aria-label="쇼츠 메이커"
-      style="margin:0 calc(-1 * clamp(16px, 3vw, 32px)) -48px;height:calc(100vh - 190px);min-height:520px;overflow:hidden;background:#F4F5FC">
+      style="margin:0 calc(-1 * clamp(16px, 3vw, 32px)) -48px;height:calc(100vh - 190px);min-height:520px;overflow:hidden;background:var(--paper)">
       <iframe src="${shortsUrl(c)}" title="쇼츠 메이커" style="display:block;width:100%;height:100%;border:0"></iframe>
     </section>`;
   }
@@ -828,27 +757,27 @@ function shortsView(){
   }[st] || ['쇼츠 메이커를 불러올게요', '‘연결 확인’을 누르면 시작합니다.'];
 
   const howto = (st === 'off' || st === 'idle') ? `
-    <div style="display:flex;flex-direction:column;gap:8px;padding:16px;border-radius:14px;background:#F6F7FC;text-align:left">
+    <div style="display:flex;flex-direction:column;gap:8px;padding:16px;border-radius:var(--r-card);background:var(--field);text-align:left">
       <strong style="font-size:13.5px;font-weight:800">실행 방법</strong>
-      <code style="font-family:ui-monospace,monospace;font-size:12.5px;color:#4F5770;word-break:break-all">바탕화면 › 프로젝트 › 쇼츠 메이커 › <b>쇼츠 메이커 (워크스페이스 연결).bat</b></code>
-      <span style="font-size:12.5px;color:#64708F">평소 쓰던 실행 파일은 주소가 매번 바뀌어서 이 탭이 찾지 못합니다. 위 파일로 실행해 주세요.</span>
+      <code style="font-family:ui-monospace,monospace;font-size:12.5px;color:var(--muted);word-break:break-all">바탕화면 › 프로젝트 › 쇼츠 메이커 › <b>쇼츠 메이커 (워크스페이스 연결).bat</b></code>
+      <span style="font-size:12.5px;color:var(--muted)">평소 쓰던 실행 파일은 주소가 매번 바뀌어서 이 탭이 찾지 못합니다. 위 파일로 실행해 주세요.</span>
     </div>` : '';
 
   const setup = state.shortsSetup ? `
-    <form id="shorts-form" style="display:flex;flex-direction:column;gap:10px;padding:16px;border-radius:14px;background:#F8F9FD;text-align:left">
+    <form id="shorts-form" style="display:flex;flex-direction:column;gap:10px;padding:16px;border-radius:var(--r-card);background:var(--field);text-align:left">
       <label style="display:flex;flex-direction:column;gap:5px;font-size:12.5px;font-weight:700">주소
-        <input name="base" value="${esc(c.base)}" placeholder="http://127.0.0.1:7731" style="height:42px;padding:0 12px;border-radius:11px;border:1px solid #E6E9F3;background:#FFFFFF;font-family:inherit;font-size:14px;color:#20294D"></label>
+        <input name="base" value="${esc(c.base)}" placeholder="http://127.0.0.1:7731" style="height:42px;padding:0 12px;border-radius:var(--r-ctl);border:1px solid var(--rule);background:#FFFFFF;font-family:inherit;font-size:14px;color:var(--ink)"></label>
       <label style="display:flex;flex-direction:column;gap:5px;font-size:12.5px;font-weight:700">열쇠
-        <input name="key" value="${esc(c.key)}" style="height:42px;padding:0 12px;border-radius:11px;border:1px solid #E6E9F3;background:#FFFFFF;font-family:inherit;font-size:14px;color:#20294D"></label>
-      <button type="submit" style="height:42px;border:0;border-radius:11px;background:linear-gradient(135deg, #416FDE, #6656DA);color:var(--a-ink);font-family:inherit;font-size:14px;font-weight:500;cursor:pointer">저장하고 다시 확인</button>
+        <input name="key" value="${esc(c.key)}" style="height:42px;padding:0 12px;border-radius:var(--r-ctl);border:1px solid var(--rule);background:#FFFFFF;font-family:inherit;font-size:14px;color:var(--ink)"></label>
+      <button type="submit" style="height:42px;border:0;border-radius:var(--r-ctl);background:var(--sel);color:var(--a-ink);font-family:inherit;font-size:14px;font-weight:500;cursor:pointer">저장하고 다시 확인</button>
     </form>` : '';
 
   return `${hero}
   <section style="${CARD};box-sizing:border-box;width:min(560px, 100%);margin:min(6vh, 56px) auto 0;padding:36px;display:flex;flex-direction:column;gap:18px;text-align:center;align-items:center">
-    <span aria-hidden="true" style="width:58px;height:58px;border-radius:18px;background:linear-gradient(140deg, #E3EAFF, #EDE6FF);color:#3F4FD0;display:flex;align-items:center;justify-content:center"><svg width="27" height="27" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="13" height="12" rx="2.5"/><path d="M16 10.5l5-3v9l-5-3"/></svg></span>
+    <span aria-hidden="true" style="width:58px;height:58px;border-radius:var(--r-card);background:var(--blue-card);color:var(--blue-ink);display:flex;align-items:center;justify-content:center"><svg width="27" height="27" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="13" height="12" rx="2.5"/><path d="M16 10.5l5-3v9l-5-3"/></svg></span>
     <div style="display:flex;flex-direction:column;gap:6px">
       <h2 style="margin:0;font-size:21px;font-weight:800">${panel[0]}</h2>
-      <p style="margin:0;font-size:14px;color:#64708F;line-height:1.6">${panel[1]}</p>
+      <p style="margin:0;font-size:14px;color:var(--muted);line-height:1.6">${panel[1]}</p>
     </div>
     <div style="width:100%;display:flex;flex-direction:column;gap:12px">${howto}${setup}</div>
   </section>`;
@@ -858,12 +787,12 @@ function shortsView(){
    예전엔 이 컴퓨터에서 돌던 로컬 서버(127.0.0.1:3000)를 띄웠다.
    이제 drive/ 폴더에 같이 들어 있어서 같은 출처에서 바로 연다.
    서버 탐지도, 주소 설정도, 꺼져 있다는 안내도 필요 없다. */
-const DRIVE_VERSION = '20261116-1';
+const DRIVE_VERSION = '20261116-ws';
 function driveView(){
   const hash = state.driveSettings ? '#settings' : '';
   state.driveSettings = false;
   return `<section aria-label="공유드라이브"
-    style="margin:-22px calc(-1 * clamp(16px, 3vw, 32px)) -48px;height:calc(100vh - 66px);overflow:hidden;background:#F4F5FC">
+    style="margin:-22px calc(-1 * clamp(16px, 3vw, 32px)) -48px;height:calc(100vh - 66px);overflow:hidden;background:var(--paper)">
     <iframe src="./drive/index.html?v=${DRIVE_VERSION}${hash}" title="방송국 공유드라이브" style="display:block;width:100%;height:100%;border:0"></iframe>
   </section>`;
 }
@@ -880,9 +809,9 @@ function subTabBar(list, current, attr, label){
   const tabs = list.map(([k, text]) => {
     const on = current === k;
     return `<button data-${attr}="${k}" aria-selected="${on}" role="tab"
-      style="height:38px;padding:0 16px;border:0;border-radius:11px;background:${on ? '#EEF2FF' : 'transparent'};color:${on ? '#3F55D6' : '#64708F'};font-family:inherit;font-size:14.5px;font-weight:${on ? 700 : 600};cursor:pointer">${text}</button>`;
+      style="height:38px;padding:0 16px;border:0;border-radius:var(--r-ctl);background:${on ? 'var(--blue-card)' : 'transparent'};color:${on ? 'var(--blue-ink)' : 'var(--muted)'};font-family:inherit;font-size:14.5px;font-weight:${on ? 700 : 600};cursor:pointer">${text}</button>`;
   }).join('');
-  return `<div role="tablist" aria-label="${label}" style="display:flex;align-items:center;gap:4px;padding:6px;border-radius:16px;background:rgba(255,255,255,0.9);border:1px solid #FFFFFF;box-shadow:0 8px 24px rgba(60,72,140,0.06)">${tabs}</div>`;
+  return `<div role="tablist" aria-label="${label}" style="display:flex;align-items:center;gap:4px;padding:6px;border-radius:var(--r-card);background:var(--card);border:1px solid #FFFFFF;box-shadow:var(--lift)">${tabs}</div>`;
 }
 
 const RADIO_SLOTS = [
@@ -923,9 +852,9 @@ function radioPickCard(){
     const on = pick.ids.includes(p[7]);
     const sub = `${showDept ? `${p[2]} · ` : ''}${free ? '이 시간 가능' : '이 시간 불가'}`;
     return `<button type="button" data-radio-pick="${esc(p[7])}" aria-pressed="${on}"
-      style="display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:10px 13px;border-radius:13px;border:1px solid ${on?'transparent':'#E8EBF5'};background:${on?'linear-gradient(135deg, #4C6FE6, #7C5FD8)':'#FFFFFF'};color:${on?'#FFFFFF':'#20294D'};font-family:inherit;text-align:left;cursor:pointer">
+      style="display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:10px 13px;border-radius:var(--r-ctl);border:1px solid ${on?'transparent':'var(--rule)'};background:${on?'var(--sel)':'#FFFFFF'};color:${on?'#FFFFFF':'var(--ink)'};font-family:inherit;text-align:left;cursor:pointer">
       <strong style="font-size:14px;font-weight:700">${esc(p[0])}</strong>
-      <span style="font-size:11.5px;color:${on?'#DCE2FF':(free?'#64708F':'#A13F5A')}">${esc(sub)}</span>
+      <span style="font-size:11.5px;color:${on?'var(--blue-card)':(free?'var(--muted)':'var(--rose-ink)')}">${esc(sub)}</span>
     </button>`;
   };
 
@@ -939,17 +868,17 @@ function radioPickCard(){
     return `<section style="display:flex;flex-direction:column;gap:8px">
       <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
         <span style="padding:3px 10px;border-radius:99px;background:${bg};color:${fg};font-size:12.5px;font-weight:800">${esc(dept)}</span>
-        <span style="font-size:12.5px;font-weight:700;color:${n?'#2A7553':'#6E6E73'}">${n ? `${n}명 선택` : '아직 없음'}</span>
+        <span style="font-size:12.5px;font-weight:700;color:${n?'var(--mint-ink)':'var(--muted)'}">${n ? `${n}명 선택` : '아직 없음'}</span>
       </div>
       <div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(140px, 1fr));gap:8px">${own.map(p => chipFor(p, false)).join('')}
         <button type="button" data-radio-other="${esc(dept)}" aria-pressed="${open}"
-          style="display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:10px 13px;border-radius:13px;border:1px dashed ${open?'#3F55D6':'#D7DCEC'};background:${open?'#EEF2FF':'transparent'};color:${open?'#3F55D6':'#64708F'};font-family:inherit;text-align:left;cursor:pointer">
+          style="display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:10px 13px;border-radius:var(--r-ctl);border:1px dashed ${open?'var(--blue-ink)':'var(--rule-strong)'};background:${open?'var(--blue-card)':'transparent'};color:${open?'var(--blue-ink)':'var(--muted)'};font-family:inherit;text-align:left;cursor:pointer">
           <strong style="font-size:14px;font-weight:700">${open ? '기타 닫기' : '기타'}</strong>
           <span style="font-size:11.5px">다른 부서에서</span>
         </button>
       </div>
-      ${open ? `<div style="display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:14px;background:#F8F9FD;border:1px solid #EEF0F7">
-        <span style="font-size:12px;font-weight:700;color:#64708F">다른 부서에서 이 자리를 맡을 부원</span>
+      ${open ? `<div style="display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:var(--r-card);background:var(--field);border:1px solid var(--rule-strong)">
+        <span style="font-size:12px;font-weight:700;color:var(--muted)">다른 부서에서 이 자리를 맡을 부원</span>
         <div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(140px, 1fr));gap:8px">${rest.map(p => chipFor(p, true)).join('')}</div>
       </div>` : ''}
     </section>`;
@@ -960,19 +889,19 @@ function radioPickCard(){
   return `
   <div data-radio-close="backdrop" style="position:fixed;inset:0;z-index:90;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(25,33,60,0.42);backdrop-filter:blur(3px)">
     <section role="dialog" aria-modal="true" aria-label="${esc(slot.label)} 담당 지정"
-      style="width:min(520px, 100%);max-height:88dvh;display:flex;flex-direction:column;border-radius:22px;background:#FFFFFF;box-shadow:0 24px 60px rgba(28,37,67,0.28);overflow:hidden">
-      <header style="display:flex;align-items:center;gap:12px;padding:18px 20px;border-bottom:1px solid #F0F2F9">
+      style="width:min(520px, 100%);max-height:88dvh;display:flex;flex-direction:column;border-radius:var(--r-card);background:#FFFFFF;box-shadow:var(--lift);overflow:hidden">
+      <header style="display:flex;align-items:center;gap:12px;padding:18px 20px;border-bottom:1px solid var(--field)">
         <span style="display:flex;flex-direction:column;gap:2px;flex:1;min-width:0">
           <strong style="font-size:17px;font-weight:800">${esc(slot.label)} 담당</strong>
-          <small style="font-size:12.5px;color:#64708F">${esc(monthDay(pick.iso))} (${esc(dowOf(pick.iso))}) · ${esc(slot.time)}</small>
+          <small style="font-size:12.5px;color:var(--muted)">${esc(monthDay(pick.iso))} (${esc(dowOf(pick.iso))}) · ${esc(slot.time)}</small>
         </span>
-        <button type="button" data-radio-close="x" aria-label="닫기" style="width:36px;height:36px;border:0;border-radius:11px;background:#F2F4FB;color:#4F5770;font-family:inherit;font-size:16px;cursor:pointer">×</button>
+        <button type="button" data-radio-close="x" aria-label="닫기" style="width:36px;height:36px;border:0;border-radius:var(--r-ctl);background:var(--field);color:var(--muted);font-family:inherit;font-size:16px;cursor:pointer">×</button>
       </header>
       <div style="flex:1;min-height:0;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:18px">${groups}</div>
-      <footer style="display:flex;align-items:center;gap:9px;padding:14px 20px;border-top:1px solid #F0F2F9">
-        <span style="margin-right:auto;font-size:13px;color:#64708F">${pick.ids.length ? `${pick.ids.length}명 · ${esc(summary)}` : '부서마다 한 명씩 골라 주세요.'}</span>
-        <button type="button" data-radio-close="cancel" style="height:42px;padding:0 16px;border:1px solid #E8EBF5;border-radius:12px;background:#FFFFFF;color:#4F5770;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer">취소</button>
-        <button type="button" id="save-radio" style="height:42px;padding:0 18px;border:0;border-radius:12px;background:linear-gradient(135deg, #416FDE, #6656DA);color:#FFFFFF;font-family:inherit;font-size:14px;font-weight:800;cursor:pointer">저장하기</button>
+      <footer style="display:flex;align-items:center;gap:9px;padding:14px 20px;border-top:1px solid var(--field)">
+        <span style="margin-right:auto;font-size:13px;color:var(--muted)">${pick.ids.length ? `${pick.ids.length}명 · ${esc(summary)}` : '부서마다 한 명씩 골라 주세요.'}</span>
+        <button type="button" data-radio-close="cancel" style="height:42px;padding:0 16px;border:1px solid var(--rule);border-radius:var(--r-ctl);background:#FFFFFF;color:var(--muted);font-family:inherit;font-size:14px;font-weight:700;cursor:pointer">취소</button>
+        <button type="button" id="save-radio" style="height:42px;padding:0 18px;border:0;border-radius:var(--r-ctl);background:var(--sel);color:#FFFFFF;font-family:inherit;font-size:14px;font-weight:800;cursor:pointer">저장하기</button>
       </footer>
     </section>
   </div>`;
@@ -1003,38 +932,51 @@ function radioView(){
   const range = `${monthDay(localIso(dates[0]))} – ${monthDay(localIso(dates[4]))}`;
   const today = localIso();
 
-  const grid = RADIO_SLOTS.map(slot => {
+  // 라디오 편성도 큐시트다. 요일 머리글에 방송 두 줄 — 인쇄된 편성표 모양.
+  const headRow = `<span class="a-sheet-corner"></span>` + dates.map(d => {
+    const iso = localIso(d), off = radioOff(iso), isToday = iso === today;
+    return `<span style="padding:7px 0 8px;text-align:center;display:flex;flex-direction:column;line-height:1.3">
+      <strong style="font-size:12px;font-weight:700;color:var(--a-muted)">${DOW[d.getDay()]}</strong>
+      <span class="hn-num" style="align-self:center;min-width:26px;padding:1px 6px;border-radius:99px;background:${isToday ? 'var(--a-ink)' : 'transparent'};color:${isToday ? '#fff' : 'var(--a-ink)'};font-size:14px;font-weight:800">${d.getDate()}</span>
+      ${off ? '<small style="font-size:10.5px;font-weight:700;color:var(--a-muted)">휴방</small>' : ''}
+    </span>`;
+  }).join('');
+
+  const slotRows = RADIO_SLOTS.map(slot => {
+    const label = `<span class="a-cell-time" style="flex-direction:column;align-items:flex-end;justify-content:center;gap:1px;padding:8px 9px 8px 6px">
+      <strong style="font-size:12.5px;font-weight:800;color:var(--a-ink)">${slot.label}</strong>
+      <small class="hn-num" style="font-size:10.5px;color:var(--a-muted)">${slot.time}</small>
+    </span>`;
+
     const cells = dates.map(dateObj => {
       const iso = localIso(dateObj);
       const off = radioOff(iso);
       const free = people.filter(p => radioAvailable(p, iso, dataDay(dateObj), slot.hour));
       const cast = radioCast(iso, slot.key);
-      const isToday = iso === today;
-      return `<div style="display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:16px;background:${off ? '#F3F4F8' : (isToday ? 'linear-gradient(135deg, #F0F3FF, #F4F0FF)' : '#F8F9FD')};border:1px solid ${off ? '#E6E8F0' : (isToday ? '#DDE3FF' : '#EEF0F7')}">
-        <span style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:#64708F">${DOW[dateObj.getDay()]} ${dateObj.getDate()}일
-          ${off ? '<span style="padding:1px 7px;border-radius:99px;background:#E6E8F0;color:#5A6480;font-size:11px;font-weight:800">휴방</span>' : ''}</span>
+      const live = iso === today && tallyNow()?.label === slot.label;
+      return `<div class="a-slot${off ? ' is-off' : ''}${live ? ' is-live' : ''}">
         ${off
-          ? `<strong style="font-size:14.5px;font-weight:700;color:var(--a-muted)">방송 없음</strong>`
+          ? `<span class="a-slot-name is-dim">방송 없음</span>`
           : cast.length
-            ? `<strong style="font-size:14.5px;font-weight:800;color:#20294D;line-height:1.4">${cast.map(c => esc(c.name || '이름 미등록')).join(', ')}</strong>`
-            : `<strong style="font-size:14.5px;font-weight:700;color:var(--a-muted)">담당 미정</strong>`}
-        ${off ? '' : `<span style="font-size:12px;color:${free.length ? '#64708F' : '#A13F5A'}">이 시간 가능 ${free.length}명</span>`}
-        ${state.radioEdit ? `<div style="display:flex;gap:6px">
-          ${off ? '' : `<button data-radio-edit="${iso}|${slot.key}" style="flex:1 1 auto;height:32px;border:0;border-radius:10px;background:#E3EAFF;color:#3F4FD0;font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer">담당 ${cast.length ? '수정' : '지정'}</button>`}
-          <button data-radio-off="${iso}" title="${off ? '휴방 해제' : '이 날 휴방'}" style="flex:${off ? '1 1 auto' : '0 0 auto'};height:32px;padding:0 10px;border:0;border-radius:10px;background:${off ? '#E3F7EE' : '#F2F4FB'};color:${off ? '#1C6E4A' : '#64708F'};font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer">${off ? '휴방 해제' : '휴방'}</button>
-        </div>` : ''}
+            ? `<span class="a-slot-name">${cast.map(c => esc(c.name || '이름 미등록')).join(', ')}</span>`
+            : `<span class="a-slot-name is-dim">담당 미정</span>`}
+        ${off ? '' : `<small class="a-slot-free${free.length ? '' : ' is-none'}">가능 ${free.length}명</small>`}
+        ${state.radioEdit ? `<span class="a-slot-actions">
+          ${off ? '' : `<button data-radio-edit="${iso}|${slot.key}" class="a-mini">담당 ${cast.length ? '수정' : '지정'}</button>`}
+          <button data-radio-off="${iso}" class="a-mini${off ? ' is-on' : ''}" title="${off ? '휴방 해제' : '이 날 휴방'}">${off ? '휴방 해제' : '휴방'}</button>
+        </span>` : ''}
       </div>`;
     }).join('');
-
-    return `<section style="${CARD};padding:20px clamp(16px, 2vw, 24px);display:flex;flex-direction:column;gap:14px">
-      <div style="display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 12px">
-        <h2 style="margin:0;font-size:19px;font-weight:800">${slot.label}</h2>
-        <span class="hn-num" style="padding:3px 10px;border-radius:99px;background:#E3EAFF;color:#3F4FD0;font-size:13px;font-weight:800">${slot.time}</span>
-        <span style="font-size:13px;color:#64708F">월요일부터 금요일까지 매일 진행해요.</span>
-      </div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(140px, 1fr));gap:10px">${cells}</div>
-    </section>`;
+    return label + cells;
   }).join('');
+
+  const grid = `<section class="a-sheet" style="${CARD};padding:0;overflow:hidden">
+    <div style="overflow-x:auto">
+      <div class="a-sheet-grid" style="min-width:680px;display:grid;grid-template-columns:96px repeat(5, minmax(0, 1fr))">
+        ${headRow}${slotRows}
+      </div>
+    </div>
+  </section>`;
 
   return `
   <section class="a-hero a-flat" style="display:flex;flex-wrap:wrap;gap:16px 24px;align-items:flex-end;justify-content:space-between">
@@ -1046,13 +988,13 @@ function radioView(){
     </div>
     <div style="position:relative;display:flex;align-items:center;gap:6px">
       <button data-radio-mode="1" aria-pressed="${state.radioEdit}" aria-label="${state.radioEdit ? '담당 수정 끝내기' : '담당 수정하기'}" title="${state.radioEdit ? '수정 끝내기' : '담당 수정'}"
-        style="display:flex;align-items:center;justify-content:center;gap:6px;height:40px;padding:0 14px;border-radius:12px;border:1px solid ${state.radioEdit ? 'transparent' : 'var(--a-rule)'};background:${state.radioEdit ? 'var(--a-action)' : 'var(--a-surface)'};color:${state.radioEdit ? '#FFFFFF' : 'var(--a-ink)'};font-family:inherit;font-size:14px;font-weight:700;cursor:pointer">
+        style="display:flex;align-items:center;justify-content:center;gap:6px;height:40px;padding:0 14px;border-radius:var(--r-ctl);border:1px solid ${state.radioEdit ? 'transparent' : 'var(--a-rule)'};background:${state.radioEdit ? 'var(--a-action)' : 'var(--a-surface)'};color:${state.radioEdit ? '#FFFFFF' : 'var(--a-ink)'};font-family:inherit;font-size:14px;font-weight:700;cursor:pointer">
         <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>${state.radioEdit ? '끝내기' : '담당 수정'}
       </button>
       <span aria-hidden="true" style="width:1px;height:24px;background:var(--a-rule)"></span>
-      <button data-week-step="-1" aria-label="이전 주" style="width:40px;height:40px;border-radius:12px;border:1px solid var(--a-rule);background:var(--a-surface);color:var(--a-ink);font-family:inherit;font-size:16px;cursor:pointer">‹</button>
-      <button data-week-step="0" style="height:40px;padding:0 14px;border-radius:12px;border:1px solid var(--a-rule);background:var(--a-surface);color:var(--a-ink);font-family:inherit;font-size:14px;font-weight:500;cursor:pointer">이번 주</button>
-      <button data-week-step="1" aria-label="다음 주" style="width:40px;height:40px;border-radius:12px;border:1px solid var(--a-rule);background:var(--a-surface);color:var(--a-ink);font-family:inherit;font-size:16px;cursor:pointer">›</button>
+      <button data-week-step="-1" aria-label="이전 주" style="width:40px;height:40px;border-radius:var(--r-ctl);border:1px solid var(--a-rule);background:var(--a-surface);color:var(--a-ink);font-family:inherit;font-size:16px;cursor:pointer">‹</button>
+      <button data-week-step="0" style="height:40px;padding:0 14px;border-radius:var(--r-ctl);border:1px solid var(--a-rule);background:var(--a-surface);color:var(--a-ink);font-family:inherit;font-size:14px;font-weight:500;cursor:pointer">이번 주</button>
+      <button data-week-step="1" aria-label="다음 주" style="width:40px;height:40px;border-radius:var(--r-ctl);border:1px solid var(--a-rule);background:var(--a-surface);color:var(--a-ink);font-family:inherit;font-size:16px;cursor:pointer">›</button>
     </div>
   </section>
   ${grid}
@@ -1072,12 +1014,12 @@ function projectsView(){
     const done=shoots.filter(s=>s.status==='완료').length;
     return `<article style="${CARD};padding:18px;display:flex;flex-direction:column;gap:12px">
       <div style="display:flex;align-items:flex-start;gap:10px">
-        <span aria-hidden="true" style="flex:0 0 auto;width:40px;height:40px;border-radius:13px;background:linear-gradient(140deg, #E3EAFF, #EDE6FF);color:#3F4FD0;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800">${esc(initial(p.name||id))}</span>
+        <span aria-hidden="true" style="flex:0 0 auto;width:40px;height:40px;border-radius:var(--r-ctl);background:var(--blue-card);color:var(--blue-ink);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800">${esc(initial(p.name||id))}</span>
         <span style="flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:2px">
           <strong style="font-size:17px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(p.name||id)}</strong>
-          <span style="font-size:12.5px;color:#64708F">촬영 ${shoots.length}건${shoots.length?` · 완료 ${done}건`:''}</span>
+          <span style="font-size:12.5px;color:var(--muted)">촬영 ${shoots.length}건${shoots.length?` · 완료 ${done}건`:''}</span>
         </span>
-        <button type="button" data-edit-open="project|${esc(id)}" aria-label="${esc(p.name||id)} 수정" title="수정" style="flex:0 0 auto;width:32px;height:32px;border:0;border-radius:10px;background:#F2F4FB;color:#3F55D6;display:inline-flex;align-items:center;justify-content:center;cursor:pointer">${EDIT_ICON}</button>
+        <button type="button" data-edit-open="project|${esc(id)}" aria-label="${esc(p.name||id)} 수정" title="수정" style="flex:0 0 auto;width:32px;height:32px;border:0;border-radius:var(--r-ctl);background:var(--field);color:var(--blue-ink);display:inline-flex;align-items:center;justify-content:center;cursor:pointer">${EDIT_ICON}</button>
       </div>
       <div style="display:flex;flex-direction:column;gap:6px">
         <span style="font-size:12px;font-weight:700;color:var(--a-muted)">참여 인원 ${crew.length}명</span>
@@ -1094,10 +1036,10 @@ function projectsView(){
       <h1>프로젝트</h1>
       <span style="font-size:14.5px;color:var(--a-muted)">방송제·마디영상처럼 묶어서 진행하는 작품을 관리해요.</span>
     </div>
-    <button data-project-new="1" style="position:relative;display:inline-flex;align-items:center;gap:7px;height:44px;padding:0 18px;border:0;border-radius:13px;background:var(--a-action);color:#FFFFFF;font-family:inherit;font-size:15px;font-weight:500;cursor:pointer;border-radius:980px">+ 프로젝트 추가</button>
+    <button data-project-new="1" style="position:relative;display:inline-flex;align-items:center;gap:7px;height:44px;padding:0 18px;border:0;border-radius:var(--r-ctl);background:var(--a-action);color:#FFFFFF;font-family:inherit;font-size:15px;font-weight:500;cursor:pointer">+ 프로젝트 추가</button>
   </section>
   ${list.length?`<div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(260px, 1fr));gap:14px">${cards}</div>`
-    :`<section style="${CARD};padding:40px 20px;text-align:center;color:#64708F;font-size:14px">아직 만든 프로젝트가 없어요.<br>오른쪽 위 ‘프로젝트 추가’를 눌러 시작하세요.</section>`}`;
+    :`<section style="${CARD};padding:40px 20px;text-align:center;color:var(--muted);font-size:14px">아직 만든 프로젝트가 없어요.<br>오른쪽 위 ‘프로젝트 추가’를 눌러 시작하세요.</section>`}`;
 }
 
 function scheduleView(){
@@ -1133,15 +1075,15 @@ function scriptView(){
   // 각 단계에 들어갈 수 있는지. 앞 단계가 안 끝났으면 못 넘어간다.
   const reach=[true,!!state.aiText,!!(job||state.aiRunning),scenes.length>0];
   const step=Math.min(state.aiStep,reach.lastIndexOf(true));
-  const field='height:44px;padding:0 10px;border-radius:12px;border:1px solid #E6E9F3;background:#F8F9FD;font-family:inherit;font-size:14px;color:#20294D';
+  const field='height:44px;padding:0 10px;border-radius:var(--r-ctl);border:1px solid var(--rule);background:var(--field);font-family:inherit;font-size:14px;color:var(--ink)';
 
   const steps=['대본 선택','분석 설정','AI 분석','일정 후보'].map((s,i)=>{ const on=i===step, done=i<step;
     return `<button ${reach[i]?`data-ai-step="${i}"`:'disabled'} style="display:flex;align-items:center;gap:8px;padding:0;border:0;background:none;font-family:inherit;cursor:${reach[i]?'pointer':'default'};opacity:${reach[i]?1:.45}">
-      <span class="hn-num" style="width:24px;height:24px;border-radius:50%;background:${on||done?'var(--a-action)':'#E6EAF2'};color:${on||done?'#FFFFFF':'#55585F'};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800">${done?'✓':i+1}</span>
-      <b style="font-size:13.5px;font-weight:${on?700:600};color:${on?'#20294D':'#6E6E73'}">${s}</b>
-    </button>${i<3?'<span aria-hidden="true" style="flex:0 1 36px;height:2px;background:#E6EAF2"></span>':''}`;}).join('');
+      <span class="hn-num" style="width:24px;height:24px;border-radius:50%;background:${on||done?'var(--a-action)':'var(--rule)'};color:${on||done?'#FFFFFF':'var(--muted)'};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800">${done?'✓':i+1}</span>
+      <b style="font-size:13.5px;font-weight:${on?700:600};color:${on?'var(--ink)':'var(--muted)'}">${s}</b>
+    </button>${i<3?'<span aria-hidden="true" style="flex:0 1 36px;height:2px;background:var(--rule)"></span>':''}`;}).join('');
 
-  const navBtn=(dir,label,enabled)=>`<button ${enabled?`data-ai-step="${step+dir}"`:'disabled'} style="height:44px;padding:0 18px;border:0;border-radius:12px;background:${dir>0?(enabled?'linear-gradient(135deg, #416FDE, #6656DA)':'#B9C3E6'):'#F2F4FB'};color:${dir>0?'#FFFFFF':'#4F5770'};font-family:inherit;font-size:14px;font-weight:700;cursor:${enabled?'pointer':'default'}">${label}</button>`;
+  const navBtn=(dir,label,enabled)=>`<button ${enabled?`data-ai-step="${step+dir}"`:'disabled'} style="height:44px;padding:0 18px;border:0;border-radius:var(--r-ctl);background:${dir>0?(enabled?'var(--sel)':'var(--rule-strong)'):'var(--field)'};color:${dir>0?'#FFFFFF':'var(--muted)'};font-family:inherit;font-size:14px;font-weight:700;cursor:${enabled?'pointer':'default'}">${label}</button>`;
 
   let panel;
 
@@ -1151,16 +1093,16 @@ function scriptView(){
       : state.aiFile||'파일을 선택하세요 (PDF · DOCX · TXT)';
     panel=`
       <h2 style="margin:0 0 4px;font-size:18px;font-weight:800">대본 선택</h2>
-      <p style="margin:0 0 18px;font-size:13.5px;color:#64708F">분석할 프로젝트와 대본 파일을 고르세요. 원본 파일은 서버에 저장하지 않습니다.</p>
+      <p style="margin:0 0 18px;font-size:13.5px;color:var(--muted)">분석할 프로젝트와 대본 파일을 고르세요. 원본 파일은 서버에 저장하지 않습니다.</p>
       <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start">
         <label style="flex:1 1 240px;display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:700">프로젝트
           <select id="ai-project" style="${field}">${projectList.map(([id,p])=>`<option value="${esc(id)}" ${id===state.aiProjectId?'selected':''}>${esc(p.name||id)}</option>`).join('')||'<option value="">프로젝트 없음</option>'}</select>
         </label>
         <div style="flex:999 1 320px;min-width:0">
           <input id="ai-file" type="file" accept=".pdf,.docx,.txt" hidden>
-          <button id="ai-pick" style="width:100%;display:flex;flex-direction:column;align-items:center;gap:5px;padding:28px 14px;border:1.5px dashed #B5BEEA;border-radius:16px;background:#F8F9FD;color:#3F55D6;font-family:inherit;cursor:pointer">
+          <button id="ai-pick" style="width:100%;display:flex;flex-direction:column;align-items:center;gap:5px;padding:28px 14px;border:1.5px dashed var(--rule-strong);border-radius:var(--r-card);background:var(--field);color:var(--blue-ink);font-family:inherit;cursor:pointer">
             <strong style="font-size:14.5px;font-weight:700">${esc(dropLabel)}</strong>
-            <small style="font-size:12px;color:#64708F">${state.aiText?`${state.aiChars.toLocaleString()}자 추출 완료`:'PDF · DOCX · TXT'}</small>
+            <small style="font-size:12px;color:var(--muted)">${state.aiText?`${state.aiChars.toLocaleString()}자 추출 완료`:'PDF · DOCX · TXT'}</small>
           </button>
         </div>
       </div>`;
@@ -1171,87 +1113,87 @@ function scriptView(){
     const estimate=Math.max(1,Math.ceil(state.aiChars/maxChars));
     panel=`
       <h2 style="margin:0 0 4px;font-size:18px;font-weight:800">분석 설정</h2>
-      <p style="margin:0 0 18px;font-size:13.5px;color:#64708F">대본을 묶음으로 나눠 분석합니다. 묶음이 작을수록 정확하지만 오래 걸려요.</p>
+      <p style="margin:0 0 18px;font-size:13.5px;color:var(--muted)">대본을 묶음으로 나눠 분석합니다. 묶음이 작을수록 정확하지만 오래 걸려요.</p>
       <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:18px">
         ${[['정확도 우선','묶음 6,000자 · 가장 정확, 가장 느림'],['균형 (추천)','묶음 11,000자 · 권장'],['속도 우선','묶음 18,000자 · 가장 빠름, 놓칠 수 있음']].map(([v,desc])=>{ const on=state.aiPrecision===v;
-          return `<button data-ai-precision="${esc(v)}" aria-pressed="${on}" style="display:flex;align-items:center;gap:12px;padding:14px 16px;border:1.5px solid ${on?'#6B6AE6':'#ECEEF6'};border-radius:14px;background:${on?'linear-gradient(120deg, #F1F4FF, #F5F0FF)':'#FFFFFF'};font-family:inherit;text-align:left;cursor:pointer">
-            <span aria-hidden="true" style="flex:0 0 18px;width:18px;height:18px;border-radius:50%;border:2px solid ${on?'#5A5FE0':'#CBD2E6'};background:${on?'#5A5FE0':'transparent'};box-shadow:${on?'inset 0 0 0 3px #FFFFFF':'none'}"></span>
-            <span style="flex:1 1 auto;min-width:0;display:flex;flex-direction:column;line-height:1.4"><strong style="font-size:14.5px;font-weight:800">${esc(v)}</strong><span style="font-size:12.5px;color:#64708F">${esc(desc)}</span></span>
+          return `<button data-ai-precision="${esc(v)}" aria-pressed="${on}" style="display:flex;align-items:center;gap:12px;padding:14px 16px;border:1.5px solid ${on?'var(--lav-ink)':'var(--rule)'};border-radius:var(--r-card);background:${on?'var(--blue-card)':'#FFFFFF'};font-family:inherit;text-align:left;cursor:pointer">
+            <span aria-hidden="true" style="flex:0 0 18px;width:18px;height:18px;border-radius:50%;border:2px solid ${on?'var(--blue)':'var(--rule-strong)'};background:${on?'var(--blue)':'transparent'};box-shadow:${on?'inset 0 0 0 3px #FFFFFF':'none'}"></span>
+            <span style="flex:1 1 auto;min-width:0;display:flex;flex-direction:column;line-height:1.4"><strong style="font-size:14.5px;font-weight:800">${esc(v)}</strong><span style="font-size:12.5px;color:var(--muted)">${esc(desc)}</span></span>
           </button>`;}).join('')}
       </div>
       <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px">
-        <span style="flex:1 1 150px;display:flex;flex-direction:column;gap:2px;padding:12px 14px;border-radius:14px;background:#F6F7FC"><span style="font-size:12px;color:#64708F">대본 길이</span><strong class="hn-num" style="font-size:16px;font-weight:800">${state.aiChars.toLocaleString()}자</strong></span>
-        <span style="flex:1 1 150px;display:flex;flex-direction:column;gap:2px;padding:12px 14px;border-radius:14px;background:#F6F7FC"><span style="font-size:12px;color:#64708F">예상 묶음</span><strong class="hn-num" style="font-size:16px;font-weight:800">약 ${estimate}개</strong></span>
+        <span style="flex:1 1 150px;display:flex;flex-direction:column;gap:2px;padding:12px 14px;border-radius:var(--r-card);background:var(--field)"><span style="font-size:12px;color:var(--muted)">대본 길이</span><strong class="hn-num" style="font-size:16px;font-weight:800">${state.aiChars.toLocaleString()}자</strong></span>
+        <span style="flex:1 1 150px;display:flex;flex-direction:column;gap:2px;padding:12px 14px;border-radius:var(--r-card);background:var(--field)"><span style="font-size:12px;color:var(--muted)">예상 묶음</span><strong class="hn-num" style="font-size:16px;font-weight:800">약 ${estimate}개</strong></span>
       </div>
-      <div style="display:flex;flex-direction:column;gap:6px;padding:14px 16px;border-radius:14px;background:${crewOk?'#F0FAF5':'#FFF5D9'};color:${crewOk?'#17603F':'#6E5208'};margin-bottom:18px">
+      <div style="display:flex;flex-direction:column;gap:6px;padding:14px 16px;border-radius:var(--r-card);background:${crewOk?'var(--mint-card)':'var(--amber-card)'};color:${crewOk?'var(--mint-ink)':'var(--amber-ink)'};margin-bottom:18px">
         <strong style="font-size:13.5px;font-weight:800">${crewOk?'✓ 담당 지정 완료':'! 담당을 먼저 지정해 주세요'}</strong>
         <span style="font-size:12.5px">기획 ${esc(names(crew.planning))} · 촬영 ${esc(names(crew.production))}</span>
         ${crewOk?'':'<span style="font-size:12px">기획·촬영 담당이 모두 있어야 서버가 분석을 받습니다.</span>'}
       </div>
-      <button id="ai-start" ${(!state.aiText||!crewOk||state.aiRunning)?'disabled':''} style="width:100%;height:48px;border:0;border-radius:12px;background:${(!state.aiText||!crewOk||state.aiRunning)?'#B9C3E6':'linear-gradient(135deg, #416FDE, #6656DA)'};color:#FFFFFF;font-family:inherit;font-size:15px;font-weight:700;cursor:${(!state.aiText||!crewOk||state.aiRunning)?'default':'pointer'}">${state.aiRunning?'분석 중…':'분석 시작'}</button>`;
+      <button id="ai-start" ${(!state.aiText||!crewOk||state.aiRunning)?'disabled':''} style="width:100%;height:48px;border:0;border-radius:var(--r-ctl);background:${(!state.aiText||!crewOk||state.aiRunning)?'var(--rule-strong)':'var(--sel)'};color:#FFFFFF;font-family:inherit;font-size:15px;font-weight:700;cursor:${(!state.aiText||!crewOk||state.aiRunning)?'default':'pointer'}">${state.aiRunning?'분석 중…':'분석 시작'}</button>`;
   }
 
   else if(step===2){
-    const failedRows=items.filter(x=>x.status==='failed').map(x=>`<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 13px;border-radius:12px;background:#FFF1F4;color:#A8324F;font-size:12.5px;font-weight:600;margin-top:6px">
+    const failedRows=items.filter(x=>x.status==='failed').map(x=>`<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 13px;border-radius:var(--r-ctl);background:var(--rose-card);color:var(--rose-ink);font-size:12.5px;font-weight:600;margin-top:6px">
         <span>묶음 ${x.index+1} · ${esc(x.error||'분석 실패')}</span>
-        <button data-ai-retry="${x.index}" style="height:28px;padding:0 10px;border:0;border-radius:8px;background:#FFFFFF;color:#A8324F;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer">재시도</button>
+        <button data-ai-retry="${x.index}" style="height:28px;padding:0 10px;border:0;border-radius:8px;background:#FFFFFF;color:var(--rose-ink);font-family:inherit;font-size:12px;font-weight:700;cursor:pointer">재시도</button>
       </div>`).join('');
     panel=`
       <h2 style="margin:0 0 4px;font-size:18px;font-weight:800">AI 분석</h2>
-      <p style="margin:0 0 20px;font-size:13.5px;color:#64708F">묶음을 하나씩 NVIDIA NIM에 보내 씬·장소·배역을 뽑습니다.</p>
-      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:22px;padding:18px;border-radius:16px;background:linear-gradient(120deg, #F3F5FF, #F6F2FF)">
-        <span aria-hidden="true" style="flex:0 0 104px;width:104px;height:104px;border-radius:50%;background:conic-gradient(#5A5FE0 0 ${progress}%, #E6EAF2 ${progress}% 100%);display:flex;align-items:center;justify-content:center">
+      <p style="margin:0 0 20px;font-size:13.5px;color:var(--muted)">묶음을 하나씩 NVIDIA NIM에 보내 씬·장소·배역을 뽑습니다.</p>
+      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:22px;padding:18px;border-radius:var(--r-card);background:var(--field)">
+        <span aria-hidden="true" style="flex:0 0 104px;width:104px;height:104px;border-radius:50%;background:var(--blue-card);display:flex;align-items:center;justify-content:center">
           <span style="width:80px;height:80px;border-radius:50%;background:#FFFFFF;display:flex;align-items:center;justify-content:center"><strong class="hn-num" style="font-size:20px;font-weight:800">${progress}%</strong></span>
         </span>
         <span style="flex:1 1 200px;min-width:0;display:flex;flex-direction:column;gap:7px">
-          <span style="font-size:13px;color:#64708F">${job?.status==='completed'?'분석 완료':state.aiRunning?'대본 분석 중':'분석 대기'}</span>
+          <span style="font-size:13px;color:var(--muted)">${job?.status==='completed'?'분석 완료':state.aiRunning?'대본 분석 중':'분석 대기'}</span>
           <strong style="font-size:16px;font-weight:800">${items.length?`묶음 ${success} / ${items.length} 완료`:'분석을 시작하면 진행이 표시됩니다'}</strong>
-          <span style="display:flex;gap:18px;font-size:12.5px;color:#64708F">
-            <span>완료 <b class="hn-num" style="color:#17603F">${success}</b></span>
-            <span>실패 <b class="hn-num" style="color:#A8324F">${failed}</b></span>
+          <span style="display:flex;gap:18px;font-size:12.5px;color:var(--muted)">
+            <span>완료 <b class="hn-num" style="color:var(--mint-ink)">${success}</b></span>
+            <span>실패 <b class="hn-num" style="color:var(--rose-ink)">${failed}</b></span>
             <span>대기 <b class="hn-num">${pending}</b></span>
           </span>
         </span>
       </div>
       ${failedRows}
-      ${scenes.length?`<p style="margin:16px 0 0;font-size:13px;color:#17603F;font-weight:600">${scenes.length}개 장면을 찾았어요. ‘다음’을 눌러 일정 후보로 넘어가세요.</p>`:''}`;
+      ${scenes.length?`<p style="margin:16px 0 0;font-size:13px;color:var(--mint-ink);font-weight:600">${scenes.length}개 장면을 찾았어요. ‘다음’을 눌러 일정 후보로 넘어가세요.</p>`:''}`;
   }
 
   else {
     const detail=scene?`
       <div style="display:flex;flex-direction:column;gap:12px">
         <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px">
-          <span class="hn-num" style="padding:3px 10px;border-radius:99px;background:#E8EDFF;color:#3F4FD0;font-size:12px;font-weight:800">${esc(scene.sceneId||'S#')}</span>
+          <span class="hn-num" style="padding:3px 10px;border-radius:99px;background:var(--blue-card);color:var(--blue-ink);font-size:12px;font-weight:800">${esc(scene.sceneId||'S#')}</span>
           <strong style="font-size:17px;font-weight:800">${esc(scene.location||'장소 미정')}</strong>
-          ${scene.interiorExterior&&scene.interiorExterior!=='UNKNOWN'?`<span style="padding:2px 9px;border-radius:99px;background:#EDE6FF;color:#4A3FB0;font-size:12px;font-weight:700">${esc(scene.interiorExterior==='INT'?'실내':'실외')}</span>`:''}
-          ${scene.dayNight&&scene.dayNight!=='UNKNOWN'?`<span style="padding:2px 9px;border-radius:99px;background:${scene.dayNight==='DAY'?'#FFF4D6':'#E3EAFF'};color:${scene.dayNight==='DAY'?'#6E5208':'#2F4FC2'};font-size:12px;font-weight:700">${esc(scene.dayNight==='DAY'?'낮':'밤')}</span>`:''}
-          ${scene.estimatedMinutes?`<span style="padding:2px 9px;border-radius:99px;background:#E3F7EE;color:#17603F;font-size:12px;font-weight:700">약 ${scene.estimatedMinutes}분</span>`:''}
+          ${scene.interiorExterior&&scene.interiorExterior!=='UNKNOWN'?`<span style="padding:2px 9px;border-radius:99px;background:var(--lav-card);color:var(--lav-ink);font-size:12px;font-weight:700">${esc(scene.interiorExterior==='INT'?'실내':'실외')}</span>`:''}
+          ${scene.dayNight&&scene.dayNight!=='UNKNOWN'?`<span style="padding:2px 9px;border-radius:99px;background:${scene.dayNight==='DAY'?'var(--amber-card)':'var(--blue-card)'};color:${scene.dayNight==='DAY'?'var(--amber-ink)':'var(--blue-ink)'};font-size:12px;font-weight:700">${esc(scene.dayNight==='DAY'?'낮':'밤')}</span>`:''}
+          ${scene.estimatedMinutes?`<span style="padding:2px 9px;border-radius:99px;background:var(--mint-card);color:var(--mint-ink);font-size:12px;font-weight:700">약 ${scene.estimatedMinutes}분</span>`:''}
         </div>
-        ${(scene.characters||[]).length?`<div style="display:flex;flex-wrap:wrap;gap:5px">${scene.characters.map(c=>`<span style="padding:3px 10px;border-radius:99px;background:#F2F4FB;color:#4F5770;font-size:12.5px;font-weight:600">${esc(c)}</span>`).join('')}</div>`:''}
-        ${scene.summary?`<p style="margin:0;padding:12px 14px;border-radius:14px;background:#F6F7FC;font-size:13.5px;line-height:1.7;color:#4F5770;white-space:pre-wrap">${esc(scene.summary)}</p>`:''}
-      </div>`:'<p style="margin:0;font-size:13px;color:#64708F">장면을 선택하세요.</p>';
+        ${(scene.characters||[]).length?`<div style="display:flex;flex-wrap:wrap;gap:5px">${scene.characters.map(c=>`<span style="padding:3px 10px;border-radius:99px;background:var(--field);color:var(--muted);font-size:12.5px;font-weight:600">${esc(c)}</span>`).join('')}</div>`:''}
+        ${scene.summary?`<p style="margin:0;padding:12px 14px;border-radius:var(--r-card);background:var(--field);font-size:13.5px;line-height:1.7;color:var(--muted);white-space:pre-wrap">${esc(scene.summary)}</p>`:''}
+      </div>`:'<p style="margin:0;font-size:13px;color:var(--muted)">장면을 선택하세요.</p>';
 
     const cands=aiCandidates(scene);
-    const candidateRows=cands.length?cands.map(c=>`<button data-ai-cand="${c.d}:${c.t}" style="width:100%;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;border:0;border-radius:12px;background:${c.yes===c.total?'#F0FAF5':'#FFFAEC'};color:${c.yes===c.total?'#2A7553':'#7A5E14'};font-family:inherit;text-align:left;cursor:pointer;margin-bottom:6px">
+    const candidateRows=cands.length?cands.map(c=>`<button data-ai-cand="${c.d}:${c.t}" style="width:100%;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;border:0;border-radius:var(--r-ctl);background:${c.yes===c.total?'var(--mint-card)':'var(--amber-card)'};color:${c.yes===c.total?'var(--mint-ink)':'var(--amber-ink)'};font-family:inherit;text-align:left;cursor:pointer;margin-bottom:6px">
         <strong style="font-size:13px;font-weight:700">${monthDay(c.iso)} (${DOW[c.d]}) ${pad2(c.t)}:00–${pad2(c.t+1)}:00</strong>
         <span style="font-size:12px;font-weight:600">${c.yes}/${c.total}명</span>
       </button>`).join('')
-      :`<p style="margin:0;font-size:13px;color:#64708F">${scene?'배역을 실제 인원과 연결하면 후보가 계산됩니다.':'먼저 장면을 선택하세요.'}</p>`;
+      :`<p style="margin:0;font-size:13px;color:var(--muted)">${scene?'배역을 실제 인원과 연결하면 후보가 계산됩니다.':'먼저 장면을 선택하세요.'}</p>`;
 
     panel=`
       <h2 style="margin:0 0 4px;font-size:18px;font-weight:800">일정 후보</h2>
-      <p style="margin:0 0 18px;font-size:13.5px;color:#64708F">장면을 고르고 배역을 실제 인원과 연결하면 촬영 가능한 시간이 나옵니다.</p>
+      <p style="margin:0 0 18px;font-size:13.5px;color:var(--muted)">장면을 고르고 배역을 실제 인원과 연결하면 촬영 가능한 시간이 나옵니다.</p>
       <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start">
         <div style="flex:1 1 220px;min-width:0">
           <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px">
-            <h3 style="margin:0;font-size:14px;font-weight:800">장면 목록</h3><span class="hn-num" style="font-size:13px;color:#3F55D6;font-weight:800">${scenes.length}</span>
+            <h3 style="margin:0;font-size:14px;font-weight:800">장면 목록</h3><span class="hn-num" style="font-size:13px;color:var(--blue-ink);font-weight:800">${scenes.length}</span>
           </div>
           <div style="max-height:420px;overflow-y:auto;padding-right:2px">
             ${scenes.map((s,i)=>{ const on=i===state.aiSceneIndex;
-              return `<button data-ai-scene="${i}" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;border:0;border-radius:12px;background:${on?'linear-gradient(135deg, #4C6FE6, #7C5FD8)':'#F7F8FC'};color:${on?'#FFFFFF':'#20294D'};font-family:inherit;text-align:left;cursor:pointer;margin-bottom:6px">
-                <span class="hn-num" style="flex:0 0 auto;padding:2px 8px;border-radius:8px;background:${on?'rgba(255,255,255,0.22)':'#E8EDFF'};color:${on?'#FFFFFF':'#3F4FD0'};font-size:11.5px;font-weight:800">${esc(s.sceneId||`S#${i+1}`)}</span>
+              return `<button data-ai-scene="${i}" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;border:0;border-radius:var(--r-ctl);background:${on?'var(--sel)':'var(--field)'};color:${on?'#FFFFFF':'var(--ink)'};font-family:inherit;text-align:left;cursor:pointer;margin-bottom:6px">
+                <span class="hn-num" style="flex:0 0 auto;padding:2px 8px;border-radius:8px;background:${on?'rgba(255,255,255,0.22)':'var(--blue-card)'};color:${on?'#FFFFFF':'var(--blue-ink)'};font-size:11.5px;font-weight:800">${esc(s.sceneId||`S#${i+1}`)}</span>
                 <span style="flex:1 1 auto;min-width:0;font-size:13.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(s.location||s.title||'장소 미정')}</span>
-              </button>`;}).join('')||'<p style="margin:0;font-size:13px;color:#64708F">장면이 없습니다.</p>'}
+              </button>`;}).join('')||'<p style="margin:0;font-size:13px;color:var(--muted)">장면이 없습니다.</p>'}
           </div>
         </div>
         <div style="flex:999 1 300px;min-width:0">${detail}</div>
@@ -1265,16 +1207,16 @@ function scriptView(){
           </div>
           <div>
             <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px">
-              <h3 style="margin:0;font-size:14px;font-weight:800">배역 → 인원</h3><span style="font-size:12.5px;color:#64708F">${mapped}/${chars.length}</span>
+              <h3 style="margin:0;font-size:14px;font-weight:800">배역 → 인원</h3><span style="font-size:12.5px;color:var(--muted)">${mapped}/${chars.length}</span>
             </div>
             <div style="display:flex;flex-direction:column;gap:7px;max-height:260px;overflow-y:auto">
               ${chars.map(c=>`<label style="display:flex;align-items:center;gap:8px;font-size:13px">
                 <span style="flex:0 0 70px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(c)}</span>
-                <select data-ai-map="${esc(c)}" style="flex:1 1 auto;min-width:0;height:36px;padding:0 8px;border-radius:10px;border:1px solid #E6E9F3;background:#F8F9FD;font-family:inherit;font-size:13px;color:#20294D">
+                <select data-ai-map="${esc(c)}" style="flex:1 1 auto;min-width:0;height:36px;padding:0 8px;border-radius:var(--r-ctl);border:1px solid var(--rule);background:var(--field);font-family:inherit;font-size:13px;color:var(--ink)">
                   <option value="">미지정</option>
                   ${people.map(p=>`<option value="${esc(p[7])}" ${mappings[c]===p[7]?'selected':''}>${esc(p[0])} · ${esc(p[2])}</option>`).join('')}
                 </select>
-              </label>`).join('')||'<p style="margin:0;font-size:13px;color:#64708F">분석이 끝나면 배역이 여기 나옵니다.</p>'}
+              </label>`).join('')||'<p style="margin:0;font-size:13px;color:var(--muted)">분석이 끝나면 배역이 여기 나옵니다.</p>'}
             </div>
           </div>
         </div>
@@ -1291,24 +1233,24 @@ function scriptView(){
     </div>
   </section>
 
-  <div style="display:flex;flex-wrap:wrap;align-items:center;gap:14px;padding:12px 16px;border-radius:18px;background:rgba(255,255,255,0.9);border:1px solid #FFFFFF;box-shadow:0 8px 24px rgba(60,72,140,0.06)">${steps}</div>
+  <div style="display:flex;flex-wrap:wrap;align-items:center;gap:14px;padding:12px 16px;border-radius:var(--r-card);background:var(--card);border:1px solid #FFFFFF;box-shadow:var(--lift)">${steps}</div>
 
-  ${state.aiError?`<div style="padding:12px 16px;border-radius:14px;background:#FFF1F4;color:#A8324F;font-size:13.5px;font-weight:600">${esc(state.aiError)}</div>`:''}
+  ${state.aiError?`<div style="padding:12px 16px;border-radius:var(--r-card);background:var(--rose-card);color:var(--rose-ink);font-size:13.5px;font-weight:600">${esc(state.aiError)}</div>`:''}
 
   <section aria-label="분석 단계" style="${CARD};padding:22px">
     ${panel}
-    <div style="display:flex;justify-content:space-between;gap:10px;margin-top:22px;padding-top:18px;border-top:1px solid #EEF0F6">
+    <div style="display:flex;justify-content:space-between;gap:10px;margin-top:22px;padding-top:18px;border-top:1px solid var(--rule)">
       ${navBtn(-1,'← 이전',step>0)}
       ${navBtn(1,'다음 →',step<3&&reach[step+1])}
     </div>
   </section>`;
 }
 
-const SHOOT_STATUS={'예정':['#EAF0FF','#2F4FC2','STBY'],'진행 중':['#FFE9EC','#B02C48','ON AIR'],'완료':['#EEF0F5','#4F5770','WRAP']};
-const SHOOT_TILE={'예정':['linear-gradient(140deg, #E3EAFF, #EDE6FF)','#3F4FD0'],'진행 중':['#FFE9EC','#B02C48'],'완료':['#F0F1F6','#4F5770']};
+const SHOOT_STATUS={'예정':['var(--blue-card)','var(--blue-ink)','STBY'],'진행 중':['var(--rose-card)','var(--rose-ink)','ON AIR'],'완료':['var(--field)','var(--muted)','WRAP']};
+const SHOOT_TILE={'예정':['var(--blue-card)','var(--blue-ink)'],'진행 중':['var(--rose-card)','var(--rose-ink)'],'완료':['var(--field)','var(--muted)']};
 
 // 촬영과 방송국 일정(회의·행사)은 같은 shoots 컬렉션에 category 로만 구분해 둔다.
-const CATEGORIES=[['촬영','#E3EAFF','#2F4FC2'],['방송제','#FFF1CC','#6E5208'],['마디영상','#FDECEF','#A8324F'],['회의','#EDE6FF','#4A3FB0'],['행사','#FFE9DF','#8A3A1A'],['기타','#E3F7EE','#17603F']];
+const CATEGORIES=[['촬영','var(--blue-card)','var(--blue-ink)'],['방송제','var(--amber-card)','var(--amber-ink)'],['마디영상','var(--rose-card)','var(--rose-ink)'],['회의','var(--lav-card)','var(--lav-ink)'],['행사','var(--peach-card)','var(--peach-ink)'],['기타','var(--mint-card)','var(--mint-ink)']];
 // 구분이 비어 있거나 목록에 없는 옛 일정은 '기타'로 본다. 자리 번호로 찾으면 목록이 늘 때 깨진다.
 function projectOptions(selected=''){
   const list=Object.entries(projects).sort((a,b)=>(a[1].createdAt||0)-(b[1].createdAt||0));
@@ -1337,56 +1279,56 @@ function shootsCalendar(items){
     const iso=`${year}-${pad2(month+1)}-${pad2(day)}`;
     const dayItems=items.filter(s=>s.date===iso).sort((a,b)=>a.startH-b.startH);
     const isToday=iso===today, on=state.shootDay===iso;
-    cells+=`<button data-shoot-day="${iso}" aria-pressed="${on}" aria-label="${month+1}월 ${day}일, 일정 ${dayItems.length}건" style="min-height:104px;padding:7px;border:0;border-radius:14px;background:${on?'#FFFFFF':(isToday?'rgba(82,127,240,0.08)':'#F7F8FC')};box-shadow:${on?'inset 0 0 0 2px #6B6AE6, 0 10px 22px rgba(90,95,224,0.18)':'none'};font-family:inherit;text-align:left;display:flex;flex-direction:column;gap:3px;cursor:pointer">
-      <span class="hn-num" style="align-self:flex-start;min-width:24px;height:24px;padding:0 4px;box-sizing:border-box;border-radius:8px;background:${isToday?'linear-gradient(135deg, #4C6FE6, #7C5FD8)':'transparent'};color:${isToday?'#FFFFFF':(i%7===0?'#A8324F':'#20294D')};display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:800">${day}</span>
+    cells+=`<button data-shoot-day="${iso}" aria-pressed="${on}" aria-label="${month+1}월 ${day}일, 일정 ${dayItems.length}건" style="min-height:104px;padding:7px;border:0;border-radius:var(--r-card);background:${on?'#FFFFFF':(isToday?'var(--blue-wash)':'var(--field)')};box-shadow:${on?'inset 0 0 0 2px var(--lav-ink), 0 10px 22px rgba(90,95,224,0.18)':'none'};font-family:inherit;text-align:left;display:flex;flex-direction:column;gap:3px;cursor:pointer">
+      <span class="hn-num" style="align-self:flex-start;min-width:24px;height:24px;padding:0 4px;box-sizing:border-box;border-radius:8px;background:${isToday?'var(--sel)':'transparent'};color:${isToday?'#FFFFFF':(i%7===0?'var(--rose-ink)':'var(--ink)')};display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:800">${day}</span>
       ${dayItems.slice(0,3).map(s=>{const [,bg,fg]=categoryColor(s.type);
         return `<span title="${esc(s.time)} ${esc(s.title)}" style="display:block;width:100%;box-sizing:border-box;padding:3px 7px;border-radius:7px;background:${bg};color:${fg};font-size:11.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(hourLabel(s.startH))} ${esc(s.title)}</span>`;}).join('')}
-      ${dayItems.length>3?`<span style="padding-left:7px;font-size:11px;color:#64708F">+${dayItems.length-3}건</span>`:''}
+      ${dayItems.length>3?`<span style="padding-left:7px;font-size:11px;color:var(--muted)">+${dayItems.length-3}건</span>`:''}
     </button>`;
   }
 
   const sel=state.shootDay&&items.filter(s=>s.date===state.shootDay).sort((a,b)=>a.startH-b.startH);
   const dayPanel=!state.shootDay?'':`
-    <aside style="flex:1 1 300px;min-width:0;align-self:stretch;padding:16px;border-radius:18px;background:#F8F9FD;border:1px solid #EEF0F7">
+    <aside style="flex:1 1 300px;min-width:0;align-self:stretch;padding:16px;border-radius:var(--r-card);background:var(--field);border:1px solid var(--rule-strong)">
       <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:12px">
-        <span style="flex:0 0 46px;height:50px;border-radius:14px;background:linear-gradient(135deg, #4C6FE6, #7C5FD8);color:#FFFFFF;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.1;box-shadow:0 8px 18px rgba(90,95,224,0.3)"><span style="font-size:11px;font-weight:700">${dowOf(state.shootDay)}</span><strong class="hn-num" style="font-size:19px;font-weight:800">${new Date(`${state.shootDay}T00:00:00`).getDate()}</strong></span>
-        <span style="display:flex;flex-direction:column;line-height:1.35"><strong style="font-size:16px;font-weight:800">${monthDay(state.shootDay)} ${dowOf(state.shootDay)}요일</strong><span style="font-size:13px;color:#64708F">일정 ${sel.length}건</span></span>
-        <button data-shoot-day-clear="1" style="margin-left:auto;height:32px;padding:0 10px;border:0;border-radius:8px;background:#F2F4FB;color:#4F5770;font-family:inherit;font-size:12.5px;font-weight:600;cursor:pointer">닫기</button>
+        <span style="flex:0 0 46px;height:50px;border-radius:var(--r-card);background:var(--sel);color:#FFFFFF;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.1;box-shadow:var(--lift)"><span style="font-size:11px;font-weight:700">${dowOf(state.shootDay)}</span><strong class="hn-num" style="font-size:19px;font-weight:800">${new Date(`${state.shootDay}T00:00:00`).getDate()}</strong></span>
+        <span style="display:flex;flex-direction:column;line-height:1.35"><strong style="font-size:16px;font-weight:800">${monthDay(state.shootDay)} ${dowOf(state.shootDay)}요일</strong><span style="font-size:13px;color:var(--muted)">일정 ${sel.length}건</span></span>
+        <button data-shoot-day-clear="1" style="margin-left:auto;height:32px;padding:0 10px;border:0;border-radius:8px;background:var(--field);color:var(--muted);font-family:inherit;font-size:12.5px;font-weight:600;cursor:pointer">닫기</button>
       </div>
       ${sel.length?`<div style="display:flex;flex-direction:column">${sel.map((s,k)=>{const [,bg,fg]=categoryColor(s.type);
         return `<div style="display:flex;gap:12px">
-          <span aria-hidden="true" style="flex:0 0 12px;position:relative;display:flex;justify-content:center"><i style="position:absolute;top:0;bottom:0;width:2px;background:#EAEDF7"></i><i style="position:relative;margin-top:16px;width:10px;height:10px;border-radius:50%;background:${fg};box-shadow:0 0 0 3px #F8F9FD"></i></span>
-          <div data-detail="${esc(s.id)}" style="flex:1 1 auto;min-width:0;margin-bottom:${k===sel.length-1?0:8}px;padding:12px 14px;border-radius:14px;background:${bg};color:#20294D;cursor:pointer;display:flex;flex-direction:column;gap:5px">
+          <span aria-hidden="true" style="flex:0 0 12px;position:relative;display:flex;justify-content:center"><i style="position:absolute;top:0;bottom:0;width:2px;background:var(--field)"></i><i style="position:relative;margin-top:16px;width:10px;height:10px;border-radius:50%;background:${fg};box-shadow:0 0 0 3px var(--field)"></i></span>
+          <div data-detail="${esc(s.id)}" style="flex:1 1 auto;min-width:0;margin-bottom:${k===sel.length-1?0:8}px;padding:12px 14px;border-radius:var(--r-card);background:${bg};color:var(--ink);cursor:pointer;display:flex;flex-direction:column;gap:5px">
             <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
-              <span class="hn-num" style="font-size:12.5px;font-weight:700;color:#4F5770">${esc(s.time)}</span>
+              <span class="hn-num" style="font-size:12.5px;font-weight:700;color:var(--muted)">${esc(s.time)}</span>
               <span style="display:inline-flex;align-items:center;gap:6px">
                 <span style="padding:2px 9px;border-radius:99px;background:#FFFFFF;color:${fg};font-size:11.5px;font-weight:800">${esc(s.type)}</span>
-                <button type="button" data-edit-open="shoot|${esc(s.id)}" aria-label="${esc(s.title)} 수정" title="수정" style="width:28px;height:28px;border:0;border-radius:9px;background:#FFFFFF;color:#3F55D6;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 6px rgba(60,72,140,0.08)">${EDIT_ICON}</button>
+                <button type="button" data-edit-open="shoot|${esc(s.id)}" aria-label="${esc(s.title)} 수정" title="수정" style="width:28px;height:28px;border:0;border-radius:var(--r-ctl);background:#FFFFFF;color:var(--blue-ink);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:var(--lift)">${EDIT_ICON}</button>
               </span>
             </div>
             <strong style="font-size:15px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(s.title)}</strong>
-            <span style="font-size:12.5px;color:#4F5770;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(s.place||'장소 미정')} · ${s.people.length}명</span>
+            <span style="font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(s.place||'장소 미정')} · ${s.people.length}명</span>
           </div>
         </div>`;}).join('')}</div>`
-        :`<div style="padding:24px 16px;border-radius:16px;background:linear-gradient(120deg, #F3F5FF, #F6F2FF);text-align:center;color:#4F5770;font-size:14px">이 날은 등록된 일정이 없어요.</div>`}
+        :`<div style="padding:24px 16px;border-radius:var(--r-card);background:var(--field);text-align:center;color:var(--muted);font-size:14px">이 날은 등록된 일정이 없어요.</div>`}
     </aside>`;
 
   return `<section aria-label="${year}년 ${month+1}월 일정" style="${CARD};padding:18px">
     <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px">
       <div style="display:flex;align-items:center;gap:8px">
-        <button data-shoot-month="-1" aria-label="이전 달" style="width:36px;height:36px;border-radius:10px;border:0;background:#F2F4FB;cursor:pointer;color:#3A4466">‹</button>
+        <button data-shoot-month="-1" aria-label="이전 달" style="width:36px;height:36px;border-radius:var(--r-ctl);border:0;background:var(--field);cursor:pointer;color:var(--ink-2)">‹</button>
         <h2 style="margin:0 4px;font-size:19px;font-weight:800">${year}년 ${month+1}월</h2>
-        <button data-shoot-month="1" aria-label="다음 달" style="width:36px;height:36px;border-radius:10px;border:0;background:#F2F4FB;cursor:pointer;color:#3A4466">›</button>
-        <button data-shoot-month="0" style="height:36px;padding:0 12px;border-radius:10px;border:0;background:#EEF2FF;color:#3F55D6;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer">오늘</button>
+        <button data-shoot-month="1" aria-label="다음 달" style="width:36px;height:36px;border-radius:var(--r-ctl);border:0;background:var(--field);cursor:pointer;color:var(--ink-2)">›</button>
+        <button data-shoot-month="0" style="height:36px;padding:0 12px;border-radius:var(--r-ctl);border:0;background:var(--blue-card);color:var(--blue-ink);font-family:inherit;font-size:13px;font-weight:700;cursor:pointer">오늘</button>
       </div>
-      <div style="display:flex;flex-wrap:wrap;gap:12px;font-size:12px;font-weight:600;color:#4F5770">
+      <div style="display:flex;flex-wrap:wrap;gap:12px;font-size:12px;font-weight:600;color:var(--muted)">
         ${(CATEGORIES.filter(c=>schedules.some(s=>s.type===c[0])).length?CATEGORIES.filter(c=>schedules.some(s=>s.type===c[0])):CATEGORIES).map(([label,bg])=>`<span style="display:inline-flex;align-items:center;gap:6px"><i style="width:12px;height:12px;border-radius:4px;background:${bg}"></i>${label}</span>`).join('')}
       </div>
     </div>
     <div style="display:flex;flex-wrap:wrap;align-items:flex-start;gap:16px">
       <div style="flex:999 1 620px;min-width:0;overflow-x:auto">
         <div style="min-width:620px;padding:2px;display:grid;grid-template-columns:repeat(7, minmax(0, 1fr));gap:6px">
-          ${DOW.map((d,i)=>`<span style="padding:4px 8px 2px;font-size:12.5px;font-weight:700;color:${i===0?'#A8324F':'#64708F'}">${d}</span>`).join('')}
+          ${DOW.map((d,i)=>`<span style="padding:4px 8px 2px;font-size:12.5px;font-weight:700;color:${i===0?'var(--rose-ink)':'var(--muted)'}">${d}</span>`).join('')}
           ${cells}
         </div>
       </div>
@@ -1396,29 +1338,29 @@ function shootsCalendar(items){
 }
 
 function shootRows(items){
-  if(!items.length) return `<tr><td colspan="7"><div style="padding:40px 20px;text-align:center;color:#64708F">이 조건에 맞는 촬영 일정이 없어요.</div></td></tr>`;
+  if(!items.length) return `<tr><td colspan="7"><div style="padding:40px 20px;text-align:center;color:var(--muted)">이 조건에 맞는 촬영 일정이 없어요.</div></td></tr>`;
   return items.map(s=>{
     const [stBg,stFg,code]=SHOOT_STATUS[s.status]||SHOOT_STATUS['완료'];
     const [tileBg,tileFg]=SHOOT_TILE[s.status]||SHOOT_TILE['완료'];
     const d=new Date(`${s.date}T00:00:00`);
-    return `<tr style="background:${s.status==='완료'?'#FAFBFD':'#FFFFFF'}">
-      <td style="padding:8px 14px;border-radius:14px 0 0 14px">
+    return `<tr style="background:${s.status==='완료'?'var(--field)':'#FFFFFF'}">
+      <td style="padding:8px 14px;border-radius:var(--r-card) 0 0 14px">
         <span style="display:flex;align-items:center;gap:10px">
-          <span style="width:42px;height:44px;border-radius:12px;background:${tileBg};color:${tileFg};display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.1"><span style="font-size:11px;font-weight:700">${dowOf(s.date)}</span><strong class="hn-num" style="font-size:17px;font-weight:800">${d.getDate()}</strong></span>
-          <span style="font-size:12.5px;color:#64708F">${d.getMonth()+1}월</span>
+          <span style="width:42px;height:44px;border-radius:var(--r-ctl);background:${tileBg};color:${tileFg};display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.1"><span style="font-size:11px;font-weight:700">${dowOf(s.date)}</span><strong class="hn-num" style="font-size:17px;font-weight:800">${d.getDate()}</strong></span>
+          <span style="font-size:12.5px;color:var(--muted)">${d.getMonth()+1}월</span>
         </span>
       </td>
       <td class="hn-num" style="padding:8px 12px;font-size:13px;font-weight:600;white-space:nowrap">${esc(s.time)}</td>
-      <td style="padding:8px 12px"><button data-detail="${esc(s.id)}" style="border:0;background:transparent;padding:4px 0;color:#20294D;font-family:inherit;font-size:15px;font-weight:700;text-align:left;cursor:pointer">${esc(s.title)}</button></td>
-      <td style="padding:8px 12px;color:${s.place?'#20294D':'#64708F'}">${esc(s.place||'장소 미정')}</td>
+      <td style="padding:8px 12px"><button data-detail="${esc(s.id)}" style="border:0;background:transparent;padding:4px 0;color:var(--ink);font-family:inherit;font-size:15px;font-weight:700;text-align:left;cursor:pointer">${esc(s.title)}</button></td>
+      <td style="padding:8px 12px;color:${s.place?'var(--ink)':'var(--muted)'}">${esc(s.place||'장소 미정')}</td>
       <td style="padding:8px 12px">
-        <span style="display:flex;align-items:center">${s.people.slice(0,3).map((n,k)=>`<span aria-hidden="true" style="width:26px;height:26px;margin-right:-7px;border-radius:9px;border:2px solid #FFFFFF;background:${AV[k%4][0]};color:${AV[k%4][1]};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800">${esc(initial(n))}</span>`).join('')}<span style="font-size:13px;color:#64708F;margin-left:14px">${s.people.length}명</span></span>
+        <span style="display:flex;align-items:center">${s.people.slice(0,3).map((n,k)=>`<span aria-hidden="true" style="width:26px;height:26px;margin-right:-7px;border-radius:var(--r-ctl);border:2px solid #FFFFFF;background:${AV[k%4][0]};color:${AV[k%4][1]};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800">${esc(initial(n))}</span>`).join('')}<span style="font-size:13px;color:var(--muted);margin-left:14px">${s.people.length}명</span></span>
       </td>
       <td style="padding:8px 12px"><span style="display:inline-flex;align-items:center;gap:6px;padding:3px 10px 3px 4px;border-radius:99px;background:${stBg};color:${stFg};font-size:12px;font-weight:700;white-space:nowrap"><span class="hn-num" style="padding:0 5px;border-radius:99px;background:#FFFFFF;font-size:10px;font-weight:800;letter-spacing:0.05em">${code}</span>${s.status}</span></td>
       <td style="padding:8px 14px;text-align:right;white-space:nowrap;border-radius:0 14px 14px 0">
         <span style="display:inline-flex;align-items:center;gap:6px">
-          <button type="button" data-edit-open="shoot|${esc(s.id)}" aria-label="${esc(s.title)} 수정" title="수정" style="width:34px;height:34px;border-radius:10px;border:0;background:#EEF2FF;color:#3F55D6;display:inline-flex;align-items:center;justify-content:center;cursor:pointer">${EDIT_ICON}</button>
-          <button type="button" data-detail="${esc(s.id)}" aria-label="${esc(s.title)} 상세 보기" title="상세 보기" style="width:34px;height:34px;border-radius:10px;border:0;background:#F2F4FB;color:#3A4466;display:inline-flex;align-items:center;justify-content:center;cursor:pointer"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button>
+          <button type="button" data-edit-open="shoot|${esc(s.id)}" aria-label="${esc(s.title)} 수정" title="수정" style="width:34px;height:34px;border-radius:var(--r-ctl);border:0;background:var(--blue-card);color:var(--blue-ink);display:inline-flex;align-items:center;justify-content:center;cursor:pointer">${EDIT_ICON}</button>
+          <button type="button" data-detail="${esc(s.id)}" aria-label="${esc(s.title)} 상세 보기" title="상세 보기" style="width:34px;height:34px;border-radius:var(--r-ctl);border:0;background:var(--field);color:var(--ink-2);display:inline-flex;align-items:center;justify-content:center;cursor:pointer"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button>
         </span>
       </td>
     </tr>`;
@@ -1430,14 +1372,14 @@ function shootsView() {
   const count=s=>schedules.filter(x=>x.status===s).length;
   const range=schedules.length?`${monthDay(schedules[0].date)} – ${monthDay(schedules[schedules.length-1].date)}`:'등록된 일정 없음';
   const heroStats=[['전체',schedules.length],['예정',count('예정')],['완료',count('완료')]]
-    .map(([label,n])=>`<span style="display:flex;flex-direction:column;min-width:84px;padding:8px 14px;border-radius:14px;background:var(--a-surface);border:1px solid var(--a-rule);line-height:1.3"><span style="font-size:12px;color:var(--a-muted)">${label}</span><strong class="hn-num" style="font-size:20px;font-weight:800">${n}<span style="font-size:12px;font-weight:600;color:var(--a-muted)"> 건</span></strong></span>`).join('');
+    .map(([label,n])=>`<span style="display:flex;flex-direction:column;min-width:84px;padding:8px 14px;border-radius:var(--r-card);background:var(--a-surface);border:1px solid var(--a-rule);line-height:1.3"><span style="font-size:12px;color:var(--a-muted)">${label}</span><strong class="hn-num" style="font-size:20px;font-weight:800">${n}<span style="font-size:12px;font-weight:600;color:var(--a-muted)"> 건</span></strong></span>`).join('');
   const filters=[['all','전체',schedules.length],['예정','예정',count('예정')],['진행 중','진행 중',count('진행 중')],['완료','완료',count('완료')]]
     .map(([k,label,n])=>{ const on=state.shootFilter===k;
-      return `<button role="tab" aria-selected="${on}" data-shoot-filter="${k}" style="height:34px;padding:0 12px;border-radius:9px;border:0;background:${on?'#FFFFFF':'transparent'};color:${on?'#3F4FD0':'#64708F'};box-shadow:${on?'0 2px 8px rgba(60,72,140,0.12)':'none'};font-family:inherit;font-size:13px;font-weight:700;cursor:pointer">${label} <span class="hn-num" style="opacity:0.8">${n}</span></button>`;}).join('');
+      return `<button role="tab" aria-selected="${on}" data-shoot-filter="${k}" style="height:34px;padding:0 12px;border-radius:var(--r-ctl);border:0;background:${on?'#FFFFFF':'transparent'};color:${on?'var(--blue-ink)':'var(--muted)'};box-shadow:${on?'0 2px 8px rgba(60,72,140,0.12)':'none'};font-family:inherit;font-size:13px;font-weight:700;cursor:pointer">${label} <span class="hn-num" style="opacity:0.8">${n}</span></button>`;}).join('');
   const usedCats=CATEGORIES.map(c=>c[0]).filter(c=>schedules.some(s=>s.type===c));
   const catTabs=[['all','전체'],...usedCats.map(c=>[c,c])].map(([k,label])=>{ const on=state.shootCategory===k;
     const n=k==='all'?schedules.length:schedules.filter(s=>s.type===k).length;
-    return `<button role="tab" aria-selected="${on}" data-shoot-category="${esc(k)}" style="height:34px;padding:0 12px;border-radius:9px;border:0;background:${on?'#FFFFFF':'transparent'};color:${on?'#3F4FD0':'#64708F'};box-shadow:${on?'0 2px 8px rgba(60,72,140,0.12)':'none'};font-family:inherit;font-size:13px;font-weight:700;cursor:pointer">${esc(label)} <span class="hn-num" style="opacity:0.8">${n}</span></button>`;}).join('');
+    return `<button role="tab" aria-selected="${on}" data-shoot-category="${esc(k)}" style="height:34px;padding:0 12px;border-radius:var(--r-ctl);border:0;background:${on?'#FFFFFF':'transparent'};color:${on?'var(--blue-ink)':'var(--muted)'};box-shadow:${on?'0 2px 8px rgba(60,72,140,0.12)':'none'};font-family:inherit;font-size:13px;font-weight:700;cursor:pointer">${esc(label)} <span class="hn-num" style="opacity:0.8">${n}</span></button>`;}).join('');
 
   return `
   <section class="a-hero a-flat" style="display:flex;flex-wrap:wrap;gap:16px 24px;align-items:flex-end;justify-content:space-between">
@@ -1449,27 +1391,27 @@ function shootsView() {
     </div>
     <div style="position:relative;display:flex;flex-wrap:wrap;align-items:center;gap:10px">
       ${heroStats}
-      <button data-action="new-shoot" style="display:inline-flex;align-items:center;gap:6px;height:44px;padding:0 18px;border-radius:12px;border:0;background:var(--a-action);color:#FFFFFF;font-family:inherit;font-size:15px;font-weight:500;cursor:pointer;border-radius:980px"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>일정 등록</button>
+      <button data-action="new-shoot" style="display:inline-flex;align-items:center;gap:6px;height:44px;padding:0 18px;border-radius:var(--r-ctl);border:0;background:var(--a-action);color:#FFFFFF;font-family:inherit;font-size:15px;font-weight:500;cursor:pointer"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>일정 등록</button>
     </div>
   </section>
 
-  <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:10px;border-radius:18px;background:rgba(255,255,255,0.9);border:1px solid #FFFFFF;box-shadow:0 8px 24px rgba(60,72,140,0.06)">
-    <label style="flex:1 1 260px;max-width:380px;display:flex;align-items:center;gap:8px;height:42px;padding:0 12px;border-radius:12px;background:#F4F6FB;color:#64708F">
+  <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:10px;border-radius:var(--r-card);background:var(--card);border:1px solid #FFFFFF;box-shadow:var(--lift)">
+    <label style="flex:1 1 260px;max-width:380px;display:flex;align-items:center;gap:8px;height:42px;padding:0 12px;border-radius:var(--r-ctl);background:var(--field);color:var(--muted)">
       <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
-      <input id="shoot-search" type="search" value="${esc(state.shootQuery||'')}" placeholder="제목, 장소, 구분, 참여자 검색" aria-label="일정 검색" style="flex:1 1 auto;min-width:0;border:0;outline:none;background:transparent;font-family:inherit;font-size:14px;color:#20294D">
+      <input id="shoot-search" type="search" value="${esc(state.shootQuery||'')}" placeholder="제목, 장소, 구분, 참여자 검색" aria-label="일정 검색" style="flex:1 1 auto;min-width:0;border:0;outline:none;background:transparent;font-family:inherit;font-size:14px;color:var(--ink)">
     </label>
-    <div role="tablist" aria-label="구분 필터" style="display:flex;gap:4px;padding:4px;border-radius:12px;background:#F4F6FB">${catTabs}</div>
-    <div role="tablist" aria-label="상태 필터" style="display:flex;gap:4px;padding:4px;border-radius:12px;background:#F4F6FB">${filters}</div>
-    <div role="tablist" aria-label="보기" style="margin-left:auto;display:flex;gap:4px;padding:4px;border-radius:12px;background:#F4F6FB">
+    <div role="tablist" aria-label="구분 필터" style="display:flex;gap:4px;padding:4px;border-radius:var(--r-ctl);background:var(--field)">${catTabs}</div>
+    <div role="tablist" aria-label="상태 필터" style="display:flex;gap:4px;padding:4px;border-radius:var(--r-ctl);background:var(--field)">${filters}</div>
+    <div role="tablist" aria-label="보기" style="margin-left:auto;display:flex;gap:4px;padding:4px;border-radius:var(--r-ctl);background:var(--field)">
       ${[['calendar','캘린더'],['list','목록']].map(([k,label])=>{const on=state.shootsMode===k;
-        return `<button role="tab" aria-selected="${on}" data-shoots-mode="${k}" style="height:34px;padding:0 14px;border-radius:9px;border:0;background:${on?'#FFFFFF':'transparent'};color:${on?'#3F4FD0':'#64708F'};box-shadow:${on?'0 2px 8px rgba(60,72,140,0.12)':'none'};font-family:inherit;font-size:13px;font-weight:700;cursor:pointer">${label}</button>`;}).join('')}
+        return `<button role="tab" aria-selected="${on}" data-shoots-mode="${k}" style="height:34px;padding:0 14px;border-radius:var(--r-ctl);border:0;background:${on?'#FFFFFF':'transparent'};color:${on?'var(--blue-ink)':'var(--muted)'};box-shadow:${on?'0 2px 8px rgba(60,72,140,0.12)':'none'};font-family:inherit;font-size:13px;font-weight:700;cursor:pointer">${label}</button>`;}).join('')}
     </div>
   </div>
 
   ${state.shootsMode==='calendar'?shootsCalendar(rows):`
   <section aria-label="일정 목록" style="${CARD};padding:8px;overflow-x:auto">
     <table style="width:100%;min-width:900px;border-collapse:separate;border-spacing:0 4px;font-size:14px">
-      <thead><tr style="color:#64708F;font-size:12.5px;text-align:left">
+      <thead><tr style="color:var(--muted);font-size:12.5px;text-align:left">
         <th scope="col" style="padding:8px 14px;font-weight:700">날짜</th>
         <th scope="col" style="padding:8px 12px;font-weight:700">시간</th>
         <th scope="col" style="padding:8px 12px;font-weight:700">제목</th>
@@ -1485,11 +1427,11 @@ function shootsView() {
 function scheduleDate(s){ return s.date ? new Intl.DateTimeFormat('ko-KR',{month:'long',day:'numeric'}).format(new Date(`${s.date}T00:00:00`)) : `10월 ${18+s.id}일`; }
 
 const PERSONAL_TONE={
-  busy:   ['#EDE6FF','#4A3FB0','linear-gradient(120deg, #F1EDFF, #F6F2FF)'],
-  fixed:  ['#FFE9DF','#8A3A1A','linear-gradient(120deg, #FFF2EC, #FFF6F1)'],
-  free:   ['#E3F7EE','#17603F','linear-gradient(120deg, #EEFAF4, #F3FBF7)'],
-  shoot:  ['#E3EAFF','#2F4FC2','linear-gradient(120deg, #EEF2FF, #F3F5FF)'],
-  radio:  ['#FFF1CC','#6E5208','linear-gradient(120deg, #FFF7E3, #FFFAEF)'],
+  busy:   ['var(--lav-card)','var(--lav-ink)','var(--lav-card)'],
+  fixed:  ['var(--peach-card)','var(--peach-ink)','var(--peach-card)'],
+  free:   ['var(--mint-card)','var(--mint-ink)','var(--mint-card)'],
+  shoot:  ['var(--blue-card)','var(--blue-ink)','var(--blue-card)'],
+  radio:  ['var(--amber-card)','var(--amber-ink)','var(--amber-card)'],
 };
 function rangeLabel(r){ return `${hourLabel(r.start)} – ${hourLabel(r.end)}`; }
 
@@ -1546,8 +1488,8 @@ function personalView(){
     monthCount+=evs.length;
     repeatCount+=evs.filter(e=>e.repeat).length;
     const on=state.personalDay===iso, isToday=iso===today;
-    cells.push(`<button data-personal-day="${iso}" aria-pressed="${on}" aria-label="${month+1}월 ${day}일, 일정 ${evs.length}건" style="min-height:100px;padding:8px;border-radius:14px;border:0;background:${on?'#FFFFFF':'#F7F8FC'};box-shadow:${on?'inset 0 0 0 2px #6B6AE6, 0 10px 22px rgba(90,95,224,0.18)':'none'};font-family:inherit;text-align:left;display:flex;flex-direction:column;gap:4px;cursor:pointer">
-      <span class="hn-num" style="align-self:flex-start;min-width:26px;height:26px;padding:0 4px;box-sizing:border-box;border-radius:9px;background:${isToday?'linear-gradient(135deg, #4C6FE6, #7C5FD8)':'transparent'};color:${isToday?'#FFFFFF':(i%7===0?'#A8324F':'#20294D')};display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800">${day}</span>
+    cells.push(`<button data-personal-day="${iso}" aria-pressed="${on}" aria-label="${month+1}월 ${day}일, 일정 ${evs.length}건" style="min-height:100px;padding:8px;border-radius:var(--r-card);border:0;background:${on?'#FFFFFF':'var(--field)'};box-shadow:${on?'inset 0 0 0 2px var(--lav-ink), 0 10px 22px rgba(90,95,224,0.18)':'none'};font-family:inherit;text-align:left;display:flex;flex-direction:column;gap:4px;cursor:pointer">
+      <span class="hn-num" style="align-self:flex-start;min-width:26px;height:26px;padding:0 4px;box-sizing:border-box;border-radius:var(--r-ctl);background:${isToday?'var(--sel)':'transparent'};color:${isToday?'#FFFFFF':(i%7===0?'var(--rose-ink)':'var(--ink)')};display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800">${day}</span>
       ${evs.slice(0,2).map(e=>{const [bg,fg]=PERSONAL_TONE[e.kind];return `<span style="display:block;padding:3px 7px;border-radius:7px;background:${bg};color:${fg};font-size:11.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(e.time.split(' – ')[0])} ${esc(e.title)}</span>`;}).join('')}
     </button>`);
   }
@@ -1559,40 +1501,40 @@ function personalView(){
   const KIND_LABEL={fixed:'수업',busy:'참여 불가',free:'참여 가능',shoot:'촬영',radio:'라디오'};
   const eventCards=selEvents.map(e=>{ const [,fg,cardBg]=PERSONAL_TONE[e.kind];
     const editType=e.kind==='fixed'?'class':(e.kind==='busy'||e.kind==='free')?'avail':e.kind==='shoot'?'shoot':'';
-    return `<div style="padding:14px;border-radius:16px;background:${cardBg};display:flex;flex-direction:column;gap:6px">
+    return `<div style="padding:14px;border-radius:var(--r-card);background:${cardBg};display:flex;flex-direction:column;gap:6px">
       <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
         <strong style="font-size:15px;font-weight:800;color:${fg};min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(e.title)}</strong>
         <span style="flex:0 0 auto;display:inline-flex;align-items:center;gap:6px">
-          ${e.repeat?'<span style="padding:3px 9px;border-radius:99px;background:#FFFFFF;color:#4A3FB0;font-size:11.5px;font-weight:700">매주 반복</span>'
+          ${e.repeat?'<span style="padding:3px 9px;border-radius:99px;background:#FFFFFF;color:var(--lav-ink);font-size:11.5px;font-weight:700">매주 반복</span>'
             :`<span style="padding:3px 9px;border-radius:99px;background:#FFFFFF;color:${fg};font-size:11.5px;font-weight:700">${KIND_LABEL[e.kind]}</span>`}
           ${editType?`<button type="button" data-edit-open="${editType}|${esc(e.id||state.personalDay)}" aria-label="${esc(e.title)} 수정" title="수정"
-            style="width:28px;height:28px;border:0;border-radius:9px;background:#FFFFFF;color:#3F55D6;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 6px rgba(60,72,140,0.08)">${EDIT_ICON}</button>`:''}
+            style="width:28px;height:28px;border:0;border-radius:var(--r-ctl);background:#FFFFFF;color:var(--blue-ink);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:var(--lift)">${EDIT_ICON}</button>`:''}
         </span>
       </div>
       <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
-        <span class="hn-num" style="font-size:13px;font-weight:600;color:#4F5770">${esc(e.time)}</span>
-        ${e.kind==='shoot'?`<button type="button" data-detail="${esc(e.id)}" style="height:26px;padding:0 10px;border:0;border-radius:8px;background:#FFFFFF;color:#3F55D6;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer">촬영 상세</button>`:''}
-        ${e.kind==='radio'?`<button type="button" data-goto-radio="1" style="height:26px;padding:0 10px;border:0;border-radius:8px;background:#FFFFFF;color:#6E5208;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer">라디오에서 보기</button>`:''}
+        <span class="hn-num" style="font-size:13px;font-weight:600;color:var(--muted)">${esc(e.time)}</span>
+        ${e.kind==='shoot'?`<button type="button" data-detail="${esc(e.id)}" style="height:26px;padding:0 10px;border:0;border-radius:8px;background:#FFFFFF;color:var(--blue-ink);font-family:inherit;font-size:12px;font-weight:700;cursor:pointer">촬영 상세</button>`:''}
+        ${e.kind==='radio'?`<button type="button" data-goto-radio="1" style="height:26px;padding:0 10px;border:0;border-radius:8px;background:#FFFFFF;color:var(--amber-ink);font-family:inherit;font-size:12px;font-weight:700;cursor:pointer">라디오에서 보기</button>`:''}
       </div>
     </div>`;}).join('')
-    ||`<div style="padding:24px 16px;border-radius:16px;background:linear-gradient(120deg, #F3F5FF, #F6F2FF);text-align:center;color:#4F5770;font-size:14px">이 날은 등록된 일정이 없어요.<br>촬영 참여 가능으로 표시돼요.</div>`;
+    ||`<div style="padding:24px 16px;border-radius:var(--r-card);background:var(--field);text-align:center;color:var(--muted);font-size:14px">이 날은 등록된 일정이 없어요.<br>촬영 참여 가능으로 표시돼요.</div>`;
 
   return `
   <section class="a-hero a-flat" style="display:flex;flex-wrap:wrap;gap:16px 24px;align-items:flex-end;justify-content:space-between">
     ${heroDots()}
     <div style="position:relative;display:flex;flex-direction:column;gap:6px;min-width:0">
       <label style="display:inline-flex;align-items:center;gap:6px;font-size:13.5px;color:var(--a-muted)">
-        <select id="personal-member" aria-label="구성원 선택" style="height:30px;padding:0 8px;border-radius:9px;border:1px solid var(--a-rule);background:var(--a-surface);color:var(--a-ink);font-family:inherit;font-size:13.5px;font-weight:600">
-          ${people.map(p=>`<option value="${esc(p[7])}" ${p[7]===state.personalMemberId?'selected':''} style="color:#20294D">${esc(p[0])} · ${esc(p[2])}</option>`).join('')}
+        <select id="personal-member" aria-label="구성원 선택" style="height:30px;padding:0 8px;border-radius:var(--r-ctl);border:1px solid var(--a-rule);background:var(--a-surface);color:var(--a-ink);font-family:inherit;font-size:13.5px;font-weight:600">
+          ${people.map(p=>`<option value="${esc(p[7])}" ${p[7]===state.personalMemberId?'selected':''} style="color:var(--ink)">${esc(p[0])} · ${esc(p[2])}</option>`).join('')}
         </select>님의 일정
       </label>
       <h1>개인 일정</h1>
       <span style="font-size:14.5px;color:var(--a-muted)">촬영에 참여할 수 없는 시간을 등록하면 주간 일정표의 가능 인원에 바로 반영돼요.</span>
     </div>
     <div style="position:relative;display:flex;flex-wrap:wrap;align-items:center;gap:10px">
-      <span style="display:flex;flex-direction:column;min-width:96px;padding:8px 14px;border-radius:14px;background:var(--a-surface);border:1px solid var(--a-rule);line-height:1.3"><span style="font-size:12px;color:var(--a-muted)">이번 달 일정</span><strong class="hn-num" style="font-size:20px;font-weight:800">${monthCount}<span style="font-size:12px;font-weight:600;color:var(--a-muted)"> 건</span></strong></span>
-      <span style="display:flex;flex-direction:column;min-width:96px;padding:8px 14px;border-radius:14px;background:var(--a-surface);border:1px solid var(--a-rule);line-height:1.3"><span style="font-size:12px;color:var(--a-muted)">수업(매주)</span><strong class="hn-num" style="font-size:20px;font-weight:800">${repeatCount}<span style="font-size:12px;font-weight:600;color:var(--a-muted)"> 개</span></strong></span>
-      <button data-action="new-personal" style="display:inline-flex;align-items:center;gap:6px;height:44px;padding:0 18px;border-radius:12px;border:0;background:var(--a-action);color:#FFFFFF;font-family:inherit;font-size:15px;font-weight:500;cursor:pointer;border-radius:980px"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>일정 추가</button>
+      <span style="display:flex;flex-direction:column;min-width:96px;padding:8px 14px;border-radius:var(--r-card);background:var(--a-surface);border:1px solid var(--a-rule);line-height:1.3"><span style="font-size:12px;color:var(--a-muted)">이번 달 일정</span><strong class="hn-num" style="font-size:20px;font-weight:800">${monthCount}<span style="font-size:12px;font-weight:600;color:var(--a-muted)"> 건</span></strong></span>
+      <span style="display:flex;flex-direction:column;min-width:96px;padding:8px 14px;border-radius:var(--r-card);background:var(--a-surface);border:1px solid var(--a-rule);line-height:1.3"><span style="font-size:12px;color:var(--a-muted)">수업(매주)</span><strong class="hn-num" style="font-size:20px;font-weight:800">${repeatCount}<span style="font-size:12px;font-weight:600;color:var(--a-muted)"> 개</span></strong></span>
+      <button data-action="new-personal" style="display:inline-flex;align-items:center;gap:6px;height:44px;padding:0 18px;border-radius:var(--r-ctl);border:0;background:var(--a-action);color:#FFFFFF;font-family:inherit;font-size:15px;font-weight:500;cursor:pointer"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>일정 추가</button>
     </div>
   </section>
 
@@ -1600,21 +1542,21 @@ function personalView(){
     <section aria-label="${year}년 ${month+1}월 캘린더" style="flex:999 1 660px;min-width:0;${CARD};padding:18px">
       <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px">
         <div style="display:flex;align-items:center;gap:8px">
-          <button data-personal-month="-1" aria-label="이전 달" style="width:36px;height:36px;border-radius:10px;border:0;background:#F2F4FB;cursor:pointer;color:#3A4466">‹</button>
+          <button data-personal-month="-1" aria-label="이전 달" style="width:36px;height:36px;border-radius:var(--r-ctl);border:0;background:var(--field);cursor:pointer;color:var(--ink-2)">‹</button>
           <h2 style="margin:0 4px;font-size:19px;font-weight:800">${year}년 ${month+1}월</h2>
-          <button data-personal-month="1" aria-label="다음 달" style="width:36px;height:36px;border-radius:10px;border:0;background:#F2F4FB;cursor:pointer;color:#3A4466">›</button>
-          <button data-personal-month="0" style="height:36px;padding:0 12px;border-radius:10px;border:0;background:#EEF2FF;color:#3F55D6;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer">오늘</button>
+          <button data-personal-month="1" aria-label="다음 달" style="width:36px;height:36px;border-radius:var(--r-ctl);border:0;background:var(--field);cursor:pointer;color:var(--ink-2)">›</button>
+          <button data-personal-month="0" style="height:36px;padding:0 12px;border-radius:var(--r-ctl);border:0;background:var(--blue-card);color:var(--blue-ink);font-family:inherit;font-size:13px;font-weight:700;cursor:pointer">오늘</button>
         </div>
-        <div style="display:flex;flex-wrap:wrap;gap:12px;font-size:12px;font-weight:600;color:#4F5770">
-          <span style="display:inline-flex;align-items:center;gap:6px"><i style="width:12px;height:12px;border-radius:4px;background:#FFE9DF"></i>수업 시간표</span>
-          <span style="display:inline-flex;align-items:center;gap:6px"><i style="width:12px;height:12px;border-radius:4px;background:#EDE6FF"></i>참여 불가</span>
-          <span style="display:inline-flex;align-items:center;gap:6px"><i style="width:12px;height:12px;border-radius:4px;background:#E3EAFF"></i>촬영</span>
-          <span style="display:inline-flex;align-items:center;gap:6px"><i style="width:12px;height:12px;border-radius:4px;background:#FFF1CC"></i>라디오</span>
+        <div style="display:flex;flex-wrap:wrap;gap:12px;font-size:12px;font-weight:600;color:var(--muted)">
+          <span style="display:inline-flex;align-items:center;gap:6px"><i style="width:12px;height:12px;border-radius:4px;background:var(--peach-card)"></i>수업 시간표</span>
+          <span style="display:inline-flex;align-items:center;gap:6px"><i style="width:12px;height:12px;border-radius:4px;background:var(--lav-card)"></i>참여 불가</span>
+          <span style="display:inline-flex;align-items:center;gap:6px"><i style="width:12px;height:12px;border-radius:4px;background:var(--blue-card)"></i>촬영</span>
+          <span style="display:inline-flex;align-items:center;gap:6px"><i style="width:12px;height:12px;border-radius:4px;background:var(--amber-card)"></i>라디오</span>
         </div>
       </div>
       <div style="overflow-x:auto">
         <div style="min-width:640px;padding:2px;display:grid;grid-template-columns:repeat(7, minmax(0, 1fr));gap:6px">
-          ${DOW.map((d,i)=>`<span style="padding:4px 8px 2px;font-size:12.5px;font-weight:700;color:${i===0?'#A8324F':'#64708F'}">${d}</span>`).join('')}
+          ${DOW.map((d,i)=>`<span style="padding:4px 8px 2px;font-size:12.5px;font-weight:700;color:${i===0?'var(--rose-ink)':'var(--muted)'}">${d}</span>`).join('')}
           ${cells.join('')}
         </div>
       </div>
@@ -1622,19 +1564,19 @@ function personalView(){
 
     <aside aria-label="선택한 날짜" style="flex:1 1 320px;min-width:0;${CARD};display:flex;flex-direction:column">
       <div style="padding:18px 18px 12px;display:flex;align-items:center;gap:12px">
-        <span style="flex:0 0 50px;height:54px;border-radius:14px;background:linear-gradient(135deg, #4C6FE6, #7C5FD8);color:#FFFFFF;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.1;box-shadow:0 8px 18px rgba(90,95,224,0.3)"><span style="font-size:11.5px;font-weight:700">${dowOf(state.personalDay)}</span><strong class="hn-num" style="font-size:20px;font-weight:800">${selDate.getDate()}</strong></span>
-        <span style="display:flex;flex-direction:column;line-height:1.35"><h2 style="margin:0;font-size:17px;font-weight:800">${selDate.getMonth()+1}월 ${selDate.getDate()}일 ${dowOf(state.personalDay)}요일</h2><span style="font-size:13px;color:#64708F">${esc(me?.[0]||'구성원')} · 일정 ${selEvents.length}건</span></span>
+        <span style="flex:0 0 50px;height:54px;border-radius:var(--r-card);background:var(--sel);color:#FFFFFF;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.1;box-shadow:var(--lift)"><span style="font-size:11.5px;font-weight:700">${dowOf(state.personalDay)}</span><strong class="hn-num" style="font-size:20px;font-weight:800">${selDate.getDate()}</strong></span>
+        <span style="display:flex;flex-direction:column;line-height:1.35"><h2 style="margin:0;font-size:17px;font-weight:800">${selDate.getMonth()+1}월 ${selDate.getDate()}일 ${dowOf(state.personalDay)}요일</h2><span style="font-size:13px;color:var(--muted)">${esc(me?.[0]||'구성원')} · 일정 ${selEvents.length}건</span></span>
       </div>
       <div style="padding:0 18px 18px;display:flex;flex-direction:column;gap:10px">
         ${eventCards}
-        <button data-personal-add="1" style="height:44px;border-radius:12px;border:1px dashed #B5BEEA;background:transparent;color:#3F55D6;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer">+ 이 날짜에 일정 추가</button>
-        <div style="margin-top:10px;padding-top:16px;border-top:1px solid #EEF0F6;display:flex;flex-direction:column;gap:8px">
+        <button data-personal-add="1" style="height:44px;border-radius:var(--r-ctl);border:1px dashed var(--rule-strong);background:transparent;color:var(--blue-ink);font-family:inherit;font-size:14px;font-weight:700;cursor:pointer">+ 이 날짜에 일정 추가</button>
+        <div style="margin-top:10px;padding-top:16px;border-top:1px solid var(--rule);display:flex;flex-direction:column;gap:8px">
           <span style="font-size:13px;font-weight:800">참여하는 촬영</span>
-          ${myShoots.map(s=>`<div data-detail="${esc(s.id)}" style="display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:14px;background:#F7F8FC;color:#20294D;cursor:pointer">
-            <span style="flex:0 0 auto;padding:4px 8px;border-radius:9px;background:#E3EAFF;color:#3F4FD0;font-size:12px;font-weight:800">${monthDay(s.date)} ${dowOf(s.date)}</span>
-            <span style="flex:1 1 auto;min-width:0;display:flex;flex-direction:column;line-height:1.35"><strong style="font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(s.title)}</strong><span class="hn-num" style="font-size:12.5px;color:#64708F">${esc(s.time)}</span></span>
-            <button type="button" data-edit-open="shoot|${esc(s.id)}" aria-label="${esc(s.title)} 수정" title="수정" style="flex:0 0 auto;width:28px;height:28px;border:0;border-radius:9px;background:#FFFFFF;color:#3F55D6;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 6px rgba(60,72,140,0.08)">${EDIT_ICON}</button>
-          </div>`).join('')||'<span style="font-size:13px;color:#64708F">예정된 촬영이 없습니다.</span>'}
+          ${myShoots.map(s=>`<div data-detail="${esc(s.id)}" style="display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:var(--r-card);background:var(--field);color:var(--ink);cursor:pointer">
+            <span style="flex:0 0 auto;padding:4px 8px;border-radius:var(--r-ctl);background:var(--blue-card);color:var(--blue-ink);font-size:12px;font-weight:800">${monthDay(s.date)} ${dowOf(s.date)}</span>
+            <span style="flex:1 1 auto;min-width:0;display:flex;flex-direction:column;line-height:1.35"><strong style="font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(s.title)}</strong><span class="hn-num" style="font-size:12.5px;color:var(--muted)">${esc(s.time)}</span></span>
+            <button type="button" data-edit-open="shoot|${esc(s.id)}" aria-label="${esc(s.title)} 수정" title="수정" style="flex:0 0 auto;width:28px;height:28px;border:0;border-radius:var(--r-ctl);background:#FFFFFF;color:var(--blue-ink);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:var(--lift)">${EDIT_ICON}</button>
+          </div>`).join('')||'<span style="font-size:13px;color:var(--muted)">예정된 촬영이 없습니다.</span>'}
         </div>
       </div>
     </aside>
@@ -1663,7 +1605,7 @@ function editPickCard(){
         <label class="field"><span>시작 *</span><input name="start" type="time" required value="${esc(start)}"></label>
         <label class="field"><span>종료 *</span><input name="end" type="time" required value="${esc(end)}"></label>
       </div>
-      <small style="color:#64708F;font-size:12.5px">매주 같은 요일·시간에 반복됩니다.</small>`;
+      <small style="color:var(--muted);font-size:12.5px">매주 같은 요일·시간에 반복됩니다.</small>`;
   }else if(pick.kind==='avail'){
     const iso=pick.iso||pick.id||state.personalDay;
     const cur=availabilityRows.find(r=>r.memberId===pick.memberId&&r.id===iso)?.data||{};
@@ -1712,7 +1654,7 @@ function editPickCard(){
             <input type="checkbox" name="cast" value="${esc(p[7])}" ${castSet.has(p[7])?'checked':''} style="flex:0 0 auto;width:16px;height:16px;min-width:16px;margin:0">
             <span style="min-width:0;display:flex;flex-direction:column;line-height:1.3">
               <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(p[0])}</span>
-              <small style="font-weight:600;color:#64708F;white-space:nowrap">${esc(p[2])}</small>
+              <small style="font-weight:600;color:var(--muted);white-space:nowrap">${esc(p[2])}</small>
             </span>
           </label>`).join('')}
         </div>
@@ -1732,7 +1674,7 @@ function editPickCard(){
             <input type="checkbox" name="crew" value="${esc(p[7])}" ${ids.has(p[7])?'checked':''} style="flex:0 0 auto;width:16px;height:16px;min-width:16px;margin:0">
             <span style="min-width:0;display:flex;flex-direction:column;line-height:1.3">
               <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(p[0])}</span>
-              <small style="font-weight:600;color:#64708F;white-space:nowrap">${esc(p[2])}</small>
+              <small style="font-weight:600;color:var(--muted);white-space:nowrap">${esc(p[2])}</small>
             </span>
           </label>`).join('')}
         </div>
@@ -1744,22 +1686,22 @@ function editPickCard(){
   return `
   <div data-edit-close="backdrop" style="position:fixed;inset:0;z-index:95;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(25,33,60,0.42);backdrop-filter:blur(3px)">
     <section role="dialog" aria-modal="true" aria-label="${esc(title)}"
-      style="width:min(460px, 100%);max-height:88dvh;display:flex;flex-direction:column;border-radius:22px;background:#FFFFFF;box-shadow:0 24px 60px rgba(28,37,67,0.28);overflow:hidden">
-      <header style="display:flex;align-items:center;gap:12px;padding:18px 20px;border-bottom:1px solid #F0F2F9">
+      style="width:min(460px, 100%);max-height:88dvh;display:flex;flex-direction:column;border-radius:var(--r-card);background:#FFFFFF;box-shadow:var(--lift);overflow:hidden">
+      <header style="display:flex;align-items:center;gap:12px;padding:18px 20px;border-bottom:1px solid var(--field)">
         <span style="display:flex;flex-direction:column;gap:2px;flex:1;min-width:0">
-          <strong style="font-size:17px;font-weight:800;color:#20294D">${esc(title)}</strong>
-          <small style="font-size:12.5px;color:#64708F">${esc(sub)}</small>
+          <strong style="font-size:17px;font-weight:800;color:var(--ink)">${esc(title)}</strong>
+          <small style="font-size:12.5px;color:var(--muted)">${esc(sub)}</small>
         </span>
-        <button type="button" data-edit-close="x" aria-label="닫기" style="width:36px;height:36px;border:0;border-radius:11px;background:#F2F4FB;color:#4F5770;font-family:inherit;font-size:16px;cursor:pointer">×</button>
+        <button type="button" data-edit-close="x" aria-label="닫기" style="width:36px;height:36px;border:0;border-radius:var(--r-ctl);background:var(--field);color:var(--muted);font-family:inherit;font-size:16px;cursor:pointer">×</button>
       </header>
       <form id="edit-pick-form" class="form-stack" style="flex:1;min-height:0;overflow-y:auto;padding:18px 20px;gap:14px">
         ${fields}
       </form>
-      <footer style="display:flex;align-items:center;gap:8px;padding:14px 20px;border-top:1px solid #F0F2F9">
-        <button type="button" id="delete-edit-pick" ${pick.kind==='project'&&!pick.id?'hidden':''} style="height:42px;padding:0 16px;border:0;border-radius:12px;background:#FDECEF;color:#A8324F;font-family:inherit;font-size:14px;font-weight:800;cursor:pointer">삭제</button>
+      <footer style="display:flex;align-items:center;gap:8px;padding:14px 20px;border-top:1px solid var(--field)">
+        <button type="button" id="delete-edit-pick" ${pick.kind==='project'&&!pick.id?'hidden':''} style="height:42px;padding:0 16px;border:0;border-radius:var(--r-ctl);background:var(--rose-card);color:var(--rose-ink);font-family:inherit;font-size:14px;font-weight:800;cursor:pointer">삭제</button>
         <span style="margin-right:auto"></span>
-        <button type="button" data-edit-close="cancel" style="height:42px;padding:0 16px;border:1px solid #E8EBF5;border-radius:12px;background:#FFFFFF;color:#4F5770;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer">취소</button>
-        <button type="submit" form="edit-pick-form" id="save-edit-pick" style="height:42px;padding:0 18px;border:0;border-radius:12px;background:linear-gradient(135deg, #416FDE, #6656DA);color:#FFFFFF;font-family:inherit;font-size:14px;font-weight:800;cursor:pointer">수정</button>
+        <button type="button" data-edit-close="cancel" style="height:42px;padding:0 16px;border:1px solid var(--rule);border-radius:var(--r-ctl);background:#FFFFFF;color:var(--muted);font-family:inherit;font-size:14px;font-weight:700;cursor:pointer">취소</button>
+        <button type="submit" form="edit-pick-form" id="save-edit-pick" style="height:42px;padding:0 18px;border:0;border-radius:var(--r-ctl);background:var(--sel);color:#FFFFFF;font-family:inherit;font-size:14px;font-weight:800;cursor:pointer">수정</button>
       </footer>
     </section>
   </div>`;
@@ -1806,7 +1748,7 @@ async function saveEditPick(e){
       await setDoc(ref,{
         name:f.name.value.trim(),memberIds:crew,
         members:crew.map(id=>({id,name:memberById(id)?.[0]||''})),
-        ...(pick.id?{}:{color:'#4C6FE6',createdAt:Date.now()}),
+        ...(pick.id?{}:{color:'var(--blue)',createdAt:Date.now()}),
         updatedAt:serverTimestamp(),
       },{merge:true});
       state.editPick=null; render(); toast(pick.id?'프로젝트를 수정했습니다.':'프로젝트를 만들었습니다.');
@@ -1853,7 +1795,7 @@ const deptRank=name=>{ const i=DEPARTMENT_ORDER.indexOf(name); return i<0?DEPART
 /* 부서 색. 정해진 부서는 순서대로 하나씩 가져가 절대 겹치지 않는다.
    (예전에는 이름 해시로 골라서 아나운서부와 기술부가 같은 색으로 떨어졌다.)
    목록에 없는 부서만 남은 색을 해시로 나눠 쓴다. */
-const DEPT_COLORS=[['#EDE6FF','#4A3FB0'],['#E3EAFF','#2F4FC2'],['#FFE9DF','#8A3A1A'],['#E3F7EE','#17603F'],['#FFF1CC','#6E5208'],['#FDECEF','#A8324F']];
+const DEPT_COLORS=[['var(--lav-card)','var(--lav-ink)'],['var(--blue-card)','var(--blue-ink)'],['var(--peach-card)','var(--peach-ink)'],['var(--mint-card)','var(--mint-ink)'],['var(--amber-card)','var(--amber-ink)'],['var(--rose-card)','var(--rose-ink)']];
 function deptColor(name){
   const i=DEPARTMENT_ORDER.indexOf(name);
   if(i>=0) return DEPT_COLORS[i%DEPT_COLORS.length];
@@ -1861,7 +1803,7 @@ function deptColor(name){
   const rest=DEPT_COLORS.length-DEPARTMENT_ORDER.length;
   return DEPT_COLORS[DEPARTMENT_ORDER.length+(h%Math.max(1,rest))];
 }
-const PERSON_STATUS={'활동 중':['#E3F7EE','#17603F'],'수습':['#FFF1CC','#6E5208'],'휴학':['#EEF0F5','#4F5770']};
+const PERSON_STATUS={'활동 중':['var(--mint-card)','var(--mint-ink)'],'수습':['var(--amber-card)','var(--amber-ink)'],'휴학':['var(--field)','var(--muted)']};
 
 function peopleMatches(p){
   const q=(state.peopleQuery||'').trim().toLowerCase();
@@ -1870,22 +1812,22 @@ function peopleMatches(p){
 }
 
 function peopleRows(items){
-  if(!items.length) return `<tr><td colspan="5"><div style="padding:40px 20px;text-align:center;color:#64708F">조건에 맞는 구성원이 없어요.</div></td></tr>`;
+  if(!items.length) return `<tr><td colspan="5"><div style="padding:40px 20px;text-align:center;color:var(--muted)">조건에 맞는 구성원이 없어요.</div></td></tr>`;
   return items.map(p=>{
     const [dBg,dFg]=deptColor(p[2]);
     const [sBg,sFg]=PERSON_STATUS[p[5]]||PERSON_STATUS['활동 중'];
-    return `<tr style="background:#FAFBFD">
-      <td style="padding:8px 14px;border-radius:14px 0 0 14px">
+    return `<tr style="background:var(--field)">
+      <td style="padding:8px 14px;border-radius:var(--r-card) 0 0 14px">
         <span style="display:flex;align-items:center;gap:10px">
-          <span aria-hidden="true" style="width:36px;height:36px;border-radius:12px;background:${dBg};color:${dFg};display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800">${esc(initial(p[0]))}</span>
+          <span aria-hidden="true" style="width:36px;height:36px;border-radius:var(--r-ctl);background:${dBg};color:${dFg};display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800">${esc(initial(p[0]))}</span>
           <strong style="font-size:14.5px;font-weight:700">${esc(p[0])}</strong>
-          ${/국장|대표|운영/.test(p[3])?'<span style="padding:1px 7px;border-radius:6px;background:linear-gradient(135deg, #4C6FE6, #7C5FD8);color:#FFFFFF;font-size:11px;font-weight:800">운영진</span>':''}
+          ${/국장|대표|운영/.test(p[3])?'<span style="padding:1px 7px;border-radius:6px;background:var(--sel);color:#FFFFFF;font-size:11px;font-weight:800">운영진</span>':''}
         </span>
       </td>
       <td style="padding:8px 12px"><span style="padding:3px 10px;border-radius:8px;background:${dBg};color:${dFg};font-size:12.5px;font-weight:700">${esc(p[2])}</span></td>
       <td style="padding:8px 12px;font-weight:600">${esc(p[3])}</td>
       <td style="padding:8px 12px"><span style="padding:3px 10px;border-radius:99px;background:${sBg};color:${sFg};font-size:12.5px;font-weight:700">${esc(p[5])}</span></td>
-      <td style="padding:8px 14px;text-align:right;border-radius:0 14px 14px 0"><button data-person="${esc(p[7])}" aria-label="${esc(p[0])} 상세 보기" style="height:34px;padding:0 12px;border-radius:10px;border:0;background:#EEF2FF;color:#3F55D6;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer">상세</button></td>
+      <td style="padding:8px 14px;text-align:right;border-radius:0 14px 14px 0"><button data-person="${esc(p[7])}" aria-label="${esc(p[0])} 상세 보기" style="height:34px;padding:0 12px;border-radius:var(--r-ctl);border:0;background:var(--blue-card);color:var(--blue-ink);font-family:inherit;font-size:13px;font-weight:700;cursor:pointer">상세</button></td>
     </tr>`;
   }).join('');
 }
@@ -1895,10 +1837,10 @@ function peopleView(){
   const depts=['전체',...new Set(people.map(p=>p[2]).filter(Boolean))];
   const tabs=depts.map(label=>{ const on=state.peopleDept===label;
     const n=label==='전체'?people.length:people.filter(p=>p[2]===label).length;
-    return `<button role="tab" aria-selected="${on}" data-people-dept="${esc(label)}" style="height:34px;padding:0 12px;border-radius:9px;border:0;background:${on?'#FFFFFF':'transparent'};color:${on?'#3F4FD0':'#64708F'};box-shadow:${on?'0 2px 8px rgba(60,72,140,0.12)':'none'};font-family:inherit;font-size:13px;font-weight:700;cursor:pointer">${esc(label)} <span class="hn-num" style="opacity:0.75">${n}</span></button>`;}).join('');
+    return `<button role="tab" aria-selected="${on}" data-people-dept="${esc(label)}" style="height:34px;padding:0 12px;border-radius:var(--r-ctl);border:0;background:${on?'#FFFFFF':'transparent'};color:${on?'var(--blue-ink)':'var(--muted)'};box-shadow:${on?'0 2px 8px rgba(60,72,140,0.12)':'none'};font-family:inherit;font-size:13px;font-weight:700;cursor:pointer">${esc(label)} <span class="hn-num" style="opacity:0.75">${n}</span></button>`;}).join('');
   const stats=[['전체',people.length],...Object.keys(PERSON_STATUS).map(s=>[s,people.filter(p=>p[5]===s).length])]
     .filter(([,n],i)=>i===0||n)
-    .map(([label,n])=>`<span style="display:flex;flex-direction:column;min-width:84px;padding:8px 14px;border-radius:14px;background:var(--a-surface);border:1px solid var(--a-rule);line-height:1.3"><span style="font-size:12px;color:var(--a-muted)">${label}</span><strong class="hn-num" style="font-size:20px;font-weight:800">${n}<span style="font-size:12px;font-weight:600;color:var(--a-muted)"> 명</span></strong></span>`).join('');
+    .map(([label,n])=>`<span style="display:flex;flex-direction:column;min-width:84px;padding:8px 14px;border-radius:var(--r-card);background:var(--a-surface);border:1px solid var(--a-rule);line-height:1.3"><span style="font-size:12px;color:var(--a-muted)">${label}</span><strong class="hn-num" style="font-size:20px;font-weight:800">${n}<span style="font-size:12px;font-weight:600;color:var(--a-muted)"> 명</span></strong></span>`).join('');
 
   return `
   <section class="a-hero a-flat" style="display:flex;flex-wrap:wrap;gap:16px 24px;align-items:flex-end;justify-content:space-between">
@@ -1910,22 +1852,22 @@ function peopleView(){
     </div>
     <div style="position:relative;display:flex;flex-wrap:wrap;align-items:center;gap:10px">
       ${stats}
-      <button data-action="new-person" style="display:inline-flex;align-items:center;gap:6px;height:44px;padding:0 18px;border-radius:12px;border:0;background:var(--a-action);color:#FFFFFF;font-family:inherit;font-size:15px;font-weight:500;cursor:pointer;border-radius:980px"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>구성원 등록</button>
+      <button data-action="new-person" style="display:inline-flex;align-items:center;gap:6px;height:44px;padding:0 18px;border-radius:var(--r-ctl);border:0;background:var(--a-action);color:#FFFFFF;font-family:inherit;font-size:15px;font-weight:500;cursor:pointer"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>구성원 등록</button>
     </div>
   </section>
 
-  <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:10px;border-radius:18px;background:rgba(255,255,255,0.9);border:1px solid #FFFFFF;box-shadow:0 8px 24px rgba(60,72,140,0.06)">
-    <label style="flex:1 1 260px;max-width:380px;display:flex;align-items:center;gap:8px;height:42px;padding:0 12px;border-radius:12px;background:#F4F6FB;color:#64708F">
+  <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:10px;border-radius:var(--r-card);background:var(--card);border:1px solid #FFFFFF;box-shadow:var(--lift)">
+    <label style="flex:1 1 260px;max-width:380px;display:flex;align-items:center;gap:8px;height:42px;padding:0 12px;border-radius:var(--r-ctl);background:var(--field);color:var(--muted)">
       <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
-      <input id="people-search" type="search" value="${esc(state.peopleQuery||'')}" placeholder="이름, 부서, 직책 검색" aria-label="구성원 검색" style="flex:1 1 auto;min-width:0;border:0;outline:none;background:transparent;font-family:inherit;font-size:14px;color:#20294D">
+      <input id="people-search" type="search" value="${esc(state.peopleQuery||'')}" placeholder="이름, 부서, 직책 검색" aria-label="구성원 검색" style="flex:1 1 auto;min-width:0;border:0;outline:none;background:transparent;font-family:inherit;font-size:14px;color:var(--ink)">
     </label>
-    <div role="tablist" aria-label="부서" style="display:flex;flex-wrap:wrap;gap:4px;padding:4px;border-radius:12px;background:#F4F6FB">${tabs}</div>
-    <span style="margin-left:auto;font-size:13px;color:#64708F">${rows.length}명 표시</span>
+    <div role="tablist" aria-label="부서" style="display:flex;flex-wrap:wrap;gap:4px;padding:4px;border-radius:var(--r-ctl);background:var(--field)">${tabs}</div>
+    <span style="margin-left:auto;font-size:13px;color:var(--muted)">${rows.length}명 표시</span>
   </div>
 
   <section aria-label="구성원 목록" style="${CARD};padding:8px;overflow-x:auto">
     <table style="width:100%;min-width:640px;border-collapse:separate;border-spacing:0 4px;font-size:14px">
-      <thead><tr style="color:#64708F;font-size:12.5px;text-align:left">
+      <thead><tr style="color:var(--muted);font-size:12.5px;text-align:left">
         <th scope="col" style="padding:8px 14px;font-weight:700">이름</th>
         <th scope="col" style="padding:8px 12px;font-weight:700">부서</th>
         <th scope="col" style="padding:8px 12px;font-weight:700">직책</th>
@@ -2009,18 +1951,18 @@ async function adminVerify(password){
 function adminGateView(){
   // 잠금 화면에는 히어로를 띄우지 않는다. 비밀번호를 통과해야 설정 화면이 나온다.
   return `
-  <section style="${CARD};box-sizing:border-box;width:min(520px, 100%);margin:min(9vh, 80px) auto 0;padding:40px;display:flex;flex-direction:column;gap:20px">
-    <span aria-hidden="true" style="width:60px;height:60px;border-radius:19px;background:linear-gradient(140deg, #E3EAFF, #EDE6FF);color:#3F4FD0;display:flex;align-items:center;justify-content:center"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></span>
+  <section class="a-cue" style="${CARD};box-sizing:border-box;width:min(520px, 100%);margin:min(9vh, 80px) auto 0;padding:40px;display:flex;flex-direction:column;gap:20px">
+    <span aria-hidden="true" style="width:60px;height:60px;border-radius:var(--r-card);background:var(--blue-card);color:var(--blue-ink);display:flex;align-items:center;justify-content:center"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></span>
     <div style="display:flex;flex-direction:column;gap:6px">
       <h2 style="margin:0;font-size:24px;font-weight:800;letter-spacing:-0.01em">관리자 비밀번호</h2>
-      <p style="margin:0;font-size:15px;color:#64708F">설정과 인원 관리는 운영진만 볼 수 있어요.</p>
+      <p style="margin:0;font-size:15px;color:var(--muted)">설정과 인원 관리는 운영진만 볼 수 있어요.</p>
     </div>
     <form id="admin-form" style="display:flex;flex-direction:column;gap:12px">
       <input id="admin-pw" type="password" autocomplete="current-password" placeholder="비밀번호" required
-        style="height:56px;padding:0 18px;border-radius:14px;border:1px solid #E6E9F3;background:#F8F9FD;font-family:inherit;font-size:16px;color:#20294D">
-      <button type="submit" id="admin-submit" style="height:56px;border:0;border-radius:14px;background:linear-gradient(135deg, #416FDE, #6656DA);color:#FFFFFF;font-family:inherit;font-size:16px;font-weight:700;cursor:pointer;box-shadow:0 10px 22px rgba(82,100,224,0.28)">확인</button>
+        style="height:56px;padding:0 18px;border-radius:var(--r-card);border:1px solid var(--rule);background:var(--field);font-family:inherit;font-size:16px;color:var(--ink)">
+      <button type="submit" id="admin-submit" style="height:56px;border:0;border-radius:var(--r-card);background:var(--sel);color:#FFFFFF;font-family:inherit;font-size:16px;font-weight:700;cursor:pointer;box-shadow:var(--lift)">확인</button>
     </form>
-    <p id="admin-msg" role="status" style="margin:0;min-height:20px;font-size:14px;font-weight:600;color:#A8324F"></p>
+    <p id="admin-msg" role="status" style="margin:0;min-height:20px;font-size:14px;font-weight:600;color:var(--rose-ink)"></p>
   </section>`;
 }
 
@@ -2029,7 +1971,7 @@ function settingsViewLocked(){ return adminUnlocked() ? settingsView() : adminGa
 function settingsView(){
   const current=SETTINGS_NAV.find(n=>n[0]===state.settingsSection)||SETTINGS_NAV[0];
   const nav=SETTINGS_NAV.map(([id,ico,label])=>{ const on=state.settingsSection===id;
-    return `<button data-settings-section="${id}" style="display:flex;align-items:center;gap:10px;height:42px;padding:0 12px;border:0;border-radius:12px;background:${on?'#EEF2FF':'transparent'};color:${on?'#3F55D6':'#3A4466'};font-family:inherit;font-size:14px;font-weight:${on?700:600};cursor:pointer;text-align:left">${icon(ico)}${label}</button>`;}).join('');
+    return `<button data-settings-section="${id}" style="display:flex;align-items:center;gap:10px;height:42px;padding:0 12px;border:0;border-radius:var(--r-ctl);background:${on?'var(--blue-card)':'transparent'};color:${on?'var(--blue-ink)':'var(--ink-2)'};font-family:inherit;font-size:14px;font-weight:${on?700:600};cursor:pointer;text-align:left">${icon(ico)}${label}</button>`;}).join('');
 
   const body=state.settingsSection==='people'?peopleSettings()
     :state.settingsSection==='drive'?driveSettings()
@@ -2044,7 +1986,7 @@ function settingsView(){
       <h1>설정</h1>
       <span style="font-size:14.5px;color:var(--a-muted)">${esc(current[3])}</span>
     </div>
-    ${state.settingsSection==='people'?`<button data-action="new-person" style="position:relative;display:inline-flex;align-items:center;gap:6px;height:44px;padding:0 18px;border-radius:12px;border:0;background:var(--a-action);color:#FFFFFF;font-family:inherit;font-size:15px;font-weight:500;cursor:pointer;border-radius:980px"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>구성원 등록</button>`:''}
+    ${state.settingsSection==='people'?`<button data-action="new-person" style="position:relative;display:inline-flex;align-items:center;gap:6px;height:44px;padding:0 18px;border-radius:var(--r-ctl);border:0;background:var(--a-action);color:#FFFFFF;font-family:inherit;font-size:15px;font-weight:500;cursor:pointer"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>구성원 등록</button>`:''}
   </section>
 
   <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start">
@@ -2058,21 +2000,21 @@ function peopleSettings(){
   const depts=['전체',...new Set(people.map(p=>p[2]).filter(Boolean))];
   const tabs=depts.map(label=>{ const on=state.peopleDept===label;
     const n=label==='전체'?people.length:people.filter(p=>p[2]===label).length;
-    return `<button role="tab" aria-selected="${on}" data-people-dept="${esc(label)}" style="height:34px;padding:0 12px;border-radius:9px;border:0;background:${on?'#FFFFFF':'transparent'};color:${on?'#3F4FD0':'#64708F'};box-shadow:${on?'0 2px 8px rgba(60,72,140,0.12)':'none'};font-family:inherit;font-size:13px;font-weight:700;cursor:pointer">${esc(label)} <span class="hn-num" style="opacity:0.75">${n}</span></button>`;}).join('');
+    return `<button role="tab" aria-selected="${on}" data-people-dept="${esc(label)}" style="height:34px;padding:0 12px;border-radius:var(--r-ctl);border:0;background:${on?'#FFFFFF':'transparent'};color:${on?'var(--blue-ink)':'var(--muted)'};box-shadow:${on?'0 2px 8px rgba(60,72,140,0.12)':'none'};font-family:inherit;font-size:13px;font-weight:700;cursor:pointer">${esc(label)} <span class="hn-num" style="opacity:0.75">${n}</span></button>`;}).join('');
 
   return `
-  <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:10px;border-radius:18px;background:rgba(255,255,255,0.9);border:1px solid #FFFFFF;box-shadow:0 8px 24px rgba(60,72,140,0.06)">
-    <label style="flex:1 1 240px;max-width:380px;display:flex;align-items:center;gap:8px;height:42px;padding:0 12px;border-radius:12px;background:#F4F6FB;color:#64708F">
+  <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:10px;border-radius:var(--r-card);background:var(--card);border:1px solid #FFFFFF;box-shadow:var(--lift)">
+    <label style="flex:1 1 240px;max-width:380px;display:flex;align-items:center;gap:8px;height:42px;padding:0 12px;border-radius:var(--r-ctl);background:var(--field);color:var(--muted)">
       <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
-      <input id="people-search" type="search" value="${esc(state.peopleQuery||'')}" placeholder="이름, 부서, 직책 검색" aria-label="구성원 검색" style="flex:1 1 auto;min-width:0;border:0;outline:none;background:transparent;font-family:inherit;font-size:14px;color:#20294D">
+      <input id="people-search" type="search" value="${esc(state.peopleQuery||'')}" placeholder="이름, 부서, 직책 검색" aria-label="구성원 검색" style="flex:1 1 auto;min-width:0;border:0;outline:none;background:transparent;font-family:inherit;font-size:14px;color:var(--ink)">
     </label>
-    <div role="tablist" aria-label="부서" style="display:flex;flex-wrap:wrap;gap:4px;padding:4px;border-radius:12px;background:#F4F6FB">${tabs}</div>
-    <span style="margin-left:auto;font-size:13px;color:#64708F">${rows.length}명 표시</span>
+    <div role="tablist" aria-label="부서" style="display:flex;flex-wrap:wrap;gap:4px;padding:4px;border-radius:var(--r-ctl);background:var(--field)">${tabs}</div>
+    <span style="margin-left:auto;font-size:13px;color:var(--muted)">${rows.length}명 표시</span>
   </div>
 
   <section aria-label="구성원 목록" style="${CARD};padding:8px;overflow-x:auto">
     <table style="width:100%;min-width:640px;border-collapse:separate;border-spacing:0 4px;font-size:14px">
-      <thead><tr style="color:#64708F;font-size:12.5px;text-align:left">
+      <thead><tr style="color:var(--muted);font-size:12.5px;text-align:left">
         <th scope="col" style="padding:8px 14px;font-weight:700">이름</th>
         <th scope="col" style="padding:8px 12px;font-weight:700">부서</th>
         <th scope="col" style="padding:8px 12px;font-weight:700">직책</th>
@@ -2097,14 +2039,19 @@ function render(){
   if(!views[state.route]) state.route='home';
   document.body.classList.toggle('hn-camera', state.route === 'maker' && state.makerTab === 'camera');
   // 다른 일정의 실시간 갱신이 촬영 배치와 입력 중인 저장 이름을 초기화하지 않게 한다.
-  if (state.route === 'maker' && state.makerTab === 'camera' && cameraCleanup && $('#simulator')) { renderTally(); renderNotifications(); return; }
+  if (state.route === 'maker' && state.makerTab === 'camera' && cameraCleanup && $('#simulator')) { renderTally(); renderNotifications(); renderShell(); return; }
   cameraCleanup?.(); cameraCleanup = null;
   $('#app').innerHTML=views[state.route]()+editPickCard();
   if (state.route === 'maker' && state.makerTab === 'camera') {
     if (cameraModule) cameraCleanup = cameraModule.mountCamera($('#simulator'), window.HNUBSCameraStore);
     else if (!cameraLoading) cameraLoading = import('./camera/app.mjs?v=20261106-3').then(module=>{cameraModule=module;render();}).catch(()=>{cameraError='시뮬레이터를 불러오지 못했습니다. 페이지를 새로고침해 주세요.';render();});
   }
-  $$('[data-route]').forEach(b=>b.classList.toggle('active',b.dataset.route===state.route));
+  // 레일은 하위 화면(라디오·대본 분석 등)으로 바로 간다. 그 화면에 있을 때 그 칸이 켜진다.
+  const sub = state.route==='schedule' ? state.scheduleTab : state.route==='maker' ? state.makerTab : '';
+  $$('[data-route]').forEach(b=>{ const r=b.dataset.route;
+    const on = r===sub || r===state.route;
+    b.classList.toggle('active',on); if(b.closest('.rail')) b.toggleAttribute('aria-current', on); });
+  renderShell();
   document.body.classList.toggle('hn-shorts', state.route==='maker' && state.makerTab==='shorts');
   renderTally();
   renderNotifications();
@@ -2289,7 +2236,7 @@ function openShootDrawer(){
             <input type="checkbox" name="cast" value="${esc(p[7])}" style="flex:0 0 auto;width:16px;height:16px;min-width:16px;margin:0">
             <span style="min-width:0;display:flex;flex-direction:column;line-height:1.3">
               <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(p[0])}</span>
-              <small style="font-weight:600;color:#64708F;white-space:nowrap">${esc(p[2])}</small>
+              <small style="font-weight:600;color:var(--muted);white-space:nowrap">${esc(p[2])}</small>
             </span>
           </label>`).join('')}
         </div>
@@ -2370,7 +2317,7 @@ function openPersonDrawer(){
 }
 // 역할은 촬영이 아니라 프로젝트(화)에 붙어 있다: roles.planning / production / cast.
 // 값이 ['id', …] 일 때도 [{id,name}, …] 일 때도 있어서 둘 다 받는다.
-const ROLE_LABELS=[['planning','기획','#EDE6FF','#4A3FB0'],['production','촬영','#E3EAFF','#2F4FC2'],['cast','출연','#E3F7EE','#17603F']];
+const ROLE_LABELS=[['planning','기획','var(--lav-card)','var(--lav-ink)'],['production','촬영','var(--blue-card)','var(--blue-ink)'],['cast','출연','var(--mint-card)','var(--mint-ink)']];
 function roleIds(project,key){ return (project?.roles?.[key]||[]).map(v=>typeof v==='string'?v:v?.id).filter(Boolean); }
 function memberRole(projectId,memberId){
   const project=projects[projectId];
@@ -2382,10 +2329,10 @@ function personRow(memberId,name,role){
   const p=memberById(memberId);
   const [dBg,dFg]=deptColor(p?.[2]);
   const label=role?`<span style="padding:2px 9px;border-radius:99px;background:${role[1]};color:${role[2]};font-size:12px;font-weight:700;white-space:nowrap">${role[0]}</span>`
-    :'<span style="font-size:12.5px;color:#64708F;white-space:nowrap">참여</span>';
-  return `<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:12px;background:#F8F9FD">
-    <span aria-hidden="true" style="width:30px;height:30px;border-radius:10px;background:${dBg};color:${dFg};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800">${esc(initial(name))}</span>
-    <span style="flex:1 1 auto;min-width:0;display:flex;flex-direction:column;line-height:1.3"><strong style="font-size:14px;font-weight:700">${esc(name)}</strong><span style="font-size:12px;color:#64708F">${esc(p?.[2]||'부서 미정')}</span></span>
+    :'<span style="font-size:12.5px;color:var(--muted);white-space:nowrap">참여</span>';
+  return `<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:var(--r-ctl);background:var(--field)">
+    <span aria-hidden="true" style="width:30px;height:30px;border-radius:var(--r-ctl);background:${dBg};color:${dFg};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800">${esc(initial(name))}</span>
+    <span style="flex:1 1 auto;min-width:0;display:flex;flex-direction:column;line-height:1.3"><strong style="font-size:14px;font-weight:700">${esc(name)}</strong><span style="font-size:12px;color:var(--muted)">${esc(p?.[2]||'부서 미정')}</span></span>
     ${label}
   </div>`;
 }
@@ -2417,7 +2364,7 @@ function openScheduleDetail(id){
        <div class="field"><span>이 촬영 참여 인원 (${members.length}명)</span>
          <div style="display:flex;flex-direction:column;gap:6px;margin-top:6px">${members.map(m=>personRow(m.id,m.name,m.role)).join('')||emptyState('담당 인원이 지정되지 않았습니다.')}</div>
        </div>
-       ${s.raw?.note?`<div class="field"><span>메모</span><p style="margin:6px 0 0;padding:12px;border-radius:12px;background:#F6F7FC;font-size:14px;color:#4F5770">${esc(s.raw.note)}</p></div>`:''}
+       ${s.raw?.note?`<div class="field"><span>메모</span><p style="margin:6px 0 0;padding:12px;border-radius:var(--r-ctl);background:var(--field);font-size:14px;color:var(--muted)">${esc(s.raw.note)}</p></div>`:''}
      </div>`,
     `<button class="secondary-button" type="button" data-edit-open="shoot|${esc(s.id)}">수정 / 삭제</button><button class="primary-button" type="button" data-action="close-drawer">확인</button>`));
 }
@@ -2425,11 +2372,10 @@ function openPersonDetail(id){const p=memberById(id);if(!p)return;openDrawer(dra
 function openSlotDrawer(){const dayNames=['월','화','수','목','금','토','일'],parts=state.selectedSlot.split(' '),day=Math.max(0,dayNames.indexOf(parts[0])),hour=Number((parts[1]||'09:00').slice(0,2)),dates=weekDates(),iso=localIso(dates[day]),available=people.filter(p=>memberAvailable(p[7],iso,day,hour));openDrawer(drawerTemplate('선택 시간 상세',`<span class="badge mint">${available.length}명 가능</span><h2>${state.selectedSlot}</h2><p style="color:var(--muted)">개인 일정과 고정 시간표를 반영한 실시간 결과입니다.</p><div class="member-list">${available.slice(0,8).map(p=>`<div class="member-mini"><span class="avatar avatar-${p[6]}">${esc(p[0][0]||'?')}</span><span><strong>${esc(p[0])}</strong><small>${esc(p[2])} · ${esc(p[3])}</small></span><span class="badge mint">가능</span></div>`).join('')||emptyState('이 시간에 가능한 구성원이 없습니다.')}</div>`,`<button class="primary-button" data-action="new-shoot">이 시간으로 등록</button>`))}
 
 function toast(message){const el=document.createElement('div');el.className='toast';el.innerHTML=`${icon('check')}<strong>${message}</strong>`;$('#toast-region').append(el);hydrateIcons(el);setTimeout(()=>el.remove(),2800)}
-function closePopovers(){['notification-popover','profile-popover'].forEach(id=>$('#'+id).hidden=true);$('#notification-button').setAttribute('aria-expanded','false');$('#profile-button').setAttribute('aria-expanded','false')}
+function closePopovers(){$('#notification-popover').hidden=true;$('#notification-button').setAttribute('aria-expanded','false')}
 function closeMobileMenu(){$('#mobile-menu').classList.remove('open');$('#mobile-menu').setAttribute('aria-hidden','true');setTimeout(()=>$('#mobile-menu-backdrop').hidden=true,220)}
 
 $('#notification-button').addEventListener('click',e=>{e.stopPropagation();const p=$('#notification-popover');const opening=p.hidden;closePopovers();p.hidden=!opening;e.currentTarget.setAttribute('aria-expanded',opening)});
-$('#profile-button').addEventListener('click',e=>{e.stopPropagation();const p=$('#profile-popover');const opening=p.hidden;closePopovers();p.hidden=!opening;e.currentTarget.setAttribute('aria-expanded',opening)});
 $('#mobile-more').addEventListener('click',()=>{$('#mobile-menu-backdrop').hidden=false;$('#mobile-menu').classList.add('open');$('#mobile-menu').setAttribute('aria-hidden','false')});
 $('#mobile-menu-backdrop').addEventListener('click',closeMobileMenu);$('#drawer-backdrop').addEventListener('click',closeDrawer);
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(state.editPick||state.radioPick){state.editPick=null;state.radioPick=null;render();}closeDrawer();closeMobileMenu();closePopovers()}if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='k'){e.preventDefault();$('#global-search')?.focus()}});
@@ -2662,10 +2608,10 @@ function searchFind(q){
   if(!key) return [];
   const hit=[];
   schedules.filter(s=>`${s.title} ${s.place} ${s.type} ${s.people.join(' ')}`.toLowerCase().includes(key))
-    .slice(0,6).forEach(s=>hit.push({group:'일정',badge:s.type,bg:'#E3EAFF',fg:'#2F4FC2',
+    .slice(0,6).forEach(s=>hit.push({group:'일정',badge:s.type,bg:'var(--blue-card)',fg:'var(--blue-ink)',
       title:s.title,meta:`${monthDay(s.date)} (${dowOf(s.date)}) ${s.time}`,run:()=>openScheduleDetail(s.id)}));
   people.filter(p=>`${p[0]} ${p[2]} ${p[3]}`.toLowerCase().includes(key))
-    .slice(0,6).forEach(p=>hit.push({group:'구성원',badge:p[2],bg:'#E3F7EE',fg:'#17603F',
+    .slice(0,6).forEach(p=>hit.push({group:'구성원',badge:p[2],bg:'var(--mint-card)',fg:'var(--mint-ink)',
       title:p[0],meta:p[3],run:()=>openPersonDetail(p[7])}));
   notices.filter(n=>`${n.title} ${n.body||''} ${n.tag}`.toLowerCase().includes(key))
     .slice(0,5).forEach(n=>{ const [,bg,fg]=noticeTag(n.tag);

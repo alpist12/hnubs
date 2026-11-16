@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 300" preserveAspectRatio="xMidYMid slice" role="img" aria-label="드라마 촬영 일러스트">
+  <rect width="600" height="300" fill="#EAE3FF"/>
+  <circle cx="470" cy="70" r="110" fill="#D4C5FF"/>
+  <!-- 레일 -->
+  <path d="M40 262h520" stroke="#1B1F3B" stroke-width="5"/>
+  <g stroke="#1B1F3B" stroke-width="4"><path d="M70 262v14M130 262v14M190 262v14M250 262v14M310 262v14M370 262v14M430 262v14M490 262v14M550 262v14"/></g>
+  <!-- 돌리 + 카메라 -->
+  <rect x="120" y="230" width="110" height="24" rx="6" fill="#2F4FE0" stroke="#1B1F3B" stroke-width="4"/>
+  <circle cx="140" cy="258" r="8" fill="#1B1F3B"/><circle cx="210" cy="258" r="8" fill="#1B1F3B"/>
+  <path d="M175 230v-50" stroke="#1B1F3B" stroke-width="7"/>
+  <rect x="128" y="136" width="96" height="48" rx="10" fill="#FFFFFF" stroke="#1B1F3B" stroke-width="4"/>
+  <circle cx="150" cy="128" r="18" fill="#FFFFFF" stroke="#1B1F3B" stroke-width="4"/><circle cx="196" cy="128" r="18" fill="#FFFFFF" stroke="#1B1F3B" stroke-width="4"/>
+  <path d="M224 150l30-12v32l-30-12z" fill="#1B1F3B"/>
+  <!-- 붐 마이크 -->
+  <path d="M520 40L330 110" stroke="#1B1F3B" stroke-width="6" stroke-linecap="round"/>
+  <rect x="300" y="98" width="46" height="22" rx="11" transform="rotate(-20 323 109)" fill="#FFE94D" stroke="#1B1F3B" stroke-width="4"/>
+  <!-- 의자 둘 -->
+  <g fill="none" stroke="#1B1F3B" stroke-width="5" stroke-linecap="round">
+    <path d="M330 200h56M336 200v58M380 200v58M330 200v-46h56v46"/>
+    <path d="M420 200h56M426 200v58M470 200v58M420 200v-46h56v46"/>
+  </g>
+  <rect x="330" y="154" width="56" height="20" fill="#2F4FE0"/><rect x="420" y="154" width="56" height="20" fill="#2F4FE0"/>
+  <!-- 슬레이트 -->
+  <g transform="rotate(-8 510 220)">
+    <rect x="470" y="196" width="96" height="62" rx="6" fill="#1B1F3B"/>
+    <path d="M470 196h96v-18H470z" fill="#FFFFFF" stroke="#1B1F3B" stroke-width="4"/>
+    <path d="M484 178l-8 18M506 178l-8 18M528 178l-8 18M550 178l-8 18" stroke="#1B1F3B" stroke-width="7"/>
+    <path d="M482 216h72M482 236h44" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" opacity=".7"/>
+  </g>
+</svg>

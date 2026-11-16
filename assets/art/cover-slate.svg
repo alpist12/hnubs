@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 300" preserveAspectRatio="xMidYMid slice" role="img" aria-label="슬레이트 일러스트">
+  <rect width="600" height="300" fill="#DFE7FF"/>
+  <circle cx="120" cy="60" r="90" fill="#FFFFFF" opacity=".6"/>
+  <circle cx="520" cy="250" r="110" fill="#D4C5FF"/>
+  <!-- 슬레이트 본체 -->
+  <g transform="rotate(-6 300 170)">
+    <rect x="170" y="120" width="260" height="150" rx="12" fill="#1B1F3B"/>
+    <path d="M180 150h240M180 196h240M300 150v110" stroke="#FFFFFF" stroke-width="3" opacity=".5"/>
+    <rect x="196" y="164" width="80" height="12" rx="6" fill="#FFE94D"/>
+    <rect x="320" y="164" width="60" height="12" rx="6" fill="#FFFFFF" opacity=".8"/>
+    <rect x="196" y="212" width="60" height="12" rx="6" fill="#FFFFFF" opacity=".8"/>
+    <rect x="320" y="212" width="86" height="12" rx="6" fill="#D4C5FF"/>
+    <!-- 위 막대: 열린 채 -->
+    <g transform="rotate(-16 172 118)">
+      <rect x="170" y="86" width="264" height="34" rx="6" fill="#FFFFFF" stroke="#1B1F3B" stroke-width="5"/>
+      <path d="M210 88l-22 30M262 88l-22 30M314 88l-22 30M366 88l-22 30M418 88l-22 30" stroke="#1B1F3B" stroke-width="14"/>
+    </g>
+    <rect x="170" y="120" width="264" height="22" fill="#FFFFFF" stroke="#1B1F3B" stroke-width="5"/>
+    <path d="M206 122l-20 18M258 122l-20 18M310 122l-20 18M362 122l-20 18M414 122l-20 18" stroke="#1B1F3B" stroke-width="13"/>
+  </g>
+  <!-- 액션 표시 -->
+  <path d="M470 70l16-16M482 96h22M450 52V30" stroke="#2F4FE0" stroke-width="6" stroke-linecap="round"/>
+  <circle cx="90" cy="230" r="10" fill="#E5243B"/>
+</svg>

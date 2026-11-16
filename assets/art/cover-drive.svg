@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 300" preserveAspectRatio="xMidYMid slice" role="img" aria-label="공유 드라이브 일러스트">
+  <rect width="1200" height="300" fill="#EEF1FB"/>
+  <path d="M560 0h640v300H520c30-90 0-180 40-300z" fill="#DFE7FF"/>
+  <circle cx="1100" cy="60" r="110" fill="#E4E0FB"/>
+  <!-- 구름 + 화살표 -->
+  <path d="M720 120a38 38 0 0 1 72-16 30 30 0 0 1 44 26 26 26 0 0 1-4 52H726a32 32 0 0 1-6-62z" fill="#FFFFFF" stroke="#1B1F3B" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M778 166v-38m-14 14l14-14 14 14" stroke="#2F4FE0" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <!-- 폴더 더미 -->
+  <g stroke="#1B1F3B" stroke-width="4" stroke-linejoin="round">
+    <path d="M880 150h44l14 14h82v104H880z" fill="#D4C5FF"/>
+    <path d="M900 176h44l14 14h82v96H900z" fill="#2F4FE0"/>
+    <path d="M920 202h44l14 14h82v84H920z" fill="#FFE94D"/>
+  </g>
+  <!-- 필름 릴 -->
+  <circle cx="640" cy="232" r="52" fill="#1B1F3B"/>
+  <g fill="#EEF1FB"><circle cx="640" cy="206" r="11"/><circle cx="664" cy="226" r="11"/><circle cx="656" cy="256" r="11"/><circle cx="624" cy="256" r="11"/><circle cx="616" cy="226" r="11"/></g>
+  <circle cx="640" cy="232" r="6" fill="#FFE94D"/>
+  <path d="M690 250c40 20 80 30 120 30" stroke="#1B1F3B" stroke-width="10" fill="none"/>
+  <!-- 문서 -->
+  <g transform="rotate(8 1130 210)">
+    <rect x="1090" y="150" width="84" height="108" rx="8" fill="#FFFFFF" stroke="#1B1F3B" stroke-width="4"/>
+    <path d="M1106 176h52M1106 196h52M1106 216h34" stroke="#1B1F3B" stroke-width="4" stroke-linecap="round" opacity=".35"/>
+    <rect x="1106" y="230" width="28" height="12" rx="4" fill="#E5243B"/>
+  </g>
+  <!-- 음표 -->
+  <path d="M860 70v46a12 12 0 1 1-8-11V78l34-8v38a12 12 0 1 1-8-11V64z" fill="#1B1F3B"/>
+  <!-- 반짝임 -->
+  <path d="M1040 120l10-10M1056 134h14M1030 104V90" stroke="#2F4FE0" stroke-width="5" stroke-linecap="round"/>
+</svg>

@@ -1520,3 +1520,132 @@ body.theme-light .edit-tag {
   .upload-floating-bar { bottom: 86px; }
   .toast-container { bottom: 96px; }
 }
+
+/* =========================================================
+   큐카드 — workspace 와 같은 디자인 층 (../styles.css 맨 끝과 같은 값)
+   종이 바탕, 흰 카드, 마커 남색 글자, 선택은 마커 파랑. 그라데이션 없음.
+   ========================================================= */
+body.theme-light {
+  --bg-deep: #F3F4FA; --bg-main: #F3F4FA; --bg-elevated: #FFFFFF;
+  --bg-card: #FFFFFF; --bg-card-hover: #F6F7FB; --bg-glass: #FFFFFF;
+  --border-subtle: #E2E4EE; --border-strong: #C9CDDD; --border-glow: rgba(47, 79, 224, 0.35);
+  --text-primary: #1B1F3B; --text-secondary: #565D78; --text-muted: #565D78;
+  --accent-blue: #2F4FE0; --accent-indigo: #2440C2; --accent-violet: #5236BF;
+  --shadow-lg: 0 2px 6px rgba(27,31,59,.06), 0 18px 40px rgba(27,31,59,.14);
+  accent-color: #2F4FE0;
+}
+body.theme-light ::selection { background: #FFE94D; color: #1B1F3B; }
+body.theme-light .app-shell { background: #F3F4FA; }
+body.theme-light .stat-card, body.theme-light .grid-card, body.theme-light .file-list, body.theme-light .side-nav,
+body.theme-light .storage-widget {
+  background: #FFFFFF; border: 1px solid #E2E4EE; box-shadow: none; border-radius: 12px;
+}
+body.theme-light .stat-card:hover, body.theme-light .grid-card:hover { border-color: #C9CDDD; box-shadow: none; }
+body.theme-light .file-list-header { border-radius: 12px 12px 0 0; border-bottom-color: #E2E4EE; }
+body.theme-light .file-row:last-child { border-radius: 0 0 12px 12px; }
+body.theme-light .file-row { border-bottom-color: #EDEEF4; }
+body.theme-light .file-row:hover { background: #F6F7FB; }
+body.theme-light .btn-primary, body.theme-light .chip-btn, body.theme-light .quick-action-pill,
+body.theme-light .sort-btn, body.theme-light .icon-btn, body.theme-light .search-box-desktop { border-radius: 8px; }
+body.theme-light .chip-btn, body.theme-light .sort-btn, body.theme-light .icon-btn, body.theme-light .search-box-desktop {
+  border-color: #C9CDDD;
+}
+body.theme-light .chip-btn.active, body.theme-light .new-btn-desktop, body.theme-light .brand-logo {
+  background: #2F4FE0; border-color: #2F4FE0; box-shadow: none; color: #FFFFFF;
+}
+body.theme-light .quick-action-pill { background: #DFE7FF; border-color: #DFE7FF; color: #2440C2; }
+body.theme-light .quick-action-pill:hover { background: #D2DCFF; }
+body.theme-light .brand-card { background: #FFFFFF; border: 1px solid #E2E4EE; border-radius: 12px; }
+body.theme-light .side-nav-label { color: #565D78; }
+body.theme-light .side-nav-item.active { background: #DFE7FF; color: #1B1F3B; }
+
+/* 상단 — 보라 띠를 걷고 workspace 화면 제목과 같은 모양으로 */
+body.theme-light .dv-hero {
+  margin: 18px 26px 0; padding: 6px 0 16px; border-radius: 0;
+  background: transparent; color: #1B1F3B; border-bottom: 1px solid #E2E4EE;
+}
+body.theme-light .dv-hero-title { font-size: 30px; font-weight: 850; letter-spacing: -0.04em; color: #1B1F3B; }
+body.theme-light .dv-crumbs, body.theme-light .dv-crumbs .crumb-link { color: #565D78; }
+body.theme-light .dv-crumbs .crumb-link:hover { color: #1B1F3B; }
+body.theme-light .dv-lock { background: #EAE3FF; color: #5236BF; }
+body.theme-light .dv-stat { background: #FFFFFF; border: 1px solid #E2E4EE; border-radius: 8px; color: #1B1F3B; }
+body.theme-light .dv-stat:hover { background: #F6F7FB; border-color: #C9CDDD; }
+body.theme-light .dv-stat span { color: #565D78; }
+body.theme-light .dv-ghost-btn, body.theme-light .dv-user {
+  background: #FFFFFF; border: 1px solid #C9CDDD; color: #1B1F3B; border-radius: 8px;
+}
+body.theme-light .dv-ghost-btn:hover, body.theme-light .dv-user:hover { background: #F6F7FB; }
+body.theme-light .dv-upload { background: #2F4FE0; color: #FFFFFF; border-radius: 8px; box-shadow: none; }
+body.theme-light .dv-upload:hover { background: #2440C2; transform: none; }
+@media (max-width: 760px) {
+  body.theme-light .dv-hero { margin: 12px 16px 0; padding: 4px 0 12px; }
+  body.theme-light .dv-hero-title { font-size: 23px; }
+}
+/* 제목이 먼저, 경로·설명은 그 아래 */
+body.theme-light .dv-hero-title { order: -1; }
+
+/* =========================================================
+   시안 E — workspace 와 같은 '그림 있는 워크스페이스' 느낌
+   흰 본문, 위에 커버 그림과 아이콘 타일, 왼쪽은 workspace 사이드바와 같은 목록.
+   ========================================================= */
+body.theme-light, body.theme-light .app-shell { background: #FFFFFF; }
+body.theme-light .main-area { background: #FFFFFF; }
+
+/* 왼쪽 목록 — 카드 대신 workspace 사이드바와 같은 평평한 목록 */
+body.theme-light .sidebar { width: 220px; padding: 14px 10px; gap: 10px; background: #F7F8FC; border-right: 1px solid #E2E4EE; }
+body.theme-light .side-nav { background: transparent; border: 0; box-shadow: none; padding: 0; border-radius: 0; }
+body.theme-light .side-nav-label { padding: 0 8px; font-size: 11px; font-weight: 800; letter-spacing: 0; }
+body.theme-light .side-nav-item { height: 32px; padding: 0 8px; border-radius: 6px; font-size: 13.5px; font-weight: 600; color: #363B5A; }
+body.theme-light .side-nav-item:hover { background: #ECEEF6; }
+body.theme-light .side-nav-item.active { background: #FFFFFF; color: #1B1F3B; font-weight: 800; box-shadow: 0 0 0 1px #E2E4EE, 0 1px 2px rgba(27,31,59,.06); }
+body.theme-light .side-nav-item.active svg { color: #2F4FE0; }
+body.theme-light .storage-widget { background: #FFFFFF; border: 1px solid #E2E4EE; border-radius: 10px; box-shadow: none; }
+
+/* 위 — 커버 그림 + 아이콘 타일 + 제목 */
+body.theme-light .dv-hero {
+  margin: 0; padding: 128px 28px 16px; border-radius: 0; border-bottom: 1px solid #E2E4EE;
+  background: #FFFFFF url(../assets/art/cover-drive.svg) no-repeat top center / 100% 104px;
+  align-items: flex-end;
+}
+body.theme-light .dv-hero-main { align-items: flex-end; gap: 14px; }
+body.theme-light .dv-hero-main::before {
+  content: ""; flex: 0 0 auto; width: 60px; height: 60px; margin-top: -48px; border-radius: 14px;
+  background: #FFFFFF url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232F4FE0' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z'/%3E%3C/svg%3E") center / 30px no-repeat;
+  border: 1px solid #E2E4EE; box-shadow: 0 6px 16px rgba(27,31,59,.10);
+}
+body.theme-light .dv-hero-title { font-size: 26px; }
+body.theme-light .dv-stat { min-width: 0; padding: 5px 10px; border-radius: 6px; }
+body.theme-light .dv-stat span { font-size: 10.5px; }
+body.theme-light .dv-stat b { font-size: 14px; }
+body.theme-light .dv-upload { height: 36px; padding: 0 14px; font-size: 13.5px; border-radius: 6px; }
+body.theme-light .dv-ghost-btn { width: 36px; height: 36px; border-radius: 6px; }
+
+/* 필터 칩 — 선택은 남색 */
+body.theme-light .chip-btn { height: 30px; padding: 0 11px; font-size: 12.5px; border-radius: 6px; }
+body.theme-light .chip-btn.active { background: #1B1F3B; border-color: #1B1F3B; color: #FFFFFF; }
+body.theme-light .quick-action-pill { height: 30px; border-radius: 6px; font-size: 12.5px; }
+
+/* 목록과 카드 */
+body.theme-light .file-list { border-radius: 10px; }
+body.theme-light .grid-card { border-radius: 10px; }
+body.theme-light .file-row:hover { background: #F6F7FB; }
+
+/* 휴대폰 — 아래 메뉴는 workspace 아래 탭과 겹치니 위쪽 가로 탭으로, + 단추는 업로드 버튼과 겹쳐서 뺀다 */
+@media (max-width: 768px) {
+  body.theme-light .dv-hero { padding: 96px 16px 12px; background-size: 100% 76px; }
+  body.theme-light .dv-hero-main::before { width: 48px; height: 48px; margin-top: -40px; background-size: 24px; }
+  body.theme-light .dv-hero-title { font-size: 21px; }
+  body.theme-light .bottom-nav {
+    position: sticky; top: 0; bottom: auto; left: auto; right: auto; z-index: 30; order: -1;
+    display: flex; gap: 4px; overflow-x: auto; padding: 8px 12px; min-height: 0;
+    background: #FFFFFF; border-top: 0; border-bottom: 1px solid #E2E4EE; box-shadow: none; scrollbar-width: none;
+  }
+  body.theme-light .bottom-nav-btn { flex: 0 0 auto; flex-direction: row; gap: 6px; height: 32px; padding: 0 12px; border-radius: 6px; font-size: 12.5px; white-space: nowrap; }
+  body.theme-light .bottom-nav-btn.active { background: #1B1F3B; color: #FFFFFF; }
+  body.theme-light .bottom-nav-btn svg { width: 15px; height: 15px; }
+  body.theme-light .fab-btn { display: none; }
+  body.theme-light .file-scroll { padding-bottom: 40px; }
+  body.theme-light .upload-floating-bar { bottom: 16px; }
+  body.theme-light .toast-container { bottom: 24px; }
+}
+@media (max-width: 768px) { body.theme-light .dv-hero { order: -2; } }

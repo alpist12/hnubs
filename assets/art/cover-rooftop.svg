@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 300" preserveAspectRatio="xMidYMid slice" role="img" aria-label="옥상 노을 촬영 일러스트">
+  <rect width="600" height="300" fill="#FFF0C4"/>
+  <rect y="150" width="600" height="150" fill="#FFE6D9"/>
+  <circle cx="300" cy="170" r="70" fill="#FFE94D"/>
+  <g fill="#D4C5FF"><rect x="0" y="170" width="70" height="130"/><rect x="80" y="140" width="50" height="160"/><rect x="470" y="150" width="60" height="150"/><rect x="540" y="180" width="60" height="120"/></g>
+  <path d="M40 60h60M60 80h70M450 50h70M480 70h50" stroke="#FFFFFF" stroke-width="10" stroke-linecap="round"/>
+  <!-- 옥상 난간 -->
+  <rect x="0" y="236" width="600" height="64" fill="#1B1F3B"/>
+  <path d="M0 214h600" stroke="#1B1F3B" stroke-width="6"/>
+  <g stroke="#1B1F3B" stroke-width="5"><path d="M30 214v22M90 214v22M150 214v22M210 214v22M270 214v22M330 214v22M390 214v22M450 214v22M510 214v22M570 214v22"/></g>
+  <!-- 두 사람 실루엣 -->
+  <g fill="#1B1F3B"><circle cx="250" cy="170" r="12"/><path d="M236 236v-40a14 14 0 0 1 28 0v40z"/><circle cx="350" cy="166" r="12"/><path d="M336 236v-44a14 14 0 0 1 28 0v44z"/></g>
+  <!-- 반사판 -->
+  <circle cx="470" cy="210" r="26" fill="#FFFFFF" stroke="#1B1F3B" stroke-width="4"/>
+  <path d="M470 236v0" stroke="#1B1F3B"/>
+  <circle cx="470" cy="210" r="14" fill="#DFE7FF"/>
+</svg>

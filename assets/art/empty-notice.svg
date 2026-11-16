@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="6 -6 156 116" role="img" aria-label="빈 게시판 일러스트">
+  <rect x="20" y="14" width="120" height="82" rx="10" fill="#FFFFFF" stroke="#1B1F3B" stroke-width="3"/>
+  <rect x="34" y="30" width="44" height="34" rx="4" fill="#FFE94D" stroke="#1B1F3B" stroke-width="2.5" transform="rotate(-6 56 47)"/>
+  <rect x="86" y="34" width="40" height="28" rx="4" fill="#EAE3FF" stroke="#1B1F3B" stroke-width="2.5" transform="rotate(5 106 48)"/>
+  <circle cx="56" cy="30" r="4" fill="#E5243B"/><circle cx="106" cy="34" r="4" fill="#2F4FE0"/>
+  <path d="M40 78h80" stroke="#1B1F3B" stroke-width="3" stroke-linecap="round" opacity=".2"/>
+  <!-- 반짝임: 오른쪽 위 모서리(137,17)에서 같은 거리로 퍼진다 -->
+  <path d="M134 8V0M143 11l6-6M146 20h8" stroke="#2F4FE0" stroke-width="3" stroke-linecap="round"/>
+</svg>
