@@ -355,7 +355,7 @@ function renderShell(){
 }
 
 function homeView() {
-  // 시안 E — 커버 그림 위에 인사와 스티커 큐카드, 프로젝트 카드, 일정 흐름, 아래 두 칸(참여 가능 · 공지).
+  // 홈: 오늘 흐름과 다음 촬영, 참여 가능 인원과 공지.
   const now=new Date(), today=localIso(now), nowMs=now.getTime(), nowMin=now.getHours()*60+now.getMinutes();
   const startMs=s=>new Date(`${s.date}T${hourLabel(s.startH)}:00`).getTime();
   const upcoming=schedules.filter(s=>s.date&&startMs(s)>=nowMs).sort((a,b)=>startMs(a)-startMs(b));
@@ -374,7 +374,6 @@ function homeView() {
       place:s.place||'장소 미정',who:`${s.people.length}명`,people:s.people,attr:`data-detail="${esc(s.id)}"`}));
     return items.sort((a,b)=>a.from-b.from); };
   const todayItems=dayItems(today);
-  const tmr=new Date(now); tmr.setDate(tmr.getDate()+1); const tmrIso=localIso(tmr);
   const row=(f,isToday)=>{ const past=isToday&&f.to<=nowMin, on=isToday&&f.from<=nowMin&&nowMin<f.to;
     const st=past?'<span class="w-st is-done">마침</span>':f.kind==='radio'?(f.who?'<span class="w-st is-ok">배정</span>':'<span class="w-st is-need">담당 필요</span>'):'<span class="w-st is-plan">예정</span>';
     const who=f.people?`<span class="h-faces">${faces(f.people,3)}</span>`:`<span class="w-who">${f.who?esc(f.who):'—'}</span>`;
@@ -383,12 +382,7 @@ function homeView() {
   let todayHtml='', placed=todayItems.some(f=>f.from<=nowMin&&nowMin<f.to);
   todayItems.forEach(f=>{ if(!placed&&f.from>nowMin){ todayHtml+=nowRow; placed=true; } todayHtml+=row(f,true); });
   if(!placed) todayHtml+=nowRow;
-  const tmrItems=dayItems(tmrIso);
-  const later=upcoming.filter(s=>s.date>tmrIso).slice(0,4);
-  const group=(label,count,body)=>`<div class="w-grp">${label} <span>${count}</span></div>${body}`;
-  const flow=group(`오늘 · ${monthDay(today)} ${DOW[now.getDay()]}`,todayItems.length,todayHtml)
-    +(tmrItems.length?group(`내일 · ${monthDay(tmrIso)} ${DOW[tmr.getDay()]}`,tmrItems.length,tmrItems.map(f=>row(f,false)).join('')):'')
-    +group('다가오는 촬영',later.length,later.length?later.map(s=>`<button class="w-row" data-detail="${esc(s.id)}"><time class="hn-num">${monthDay(s.date)}</time><i class="h-kind is-shoot" aria-hidden="true"></i><strong>${esc(s.title)}</strong><span class="w-pl">${esc(s.place||'장소 미정')}</span><span class="h-faces">${faces(s.people,3)}</span><span class="w-st is-plan">예정</span></button>`).join(''):'<p class="w-none">내일 이후 잡힌 촬영이 없어요</p>');
+  const flow=`<div class="w-grp">${monthDay(today)} ${DOW[now.getDay()]}요일 <span>${todayItems.length}건</span></div>${todayHtml}`;
 
   // 스티커 큐카드
   let countdown='';
@@ -398,22 +392,6 @@ function homeView() {
       <span class="w-st-lab"><i aria-hidden="true"></i>다음 촬영 · ${esc(next.title)}</span><b class="hn-num">${countdown}</b>
       <small>${monthDay(next.date)} (${dowOf(next.date)}) ${esc(hourLabel(next.startH))} · ${esc(next.place||'장소 미정')} · ${next.people.length}명</small></button>`
     :`<div class="w-sticker is-empty"><span class="w-st-lab">다음 촬영</span><b>아직 없어요</b><small>일정 등록으로 새 촬영을 준비해요</small></div>`;
-
-  // 프로젝트 카드 — 실제 프로젝트 + 이번 주 라디오
-  const plist=Object.entries(projects).sort((a,b)=>(a[1].createdAt||0)-(b[1].createdAt||0)).slice(0,3);
-  const pcards=plist.map(([id,p],k)=>{ const shoots=schedules.filter(s=>s.raw?.projectId===id);
-    const nx=shoots.filter(s=>s.date>=today).sort((a,b)=>a.date<b.date?-1:1)[0];
-    const done=shoots.filter(s=>s.status==='완료').length;
-    return `<button class="w-proj" data-route="projects"><span class="w-pc" style="background-image:url(./assets/art/cover-${projectArt(p,k)}.svg)"></span>
-      <span class="w-pb"><b>${esc(p.name||id)}</b><small>${nx?`다음 촬영 ${monthDay(nx.date)}`:shoots.length?`촬영 ${shoots.length}건 · 완료 ${done}건`:'아직 잡힌 촬영 없음'}</small>
-      ${shoots.length?`<span class="w-pg" aria-label="촬영 ${shoots.length}건 중 ${done}건 완료"><i style="width:${Math.round(done/shoots.length*100)}%"></i></span>`:''}</span></button>`; }).join('');
-  const total=weekDates().filter(d=>d.getDay()>=1&&d.getDay()<=5&&!radioOff(localIso(d))).length*RADIO_SLOTS.length;
-  const openSlots=radioOpenSlots().length;
-  const filled=weekDates().filter(d=>d.getDay()>=1&&d.getDay()<=5&&!radioOff(localIso(d))).reduce((n,d)=>n+RADIO_SLOTS.filter(sl=>radioCast(localIso(d),sl.key).length).length,0);
-  const radioCard=`<button class="w-proj" data-route="radio"><span class="w-pc" style="background-image:url(./assets/art/cover-radio.svg)"></span>
-      <span class="w-pb"><b>라디오</b><small>${openSlots?`이번 주 담당 ${openSlots}자리 비어 있음`:'이번 주 담당이 모두 정해졌어요'}</small>
-      ${total?`<span class="w-pg" aria-label="이번 주 ${total}자리 중 ${filled}자리 배정"><i style="width:${Math.round(filled/total*100)}%;background:var(--mint-ink)"></i></span>`:''}</span></button>`;
-  const newCard=`<button class="w-proj is-new" data-route="projects"><span data-icon="plus"></span>${plist.length?'프로젝트 전체':'새 프로젝트'}</button>`;
 
   // 아래 두 칸
   const avs=people.slice().sort((a,b)=>availableNow.includes(b)-availableNow.includes(a)).slice(0,9).map((p,k)=>
@@ -434,15 +412,11 @@ function homeView() {
     </div>
     <img class="studio-illustration" src="./assets/art/cover-home.svg" alt="" width="1200" height="300">
   </section>
-  <div class="studio-next">${sticker}</div>
-  <section class="studio-projects" aria-labelledby="studio-projects-title">
-    <div class="studio-section-head"><div><h2 id="studio-projects-title">프로젝트</h2><p>함께 준비하는 촬영과 방송</p></div>${newCard}</div>
-    <div class="w-projs">${pcards}${radioCard}</div>
-  </section>
   <section class="w-flow" aria-labelledby="w-flow-h">
-    <div class="w-flow-h"><h2 id="w-flow-h">일정 흐름</h2><button class="hn-link" data-route="weekly">주간 일정표 →</button></div>
+    <div class="w-flow-h"><h2 id="w-flow-h">오늘 일정</h2><button class="hn-link" data-route="weekly">주간 일정표 →</button></div>
     ${flow}
   </section>
+  <div class="studio-next">${sticker}</div>
   <div class="w-duo">
     <section aria-labelledby="w-team"><div class="h-side-h"><h2 id="w-team">지금 참여 가능</h2><button class="hn-link" data-route="people">전체</button></div>
       <div class="w-who-row"><p class="h-big"><strong class="hn-num">${availableNow.length}</strong><span>/ ${people.length}명 · ${pad2(hour)}:00 기준</span></p><span class="w-avs">${avs}</span></div></section>

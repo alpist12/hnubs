@@ -1568,3 +1568,5 @@ body { background: #F7F8FC; }
   .studio-home .w-duo { grid-template-columns: 1fr; }
   #app > .a-hero h1 { font-size: 24px; }
 }
+
+.studio-home .studio-next { margin-top: 0; }
