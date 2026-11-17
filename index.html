@@ -9,17 +9,27 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
-  <link rel="stylesheet" href="./styles.css?v=20261117-ws7">
+  <link rel="stylesheet" href="./styles.css?v=20261117-topnav">
   <link rel="stylesheet" href="./camera/styles.css?v=20261117-ws7">
 </head>
 <body>
   <a class="skip-link" href="#main">본문 바로가기</a>
-  <nav class="rail" aria-label="주 메뉴">
-    <button class="ws" type="button" data-route="home" aria-label="HNUBS 방송국 홈으로 이동">
-      <span class="ws-logo" aria-hidden="true">H</span>
-      <span class="ws-name"><strong>HNUBS 방송국</strong><small id="ws-meta">시범 운영</small></span>
-    </button>
-    <div class="ws-tools">
+<header class="hn-header">
+    <div class="hn-header-inner">
+      <button class="hn-brand top-brand" type="button" data-route="home" aria-label="HNUBS 홈으로 이동">
+        <span class="ws-logo" aria-hidden="true">H</span>
+        <strong>HNUBS</strong>
+      </button>
+      <nav class="workspace-nav" aria-label="주 메뉴">
+        <button type="button" data-route="home">홈</button>
+        <button type="button" data-route="schedule">일정</button>
+        <button type="button" data-route="maker">메이커스페이스</button>
+        <button type="button" data-route="drive">공유드라이브</button>
+        <button type="button" data-route="notices">공지</button>
+      </nav>
+      <nav class="crumb" id="crumb" aria-label="현재 위치"><span>HNUBS 방송국</span><i aria-hidden="true">/</i><b aria-current="page">홈</b></nav>
+
+      <div class="hn-header-actions">
       <div class="hn-search-wrap">
         <label class="hn-search" aria-label="전체 검색">
           <svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
@@ -29,33 +39,8 @@
         </label>
         <div id="search-results" class="hn-search-panel" role="listbox" aria-label="검색 결과" hidden></div>
       </div>
-      <button class="ws-new" type="button" data-action="new-shoot" aria-label="일정 등록" title="일정 등록"><span data-icon="plus"></span></button>
-    </div>
-    <button type="button" data-route="home"><span data-icon="home"></span><span>홈</span></button>
-    <button type="button" data-route="schedule"><span data-icon="calendar"></span><span>일정</span></button>
-    <button type="button" data-route="drive"><span data-icon="folder"></span><span>공유드라이브</span></button>
-    <button type="button" data-route="notices"><span data-icon="bell"></span><span>공지사항</span><em class="rail-cnt" id="rail-notices"></em></button>
-    <p class="rail-sep"><span>프로젝트</span><button type="button" data-route="projects" aria-label="프로젝트 전체 보기" title="프로젝트 전체 보기">+</button></p>
-    <div id="rail-projects" class="rail-projects"></div>
-    <p class="rail-sep"><span>메이커스페이스</span></p>
-    <button type="button" data-route="script"><span data-icon="file"></span><span>AI 대본 분석</span></button>
-    <button type="button" data-route="shorts"><span data-icon="film"></span><span>쇼츠</span></button>
-    <button type="button" data-route="camera"><span data-icon="camera"></span><span>카메라 구도</span></button>
-    <div class="rail-foot">
-      <button type="button" data-route="settings"><span data-icon="settings"></span><span>설정</span></button>
-      <span id="tally" class="a-tally" role="status" aria-live="polite"><i aria-hidden="true"></i>OFF AIR</span>
-    </div>
-  </nav>
-
-  <header class="hn-header">
-    <div class="hn-header-inner">
-      <button class="hn-brand top-brand" type="button" data-route="home" aria-label="HNUBS 홈으로 이동">
-        <span class="ws-logo" aria-hidden="true">H</span>
-        <strong>HNUBS</strong>
-      </button>
-      <nav class="crumb" id="crumb" aria-label="현재 위치"><span>HNUBS 방송국</span><i aria-hidden="true">/</i><b aria-current="page">홈</b></nav>
-
-      <div class="hn-header-actions">
+<span id="tally" class="a-tally" role="status" aria-live="polite"><i aria-hidden="true"></i>OFF AIR</span>
+        <button class="hn-icon-button" type="button" data-route="settings" aria-label="설정"><span data-icon="settings"></span></button>
         <button class="hn-icon-button" id="notification-button" type="button" aria-label="알림 열기" aria-expanded="false">
           <svg aria-hidden="true" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path></svg>
           <i class="hn-dot" aria-hidden="true"></i>

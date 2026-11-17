@@ -22,6 +22,7 @@ for (const name of [
   '.nojekyll',
 ]) cpSync(resolve(root, name), resolve(client, name));
 cpSync(resolve(root, 'drive'), resolve(client, 'drive'), { recursive: true });
+cpSync(resolve(root, 'assets'), resolve(client, 'assets'), { recursive: true });
 cpSync(resolve(root, 'camera'), resolve(client, 'camera'), { recursive: true });
 
 mkdirSync(resolve(dist, 'server'), { recursive: true });
