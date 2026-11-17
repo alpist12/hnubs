@@ -397,7 +397,7 @@ function homeView() {
   const sticker=next?`<button class="w-sticker" data-detail="${esc(next.id)}"><span class="w-tape" aria-hidden="true"></span>
       <span class="w-st-lab"><i aria-hidden="true"></i>다음 촬영 · ${esc(next.title)}</span><b class="hn-num">${countdown}</b>
       <small>${monthDay(next.date)} (${dowOf(next.date)}) ${esc(hourLabel(next.startH))} · ${esc(next.place||'장소 미정')} · ${next.people.length}명</small></button>`
-    :`<div class="w-sticker is-empty"><span class="w-tape" aria-hidden="true"></span><span class="w-st-lab">다음 촬영</span><b>아직 없어요</b><small>왼쪽 위 + 로 일정을 등록해요</small></div>`;
+    :`<div class="w-sticker is-empty"><span class="w-st-lab">다음 촬영</span><b>아직 없어요</b><small>일정 등록으로 새 촬영을 준비해요</small></div>`;
 
   // 프로젝트 카드 — 실제 프로젝트 + 이번 주 라디오
   const plist=Object.entries(projects).sort((a,b)=>(a[1].createdAt||0)-(b[1].createdAt||0)).slice(0,3);
@@ -424,13 +424,21 @@ function homeView() {
     :`<div class="w-empty-art"><img src="./assets/art/empty-notice.svg" alt="" width="84" height="60"><p>아직 올라온 공지가 없어요<br><button class="hn-link" data-action="new-notice">첫 공지 쓰기</button></p></div>`;
 
   return `
-  <div class="w-cover" aria-hidden="true"><img src="./assets/art/cover-home.svg" alt=""></div>
-  <section class="w-head" aria-label="인사">
-    <span class="w-pico" aria-hidden="true"><span data-icon="radio"></span></span>
-    <div class="w-title"><h1>${greet}, HNUBS</h1><p>${now.getMonth()+1}월 ${now.getDate()}일 ${DOW[now.getDay()]}요일 · ${todayItems.filter(f=>f.kind==='shoot').length?`오늘 촬영 ${todayItems.filter(f=>f.kind==='shoot').length}건`:'오늘 촬영 없음'}, 라디오 ${todayItems.filter(f=>f.kind==='radio').length}회</p></div>
-    ${sticker}
+  <div class="studio-home">
+  <section class="studio-welcome" aria-label="오늘의 워크스페이스">
+    <div class="studio-intro">
+      <p class="studio-date">${now.getMonth()+1}월 ${now.getDate()}일 ${DOW[now.getDay()]}요일</p>
+      <h1>${greet},<br><span>HNUBS.</span></h1>
+      <p class="studio-summary">${todayItems.filter(f=>f.kind==='shoot').length?`오늘 촬영 ${todayItems.filter(f=>f.kind==='shoot').length}건`:'오늘 촬영 없음'} · 라디오 ${todayItems.filter(f=>f.kind==='radio').length}회</p>
+      <div class="studio-actions"><button class="a-btn" data-action="new-shoot"><span data-icon="plus"></span>일정 등록</button><button class="studio-text-link" data-route="maker">메이커스페이스 <span data-icon="arrow-right"></span></button></div>
+    </div>
+    <img class="studio-illustration" src="./assets/art/cover-home.svg" alt="" width="1200" height="300">
   </section>
-  <div class="w-projs">${pcards}${radioCard}${newCard}</div>
+  <div class="studio-next">${sticker}</div>
+  <section class="studio-projects" aria-labelledby="studio-projects-title">
+    <div class="studio-section-head"><div><h2 id="studio-projects-title">프로젝트</h2><p>함께 준비하는 촬영과 방송</p></div>${newCard}</div>
+    <div class="w-projs">${pcards}${radioCard}</div>
+  </section>
   <section class="w-flow" aria-labelledby="w-flow-h">
     <div class="w-flow-h"><h2 id="w-flow-h">일정 흐름</h2><button class="hn-link" data-route="weekly">주간 일정표 →</button></div>
     ${flow}
@@ -439,6 +447,7 @@ function homeView() {
     <section aria-labelledby="w-team"><div class="h-side-h"><h2 id="w-team">지금 참여 가능</h2><button class="hn-link" data-route="people">전체</button></div>
       <div class="w-who-row"><p class="h-big"><strong class="hn-num">${availableNow.length}</strong><span>/ ${people.length}명 · ${pad2(hour)}:00 기준</span></p><span class="w-avs">${avs}</span></div></section>
     <section aria-labelledby="w-notice"><div class="h-side-h"><h2 id="w-notice">공지</h2><button class="hn-link" data-route="notices">전체</button></div>${noticeBox}</section>
+  </div>
   </div>`;
 }
 
@@ -2133,7 +2142,7 @@ function bindView(){
   $$('[data-ai-week]').forEach(b=>b.addEventListener('click',()=>{state.aiWeek+=Number(b.dataset.aiWeek);render();}));
   $$('[data-ai-cand]').forEach(b=>b.addEventListener('click',()=>openShootDrawer()));
   $$('[data-ai-map]').forEach(sel=>sel.addEventListener('change',()=>{state.aiMappings={...state.aiMappings,[sel.dataset.aiMap]:sel.value};render();}));
-  $$('[data-week-slot]').forEach(b=>b.addEventListener('click',()=>{const k=b.dataset.weekSlot;state.slots=state.slots.includes(k)?state.slots.filter(x=>x!==k):[...state.slots,k];render();}));
+  $$('[data-week-slot]').forEach(b=>b.addEventListener('click',()=>{const k=b.dataset.weekSlot;state.slots=state.slots.includes(k)?state.slots.filter(x=>x!==k):[...state.slots,k];render();$$('.a-cell').find(cell=>cell.dataset.weekSlot===k)?.focus({preventScroll:true});}));
   $$('[data-week-step]').forEach(b=>b.addEventListener('click',()=>{const step=Number(b.dataset.weekStep);state.weekOffset=step?state.weekOffset+step:0;state.slots=[];render();}));
   $$('[data-week-clear]').forEach(b=>b.addEventListener('click',()=>{state.slots=[];render();}));
   $$('[data-must-only]').forEach(b=>b.addEventListener('click',()=>{if(!state.mustIds.length)return;state.mustOnly=!state.mustOnly;render();}));
@@ -2197,9 +2206,17 @@ document.addEventListener('click',e=>{
   const person=e.target.closest('[data-person]')?.dataset.person;if(person!==undefined)openPersonDetail(person);
 });
 
-function drawerTemplate(title,body,footer=''){return `<div class="drawer-head"><h2>${title}</h2><button class="icon-button" data-action="close-drawer" aria-label="닫기">${icon('x')}</button></div><div class="drawer-body">${body}</div>${footer?`<div class="drawer-footer">${footer}</div>`:''}`}
-function openDrawer(html){$('#drawer-content').innerHTML=html;hydrateIcons($('#drawer'));$('#drawer-backdrop').hidden=false;$('#drawer').classList.add('open');$('#drawer').setAttribute('aria-hidden','false');setTimeout(()=>$('#drawer button, #drawer input')?.focus(),80)}
-function closeDrawer(){$('#drawer').classList.remove('open');$('#drawer').setAttribute('aria-hidden','true');setTimeout(()=>$('#drawer-backdrop').hidden=true,250)}
+function drawerTemplate(title,body,footer=''){return `<div class="drawer-head"><h2 id="drawer-title">${title}</h2><button class="icon-button" data-action="close-drawer" aria-label="닫기">${icon('x')}</button></div><div class="drawer-body">${body}</div>${footer?`<div class="drawer-footer">${footer}</div>`:''}`}
+let drawerOpener=null;
+function openDrawer(html){const drawer=$('#drawer');if(!drawer.classList.contains('open'))drawerOpener=document.activeElement;$('#drawer-content').innerHTML=html;hydrateIcons(drawer);$('#drawer-backdrop').hidden=false;drawer.inert=false;drawer.classList.add('open');drawer.setAttribute('aria-hidden','false');drawer.querySelector('button, input')?.focus();}
+function closeDrawer(){const drawer=$('#drawer'),wasOpen=drawer.classList.contains('open');drawer.classList.remove('open');drawer.inert=true;if(wasOpen&&drawerOpener?.isConnected)drawerOpener.focus({preventScroll:true});drawer.setAttribute('aria-hidden','true');setTimeout(()=>{if(!drawer.classList.contains('open'))$('#drawer-backdrop').hidden=true},250)}
+$('#drawer').addEventListener('keydown',e=>{
+  if(e.key!=='Tab')return;
+  const controls=$$('button:not(:disabled), input:not(:disabled), select:not(:disabled), textarea:not(:disabled), a[href], [tabindex="0"]',$('#drawer')).filter(el=>el.getClientRects().length);
+  const first=controls[0],last=controls.at(-1);
+  if(e.shiftKey&&document.activeElement===first){e.preventDefault();last?.focus();}
+  else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first?.focus();}
+});
 /* 등록 창을 열 때 미리 채울 값.
    촬영 일정 탭에서 날짜를 골랐으면 그 날짜,
    주간 일정표에서 칸을 골랐으면 그 날짜와 시간대까지 가져온다. */

@@ -1466,3 +1466,105 @@ button.w-sticker:hover { transform: translateY(-2px); }
 .w-proj.is-new:hover { transform: none; box-shadow: none; color: var(--blue); }
 @media (max-width: 767px) { .hn-header-actions .hn-search-wrap { display: block; } .hn-header-actions .hn-search { width: 104px; } }
 .hn-header-actions .hn-search { display: flex; }
+
+/* Studio: 방송국 일러스트와 파스텔 면을 이어 주는 공통 리듬 */
+body { background: #F7F8FC; }
+.hn-header { border-bottom-color: #E8EAF2; }
+.hn-header-inner { height: 80px; }
+.workspace-nav { align-items: center; gap: 6px; }
+.workspace-nav button { padding: 10px 16px; border-radius: 9px; }
+.workspace-nav button:hover { background: #F5F6FC; }
+.workspace-nav button.active { background: #E9EDFF; color: #2945BA; }
+.workspace-nav button.active::after { display: none; }
+.hn-header-actions .hn-search { border: 1px solid #E8EAF2; background: #F7F8FC; border-radius: 9px; }
+.top-new { border-radius: 9px; }
+#app > .studio-home { margin: 32px 36px 0; }
+.studio-home { display: flex; flex-direction: column; gap: 30px; }
+.studio-welcome { position: relative; min-height: 300px; border-radius: 20px; overflow: hidden; background: #EEF1FB; isolation: isolate; }
+.studio-intro { position: relative; z-index: 1; padding: 30px 36px; max-width: 52%; }
+.studio-date { margin: 0 0 16px; color: #565D78; font-size: 13px; font-weight: 650; }
+.studio-intro h1 { margin: 0; font-size: clamp(28px, 3vw, 40px); font-weight: 800; line-height: 1.24; letter-spacing: -.035em; color: #1B1F3B; }
+.studio-intro h1 span { color: #3453D4; }
+.studio-summary { margin: 14px 0 20px; font-size: 14px; color: #565D78; }
+.studio-illustration { position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%; object-fit: cover; object-position: right center; pointer-events: none; }
+.studio-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 18px; }
+.studio-actions .a-btn { min-height: 40px; border-radius: 9px; font-size: 13px; font-weight: 750; }
+.studio-actions [data-icon] { width: 16px; height: 16px; }
+.studio-text-link { display: inline-flex; align-items: center; gap: 8px; min-height: 40px; color: #363B5A; font-size: 13px; font-weight: 700; }
+.studio-text-link:hover { color: #2F4FE0; }
+.studio-next { margin-top: -14px; }
+.studio-next .w-sticker { width: 100%; display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 4px 24px; padding: 18px 24px; border-radius: 13px; background: #FFF5D9; color: #1B1F3B; box-shadow: none; border: 1px solid #F0E4BE; }
+.studio-next .w-sticker b { grid-column: 2; grid-row: 1 / 3; align-self: center; font-size: 26px; font-weight: 800; }
+.studio-next .w-sticker small { grid-column: 1; color: #665633; }
+.studio-next .w-st-lab { color: #554624; font-size: 13px; }
+.studio-next .w-tape { display: none; }
+.studio-section-head { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 16px; }
+#app .studio-section-head h2 { margin: 0; font-size: 20px; font-weight: 800; letter-spacing: -.025em; }
+.studio-section-head p { margin: 4px 0 0; font-size: 13px; color: #565D78; }
+.studio-section-head .w-proj.is-new { min-height: 36px; padding: 0; font-size: 13px; color: #565D78; }
+.studio-home .w-projs { margin: 0; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 18px; }
+.studio-home .w-proj { border-radius: 14px; border-color: #E4E7F0; }
+.studio-home .w-proj:hover { border-color: #AAB8E6; box-shadow: 0 8px 18px rgba(27,31,59,.06); }
+.studio-home .w-pc { height: 126px; }
+.studio-home .w-pb { padding: 16px; gap: 6px; }
+.studio-home .w-pb b { font-size: 16px; letter-spacing: -.02em; }
+.studio-home .w-pg { height: 4px; margin-top: 10px; background: #EDF0F8; }
+#app .studio-home .w-flow { margin: 0; padding: 22px 24px; border: 1px solid #E4E7F0; border-radius: 16px; background: #fff; }
+.studio-home .w-flow-h { padding-bottom: 18px; }
+#app .studio-home .w-flow-h h2 { font-size: 19px; letter-spacing: -.02em; }
+.studio-home .w-grp { margin-top: 18px; height: 32px; padding: 0 10px; background: #F5F6FB; color: #565D78; }
+.studio-home .w-row { min-height: 48px; height: auto; padding: 10px; font-size: 13px; }
+.studio-home .w-row.is-now { background: #FFF9E5; }
+.studio-home .w-duo { margin-top: 0; gap: 18px; }
+#app .studio-home .w-duo > section { border-radius: 16px; padding: 22px 24px; border-color: #E4E7F0; }
+#app .studio-home .h-side-h h2 { font-size: 16px; }
+.studio-home .h-big strong { font-size: 32px; }
+.hn-main > [role='tablist'] { background: transparent !important; }
+#app > .a-hero { padding-bottom: 20px; }
+#app > .a-hero h1 { font-size: 28px; }
+#app > .s-cover { border-radius: 16px; }
+@media (max-width: 1150px) {
+  .workspace-nav button { padding: 10px; font-size: 13px; }
+  .hn-header-inner { gap: 18px; }
+  .studio-intro { max-width: 54%; padding: 30px; }
+  .studio-illustration { object-position: 75% center; }
+  .studio-home .w-pc { height: 110px; }
+}
+@media (max-width: 950px) {
+  .hn-header-inner { gap: 12px; }
+  .hn-header-actions .hn-search { width: 100px; }
+  .studio-home .w-projs { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .studio-home .w-pc { height: 140px; }
+  .studio-welcome { min-height: 300px; }
+  .studio-intro h1 { font-size: 32px; }
+}
+@media (max-width: 767px) {
+  .hn-header-inner { height: auto; padding: 12px 16px 8px; gap: 10px; }
+  .workspace-nav { height: 42px; gap: 4px; }
+  .workspace-nav button { padding: 9px 12px; font-size: 12px; }
+  #app > .studio-home { margin: 20px 16px 0; }
+  .studio-home { gap: 24px; }
+  .studio-welcome { min-height: 410px; border-radius: 16px; }
+  .studio-intro { padding: 24px; max-width: none; }
+  .studio-intro h1 { font-size: 30px; }
+  .studio-date { margin-bottom: 12px; }
+  .studio-summary { margin-top: 12px; margin-bottom: 14px; }
+  .studio-illustration { top: auto; bottom: 0; height: 155px; object-fit: cover; object-position: right bottom; }
+  .studio-actions { gap: 16px; }
+  .studio-next { margin-top: -10px; }
+  .studio-next .w-sticker { padding: 16px; gap: 6px 12px; }
+  .studio-next .w-sticker b { font-size: 21px; }
+  .studio-next .w-sticker small { font-size: 11px; line-height: 1.5; }
+  .studio-section-head { align-items: flex-start; }
+  #app .studio-section-head h2 { font-size: 18px; }
+  .studio-section-head p { font-size: 12px; }
+  .studio-home .w-projs { gap: 12px; }
+  .studio-home .w-pc { height: 94px; }
+  .studio-home .w-pb { padding: 12px; }
+  .studio-home .w-pb b { font-size: 14px; }
+  .studio-home .w-pb small { font-size: 11px; line-height: 1.5; }
+  #app .studio-home .w-flow { padding: 18px 14px; }
+  .studio-home .w-row { padding: 10px 6px; gap: 8px; }
+  .studio-home .w-duo { grid-template-columns: 1fr; }
+  #app > .a-hero h1 { font-size: 24px; }
+}
