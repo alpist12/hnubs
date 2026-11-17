@@ -1570,3 +1570,44 @@ body { background: #F7F8FC; }
 }
 
 .studio-home .studio-next { margin-top: 0; }
+
+/* Compact home: 일정이 먼저 보이고 그림은 제목 옆의 포인트로 남긴다. */
+body { background: #fff; }
+.hn-header-inner { height: 64px; }
+#app > .studio-home { margin-top: 28px; }
+.studio-home { gap: 30px; }
+.studio-welcome { min-height: 166px; border-radius: 0; overflow: visible; background: transparent; }
+.studio-intro { padding: 0; max-width: calc(100% - 330px); }
+.studio-date { margin-bottom: 10px; font-weight: 500; }
+.studio-intro h1 { font-size: 28px; line-height: 1.3; letter-spacing: -.03em; }
+.studio-intro h1 br { display: none; }
+.studio-intro h1 span { color: var(--ink); margin-left: 6px; }
+.studio-summary { margin: 8px 0 14px; font-size: 13px; }
+.studio-illustration { inset: 8px 0 auto auto; width: 290px; height: 120px; border-radius: 10px; object-fit: cover; object-position: right center; }
+#app .studio-home .w-flow { padding: 0; border: 0; border-radius: 0; background: transparent; }
+.studio-home .w-flow-h { padding-bottom: 12px; }
+.studio-home .w-grp { margin-top: 12px; background: transparent; padding: 0; font-weight: 600; }
+.studio-home .w-row { min-height: 44px; }
+.studio-next .w-sticker { padding: 16px 0; border: 0; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); border-radius: 0; background: transparent; }
+.studio-next .w-st-lab, .studio-next .w-sticker small { color: var(--muted); }
+.studio-next .w-sticker b { font-size: 23px; }
+#app .studio-home .w-duo > section { padding: 0; border: 0; border-radius: 0; }
+#app .studio-home .w-duo > section + section { border-left: 1px solid var(--rule); padding-left: 24px; }
+@media (max-width: 950px) { .studio-intro { max-width: calc(100% - 250px); } .studio-illustration { width: 220px; height: 100px; } }
+@media (max-width: 767px) {
+  .hn-header-inner { height: auto; }
+  #app > .studio-home { margin-top: 20px; }
+  .studio-home { gap: 24px; }
+  .studio-welcome { min-height: 170px; }
+  .studio-intro { padding: 0; max-width: none; }
+  .studio-date { margin-bottom: 8px; }
+  .studio-intro h1 { max-width: calc(100% - 126px); font-size: 23px; }
+  .studio-intro h1 span { margin-left: 0; display: block; }
+  .studio-illustration { top: 12px; right: 0; bottom: auto; width: 120px; height: 84px; }
+  .studio-summary { margin: 8px 0 12px; font-size: 12px; }
+  .studio-actions { gap: 16px; }
+  #app .studio-home .w-flow { padding: 0; }
+  .studio-next .w-sticker { padding: 14px 0; }
+  .studio-home .w-duo { gap: 24px; }
+  #app .studio-home .w-duo > section + section { border-left: 0; padding-left: 0; border-top: 1px solid var(--rule); padding-top: 20px; }
+}
