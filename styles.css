@@ -1378,3 +1378,35 @@ button.w-row:hover { background: var(--field); }
 .crumb span { color: var(--muted); font-weight: 600; }
 .crumb b { color: var(--ink); font-weight: 800; }
 @media (max-width: 767px) { .hn-header-inner { padding: 0 14px; } }
+
+/* 주간 일정표 신호등 — 빨강·노랑·초록 (사용자 요청 2026-11-16) */
+:root {
+  /* 파스텔 신호등 (사용자 요청) — 바탕은 옅게, 숫자 글자색으로 단계를 읽게 한다 */
+  --sig-red: #FCE1E6; --sig-red-ink: #9A2445;
+  --sig-yellow: #FFF2C4; --sig-yellow-ink: #6A4D00;
+  --sig-green: #E2F5E9; --sig-green-ink: #1A6B45;
+  --sig-green-full: #C4EBD3;
+}
+/* 노란 칸 위에서도 보이게 지금 시각 띠는 남색 */
+.a-cell.is-now::before { background: var(--ink); box-shadow: none; }
+
+/* 일정 탭 커버 — 탭 아래 둥근 커버 그림, 제목 위로 아이콘 타일이 걸친다 */
+#app > .s-cover { height: 120px; margin-top: 16px; border-radius: 12px; background-color: #EEF1FB; background-repeat: no-repeat; background-position: right center; background-size: auto 100%; }
+/* 그림은 자르지 않고 오른쪽에 통째로, 왼쪽은 그림 바탕색으로 잇는다 */
+#app > .s-cover[data-tab="shoots"] { background-color: #EAE3FF; }
+#app > .s-cover[data-tab="radio"], #app > .s-cover[data-tab="projects"] { background-color: #DFE7FF; }
+#app > .s-cover + .a-hero { position: relative; margin-top: 0; padding-top: 34px; }
+#app > .s-cover + .a-hero::before {
+  content: ""; position: absolute; top: -36px; left: 0; width: 60px; height: 60px; border-radius: 14px;
+  background-color: #fff; background-position: center; background-size: 30px; background-repeat: no-repeat; border: 1px solid var(--rule); box-shadow: 0 6px 16px rgba(27, 31, 59, .10);
+}
+#app > .s-cover[data-tab="weekly"] + .a-hero::before { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232F4FE0' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='5' width='18' height='16' rx='2'/%3E%3Cpath d='M3 10h18M8 3v4M16 3v4M8 14h2M14 14h2M8 17h2'/%3E%3C/svg%3E"); }
+#app > .s-cover[data-tab="shoots"] + .a-hero::before { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232F4FE0' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='6' width='13' height='12' rx='2.5'/%3E%3Cpath d='M16 10.5l5-3v9l-5-3'/%3E%3C/svg%3E"); }
+#app > .s-cover[data-tab="radio"] + .a-hero::before { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232F4FE0' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 10v4h3l5 4V6L7 10H4z'/%3E%3Cpath d='M16 9a4 4 0 0 1 0 6M19 6.5a8 8 0 0 1 0 11'/%3E%3C/svg%3E"); }
+#app > .s-cover[data-tab="personal"] + .a-hero::before { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232F4FE0' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='8' r='4'/%3E%3Cpath d='M4 21a8 8 0 0 1 16 0'/%3E%3C/svg%3E"); }
+#app > .s-cover[data-tab="projects"] + .a-hero::before { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232F4FE0' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='9' width='18' height='12' rx='2'/%3E%3Cpath d='M3 9l2-5h14l2 5M8 4l-1 5M13 4l-1 5M18 4l-1 5'/%3E%3C/svg%3E"); }
+@media (max-width: 767px) {
+  #app > .s-cover { height: 84px; }
+  #app > .s-cover + .a-hero { padding-top: 28px; }
+  #app > .s-cover + .a-hero::before { width: 48px; height: 48px; top: -30px; background-size: 24px; }
+}

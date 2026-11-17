@@ -469,10 +469,11 @@ function weeklyView() {
       const on=slots.includes(key);
       // 다 되는 날은 확실히 초록, 빠듯한 날은 확실히 빨강. 중간은 비워 둔다.
       const ratio=total?n/total:0;
-      let bg='var(--rose-card)', fg='var(--rose-ink)';
-      if(ratio>=1){ bg='var(--mint-full)'; fg='var(--mint-ink)'; }
-      else if(ratio>=0.75){ bg='var(--mint-card)'; fg='var(--mint-ink)'; }
-      else if(ratio>=0.4){ bg='var(--lav-mid)'; fg='var(--lav-ink)'; }
+      // 신호등: 빨강(적음) · 노랑(일부) · 초록(많음), 전원 가능은 진한 초록
+      let bg='var(--sig-red)', fg='var(--sig-red-ink)';
+      if(ratio>=1){ bg='var(--sig-green-full)'; fg='var(--sig-green-ink)'; }
+      else if(ratio>=0.75){ bg='var(--sig-green)'; fg='var(--sig-green-ink)'; }
+      else if(ratio>=0.4){ bg='var(--sig-yellow)'; fg='var(--sig-yellow-ink)'; }
       if(shoot){ bg='var(--blue-card)'; fg='var(--blue-ink)'; }
       const past=isPast(iso,h);
       if(past){ bg='var(--field)'; fg='var(--muted)'; }   // var(--muted) 는 2.08:1 로 안 읽혔다
@@ -553,9 +554,10 @@ function weeklyView() {
       </button>
     </div>
     <div style="display:flex;flex-wrap:wrap;gap:14px;font-size:12.5px;font-weight:600;color:var(--muted)">
-      <span style="display:inline-flex;align-items:center;gap:6px"><i style="display:block;width:14px;height:14px;border-radius:5px;background:var(--mint-card)"></i>전원 가능</span>
-      <span style="display:inline-flex;align-items:center;gap:6px"><i style="display:block;width:14px;height:14px;border-radius:5px;background:var(--lav-mid)"></i>일부 가능</span>
-      <span style="display:inline-flex;align-items:center;gap:6px"><i style="display:block;width:14px;height:14px;border-radius:5px;background:var(--rose-card)"></i>2명 이하</span>
+      <span style="display:inline-flex;align-items:center;gap:6px"><i style="display:block;width:14px;height:14px;border-radius:5px;background:var(--sig-green-full)"></i>전원 가능</span>
+      <span style="display:inline-flex;align-items:center;gap:6px"><i style="display:block;width:14px;height:14px;border-radius:5px;background:var(--sig-green)"></i>75% 이상</span>
+      <span style="display:inline-flex;align-items:center;gap:6px"><i style="display:block;width:14px;height:14px;border-radius:5px;background:var(--sig-yellow)"></i>40~75%</span>
+      <span style="display:inline-flex;align-items:center;gap:6px"><i style="display:block;width:14px;height:14px;border-radius:5px;background:var(--sig-red)"></i>40% 미만</span>
       <span style="display:inline-flex;align-items:center;gap:6px"><i style="display:block;width:14px;height:14px;border-radius:5px;background:var(--blue-card)"></i>촬영 일정</span>
       <span style="display:inline-flex;align-items:center;gap:6px"><i style="display:block;width:14px;height:14px;border-radius:5px;background:var(--sel)"></i>선택</span>
     </div>
@@ -1042,8 +1044,11 @@ function projectsView(){
     :`<section style="${CARD};padding:40px 20px;text-align:center;color:var(--muted);font-size:14px">아직 만든 프로젝트가 없어요.<br>오른쪽 위 ‘프로젝트 추가’를 눌러 시작하세요.</section>`}`;
 }
 
+// 일정 탭마다 커버 그림 — 드라이브·카메라와 같은 머리
+const SCHEDULE_ART = { weekly: 'weekly', shoots: 'drama', radio: 'radio', personal: 'personal', projects: 'slate' };
 function scheduleView(){
   return `${subTabBar(SCHEDULE_TABS, state.scheduleTab, 'schedule-tab', '일정')}
+  <div class="s-cover" data-tab="${state.scheduleTab}" aria-hidden="true" style="background-image:url(./assets/art/cover-${SCHEDULE_ART[state.scheduleTab] || 'weekly'}.svg)"></div>
   ${state.scheduleTab === 'shoots' ? shootsView() : state.scheduleTab === 'radio' ? radioView() : state.scheduleTab === 'personal' ? personalView() : state.scheduleTab === 'projects' ? projectsView() : weeklyView()}`;
 }
 
@@ -1386,7 +1391,7 @@ function shootsView() {
     ${heroDots()}
     <div style="position:relative;display:flex;flex-direction:column;gap:2px;min-width:0">
       <span class="hn-num" style="font-size:13.5px;color:var(--a-muted)">${range}</span>
-      <h1>일정</h1>
+      <h1>촬영 일정</h1>
       <span style="font-size:14.5px;color:var(--a-muted)">촬영과 방송국 일정을 한 달력에서 봐요. 일정을 누르면 상세가 열려요.</span>
     </div>
     <div style="position:relative;display:flex;flex-wrap:wrap;align-items:center;gap:10px">

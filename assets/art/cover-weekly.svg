@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 300" preserveAspectRatio="xMidYMid slice" role="img" aria-label="주간 일정표 일러스트">
+  <rect width="1200" height="300" fill="#EEF1FB"/>
+  <path d="M560 0h640v300H520c30-90 0-180 40-300z" fill="#E4E0FB"/>
+  <!-- 달력 판 -->
+  <rect x="660" y="34" width="360" height="232" rx="14" fill="#FFFFFF" stroke="#1B1F3B" stroke-width="4"/>
+  <rect x="660" y="34" width="360" height="40" rx="14" fill="#1B1F3B"/>
+  <rect x="660" y="60" width="360" height="14" fill="#1B1F3B"/>
+  <g fill="#FFFFFF"><circle cx="712" cy="34" r="7"/><circle cx="968" cy="34" r="7"/></g>
+  <path d="M700 20v26M980 20v26" stroke="#1B1F3B" stroke-width="7" stroke-linecap="round"/>
+  <!-- 신호등 칸 -->
+  <g>
+    <rect x="682" y="90" width="44" height="34" rx="5" fill="#93D9AE"/><rect x="732" y="90" width="44" height="34" rx="5" fill="#FFE38A"/><rect x="782" y="90" width="44" height="34" rx="5" fill="#93D9AE"/><rect x="832" y="90" width="44" height="34" rx="5" fill="#F9C6CF"/><rect x="882" y="90" width="44" height="34" rx="5" fill="#C6ECD3"/><rect x="932" y="90" width="44" height="34" rx="5" fill="#93D9AE"/>
+    <rect x="682" y="132" width="44" height="34" rx="5" fill="#FFE38A"/><rect x="732" y="132" width="44" height="34" rx="5" fill="#2F4FE0"/><rect x="782" y="132" width="44" height="34" rx="5" fill="#2F4FE0"/><rect x="832" y="132" width="44" height="34" rx="5" fill="#C6ECD3"/><rect x="882" y="132" width="44" height="34" rx="5" fill="#F9C6CF"/><rect x="932" y="132" width="44" height="34" rx="5" fill="#93D9AE"/>
+    <rect x="682" y="174" width="44" height="34" rx="5" fill="#C6ECD3"/><rect x="732" y="174" width="44" height="34" rx="5" fill="#93D9AE"/><rect x="782" y="174" width="44" height="34" rx="5" fill="#FFE38A"/><rect x="832" y="174" width="44" height="34" rx="5" fill="#93D9AE"/><rect x="882" y="174" width="44" height="34" rx="5" fill="#93D9AE"/><rect x="932" y="174" width="44" height="34" rx="5" fill="#FFE38A"/>
+    <rect x="682" y="216" width="44" height="34" rx="5" fill="#93D9AE"/><rect x="732" y="216" width="44" height="34" rx="5" fill="#C6ECD3"/><rect x="782" y="216" width="44" height="34" rx="5" fill="#93D9AE"/><rect x="832" y="216" width="44" height="34" rx="5" fill="#FFE38A"/><rect x="882" y="216" width="44" height="34" rx="5" fill="#93D9AE"/><rect x="932" y="216" width="44" height="34" rx="5" fill="#C6ECD3"/>
+  </g>
+  <rect x="728" y="128" width="102" height="42" rx="7" fill="none" stroke="#1B1F3B" stroke-width="3"/>
+  <!-- 사람 셋 -->
+  <g stroke="#1B1F3B" stroke-width="3">
+    <circle cx="1090" cy="150" r="16" fill="#D4C5FF"/><path d="M1068 230v-36a22 22 0 0 1 44 0v36z" fill="#D4C5FF"/>
+    <circle cx="1138" cy="168" r="14" fill="#DFE7FF"/><path d="M1118 240v-30a20 20 0 0 1 40 0v30z" fill="#DFE7FF"/>
+  </g>
+  <path d="M1080 108l8-8M1100 104l0-12M1116 110l8-6" stroke="#2F4FE0" stroke-width="4" stroke-linecap="round"/>
+  <!-- 연필 -->
+  <g transform="rotate(-30 600 220)"><rect x="560" y="210" width="90" height="18" rx="3" fill="#FFE94D" stroke="#1B1F3B" stroke-width="3"/><path d="M650 210l20 9-20 9z" fill="#FFFFFF" stroke="#1B1F3B" stroke-width="3" stroke-linejoin="round"/><rect x="548" y="210" width="14" height="18" rx="3" fill="#E5243B" stroke="#1B1F3B" stroke-width="3"/></g>
+</svg>
