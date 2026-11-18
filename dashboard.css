@@ -149,12 +149,12 @@ body.lavender-workspace {
   .lavender-workspace .hn-header-actions { gap:0; }
   .ld-workspace-identity,.ld-air-link { display:none !important; }
   .lavender-workspace #app>.ld-dashboard { margin:0 16px; }
-  .ld-hero { min-height:204px; }
-  .ld-hero-copy { padding:15px 2px 90px; width:100%; }
-  .ld-hero-copy p { font-size:12px; margin-bottom:9px; }
+  .ld-hero { min-height:0; display:flex; flex-direction:column; }
+  .ld-hero-copy { padding:12px 2px 0; width:100%; }
+  .ld-hero-copy p { display:none; }
   .ld-hero-copy h1 { font-size:24px; }
-  .ld-hero-copy>span { font-size:13px; margin-top:7px; }
-  .ld-hero-art { width:88%; height:118px; bottom:-14px; right:-10px; opacity:.85; }
+  .ld-hero-copy>span { font-size:13px; margin-top:4px; }
+  .ld-hero-art { position:relative; align-self:flex-end; width:82%; height:auto; aspect-ratio:4/1; bottom:auto; right:-8px; opacity:.85; }
   .ld-stats { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin-bottom:14px; }
   .ld-stat { min-height:72px; border-radius:14px; padding:12px; }
   .ld-stat-icon { display:grid; width:36px; height:36px; flex-basis:36px; }
