@@ -11,58 +11,50 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
   <link rel="stylesheet" href="./styles.css?v=20261117-compact">
   <link rel="stylesheet" href="./camera/styles.css?v=20261117-ws7">
+  <link rel="stylesheet" href="./dashboard.css?v=20261118-lavender">
 </head>
-<body>
+<body class="lavender-workspace">
   <a class="skip-link" href="#main">본문 바로가기</a>
-<header class="hn-header">
+  <aside class="ld-sidebar" aria-label="워크스페이스 메뉴">
+    <button class="ld-brand" type="button" data-route="home" aria-label="HNUBS 대시보드">
+      <img src="./assets/art/brand-broadcast.svg" alt="" width="58" height="58">
+      <span><strong>HNUBS</strong><small>한밭대학교<br>신문방송국<br>내부 운영 시스템</small></span>
+    </button>
+    <nav class="ld-navigation" aria-label="주 메뉴">
+      <button type="button" data-route="home"><span data-icon="home"></span>대시보드</button>
+      <details class="ld-production"><summary><span data-icon="film"></span>제작 관리<span data-icon="chevron-down"></span></summary>
+        <div class="ld-subnav"><button type="button" data-route="projects">프로젝트</button><button type="button" data-route="script">AI 대본 분석</button><button type="button" data-route="shorts">쇼츠</button><button type="button" data-route="camera">카메라 구도</button></div>
+      </details>
+      <button type="button" data-route="schedule"><span data-icon="calendar"></span>일정</button>
+      <button type="button" data-route="personal"><span data-icon="clock"></span>개인 일정</button>
+      <button type="button" data-route="drive"><span data-icon="folder"></span>자료실</button>
+      <button type="button" data-route="notices"><span data-icon="radio"></span>공지사항</button>
+      <button type="button" data-route="people"><span data-icon="users"></span>국원 관리</button>
+      <button type="button" data-route="settings"><span data-icon="settings"></span>설정</button>
+    </nav>
+    <div class="ld-sidebar-foot"><span id="tally" class="a-tally" role="status" aria-live="polite"><i aria-hidden="true"></i>OFF AIR</span><small>함께 만드는 좋은 방송</small></div>
+  </aside>
+  <header class="hn-header">
     <div class="hn-header-inner">
-      <button class="hn-brand top-brand" type="button" data-route="home" aria-label="HNUBS 홈으로 이동">
-        <span class="ws-logo" aria-hidden="true">H</span>
-        <strong>HNUBS</strong>
-      </button>
-      <nav class="workspace-nav" aria-label="주 메뉴">
-        <button type="button" data-route="home">홈</button>
-        <button type="button" data-route="schedule">일정</button>
-        <button type="button" data-route="maker">메이커스페이스</button>
-        <button type="button" data-route="drive">공유드라이브</button>
-        <button type="button" data-route="notices">공지</button>
-      </nav>
-      <nav class="crumb" id="crumb" aria-label="현재 위치"><span>HNUBS 방송국</span><i aria-hidden="true">/</i><b aria-current="page">홈</b></nav>
-
-      <div class="hn-header-actions">
+      <button id="mobile-more" class="hn-icon-button ld-mobile-menu" type="button" aria-label="전체 메뉴 열기"><span data-icon="menu"></span></button>
       <div class="hn-search-wrap">
-        <label class="hn-search" aria-label="전체 검색">
-          <svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
-          <input id="global-search" type="search" placeholder="검색" autocomplete="off"
-            role="combobox" aria-expanded="false" aria-controls="search-results">
-          <kbd>⌘K</kbd>
-        </label>
+        <label class="hn-search" aria-label="전체 검색"><span data-icon="search"></span><input id="global-search" type="search" placeholder="일정, 구성원, 공지 검색" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="search-results"><kbd>⌘K</kbd></label>
         <div id="search-results" class="hn-search-panel" role="listbox" aria-label="검색 결과" hidden></div>
       </div>
-<span id="tally" class="a-tally" role="status" aria-live="polite"><i aria-hidden="true"></i>OFF AIR</span>
-        <button class="hn-icon-button" type="button" data-route="settings" aria-label="설정"><span data-icon="settings"></span></button>
-        <button class="hn-icon-button" id="notification-button" type="button" aria-label="알림 열기" aria-expanded="false">
-          <svg aria-hidden="true" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path></svg>
-          <i class="hn-dot" aria-hidden="true"></i>
-        </button>
-        <button class="a-btn top-new" type="button" data-action="new-shoot"><span data-icon="plus"></span>일정 등록</button>
+      <div class="hn-header-actions">
+        <button class="hn-icon-button" id="notification-button" type="button" aria-label="알림 열기" aria-expanded="false"><span data-icon="bell"></span><i class="hn-dot" aria-hidden="true"></i></button>
+        <button class="hn-icon-button ld-air-link" type="button" data-action="open-air" aria-label="Air AI 도우미 열기"><span data-icon="help-circle"></span></button>
+        <div class="ld-workspace-identity"><span class="ld-identity-icon" aria-hidden="true"><span data-icon="users"></span></span><span><strong>HNUBS 방송국</strong><small id="ws-meta">공용 워크스페이스</small></span></div>
       </div>
     </div>
   </header>
+
 
   <main id="main" tabindex="-1">
     <div id="app" class="hn-main" aria-live="polite"></div>
   </main>
 
-  <nav class="mobile-nav" aria-label="모바일 주요 메뉴">
-    <button type="button" data-route="home"><span data-icon="home"></span><span>홈</span></button>
-    <button type="button" data-route="schedule"><span data-icon="calendar"></span><span>일정</span></button>
-    <button type="button" data-route="notices"><span data-icon="bell"></span><span>공지사항</span></button>
-    <button type="button" data-route="drive"><span data-icon="folder"></span><span>드라이브</span></button>
-    <button type="button" id="mobile-more"><span data-icon="menu"></span><span>더보기</span></button>
-  </nav>
-
-  <div class="popover notification-popover" id="notification-popover" hidden>
+<div class="popover notification-popover" id="notification-popover" hidden>
     <div class="popover-head"><strong>알림</strong><button type="button" data-action="close-popover" aria-label="알림 닫기"><span data-icon="x"></span></button></div>
     <div id="notification-list"></div>
     <button class="text-link popover-footer" type="button" data-route="shoots">모든 일정 보기 <span data-icon="arrow-right"></span></button>
@@ -72,7 +64,7 @@
   <aside class="mobile-menu-sheet" id="mobile-menu" aria-label="전체 메뉴" aria-hidden="true">
     <div class="sheet-grabber" aria-hidden="true"></div>
     <div class="mobile-profile"><span class="ws-logo" aria-hidden="true">H</span><span><strong>HNUBS 방송국</strong><small>방송국 워크스페이스</small></span><button class="icon-button" type="button" data-action="close-mobile-menu" aria-label="메뉴 닫기"><span data-icon="x"></span></button></div>
-    <div class="mobile-menu-grid">
+    <div class="mobile-menu-grid"><button type="button" data-route="home"><span data-icon="home"></span>대시보드</button><button type="button" data-route="schedule"><span data-icon="calendar"></span>일정</button><button type="button" data-route="projects"><span data-icon="film"></span>프로젝트</button><button type="button" data-route="personal"><span data-icon="clock"></span>개인 일정</button>
       <button type="button" data-route="script"><span data-icon="file"></span>AI 대본 분석</button>
       <button type="button" data-route="shorts"><span data-icon="film"></span>쇼츠</button>
       <button type="button" data-route="camera"><span data-icon="camera"></span>카메라 구도</button>
@@ -117,6 +109,6 @@
 
   <div class="toast-region" id="toast-region" aria-live="polite" aria-atomic="true"></div>
   <script src="./api-config.js?v=20261111-drive"></script>
-  <script src="./app.js?v=20261117-home-today"></script>
+  <script src="./app.js?v=20261118-lavender"></script>
 </body>
 </html>

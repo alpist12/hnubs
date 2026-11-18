@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 300" preserveAspectRatio="xMidYMid slice" role="img" aria-label="방송국 스튜디오 일러스트">
+  <!-- 바탕: 연한 종이 + 큰 라벤더 면 -->
+  
+  
+  
+  <!-- 흡음 패널 -->
+  <g fill="#D4C5FF">
+    <rect x="610" y="34" width="54" height="54" rx="8"/><rect x="672" y="34" width="54" height="54" rx="8"/>
+    <rect x="610" y="96" width="54" height="54" rx="8"/><rect x="672" y="96" width="54" height="54" rx="8" fill="#FFE94D"/>
+  </g>
+  <g stroke="#1B1F3B" stroke-width="2" opacity=".18">
+    <path d="M620 44l34 34M682 44l34 34M620 106l34 34"/>
+  </g>
+  <!-- ON AIR 램프 -->
+  <rect x="790" y="40" width="96" height="40" rx="20" fill="#1B1F3B"/>
+  <circle cx="812" cy="60" r="9" fill="#E5243B"/>
+  <rect x="830" y="55" width="44" height="10" rx="5" fill="#FFFFFF" opacity=".9"/>
+  <!-- 책상 -->
+  <rect x="470" y="226" width="760" height="14" rx="7" fill="#1B1F3B"/>
+  <rect x="520" y="240" width="12" height="60" fill="#1B1F3B"/><rect x="1120" y="240" width="12" height="60" fill="#1B1F3B"/>
+  <!-- 노트북 + 파형 -->
+  <path d="M560 226l18-78h150l18 78z" fill="#FFFFFF" stroke="#1B1F3B" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M590 190h14l8-22 10 40 10-30 8 18 10-12 8 6h34" fill="none" stroke="#2F4FE0" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- 마이크 붐 -->
+  <path d="M960 226v-24M960 202l-70-70 50-50" fill="none" stroke="#1B1F3B" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="926" y="58" width="40" height="64" rx="20" transform="rotate(35 946 90)" fill="#2F4FE0" stroke="#1B1F3B" stroke-width="4"/>
+  <path d="M930 76l26 18M922 90l26 18" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" transform="rotate(0)"/>
+  <rect x="936" y="218" width="48" height="10" rx="5" fill="#1B1F3B"/>
+  <!-- 헤드폰 -->
+  <path d="M800 222c0-40 26-62 56-62s56 22 56 62" fill="none" stroke="#1B1F3B" stroke-width="7" stroke-linecap="round"/>
+  <rect x="788" y="196" width="26" height="34" rx="10" fill="#D4C5FF" stroke="#1B1F3B" stroke-width="4"/>
+  <rect x="898" y="196" width="26" height="34" rx="10" fill="#D4C5FF" stroke="#1B1F3B" stroke-width="4"/>
+  <!-- 카메라 + 삼각대 -->
+  <path d="M1080 150l-30 150M1080 150l0 150M1080 150l30 150" stroke="#1B1F3B" stroke-width="6" stroke-linecap="round"/>
+  <rect x="1036" y="102" width="86" height="54" rx="10" fill="#FFFFFF" stroke="#1B1F3B" stroke-width="4"/>
+  <circle cx="1070" cy="129" r="16" fill="#2F4FE0" stroke="#1B1F3B" stroke-width="4"/>
+  <circle cx="1070" cy="129" r="6" fill="#DFE7FF"/>
+  <rect x="1122" y="116" width="22" height="26" rx="4" fill="#1B1F3B"/>
+  <circle cx="1108" cy="112" r="4" fill="#E5243B"/>
+  <!-- 화분 -->
+  <path d="M500 226l8-34h40l8 34z" fill="#FFE94D" stroke="#1B1F3B" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M528 192c-6-28-26-36-30-60 22 6 30 26 30 60zm0 0c4-30 22-44 26-66-22 8-28 34-26 66z" fill="#2F4FE0" stroke="#1B1F3B" stroke-width="3" stroke-linejoin="round"/>
+  <!-- 케이블 -->
+  <path d="M746 226c40 30 120 30 190 0" fill="none" stroke="#1B1F3B" stroke-width="3" stroke-dasharray="1 8" stroke-linecap="round"/>
+</svg>

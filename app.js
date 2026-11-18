@@ -344,6 +344,7 @@ function renderShell(){
   // 경로: 방송국 / (일정) / 지금 화면. 단계마다 같은 구분자, 마지막만 굵게.
   const trail=['HNUBS 방송국',...(state.route==='schedule'?['일정']:[]),ROUTE_LABEL[sub]||'홈'];
   const crumb=$('#crumb'); if(crumb) crumb.innerHTML=trail.map((t,i)=>i===trail.length-1?`<b aria-current="page">${esc(t)}</b>`:`<span>${esc(t)}</span><i aria-hidden="true">/</i>`).join('');
+  const production=$('.ld-production'); if(production&&(state.route==='maker'||sub==='projects'))production.open=true;
   const meta=$('#ws-meta'); if(meta) meta.textContent=`부원 ${people.length}명 · 시범 운영`;
   const nc=$('#rail-notices'); if(nc) nc.textContent=notices.length?String(notices.length):'';
   const box=$('#rail-projects'); if(box){
@@ -362,7 +363,6 @@ function homeView() {
   const next=upcoming[0];
   const hour=Math.max(9,Math.min(22,now.getHours())), dayIdx=(now.getDay()+6)%7;
   const availableNow=people.filter(p=>memberAvailable(p[7],today,dayIdx,hour));
-  const greet=now.getHours()<11?'좋은 아침이에요':now.getHours()<18?'좋은 오후예요':'좋은 저녁이에요';
 
   // 하루치 흐름: 라디오 + 촬영
   const toMin=t=>{ const [h,m]=t.trim().split(':').map(Number); return h*60+(m||0); };
@@ -382,17 +382,11 @@ function homeView() {
   let todayHtml='', placed=todayItems.some(f=>f.from<=nowMin&&nowMin<f.to);
   todayItems.forEach(f=>{ if(!placed&&f.from>nowMin){ todayHtml+=nowRow; placed=true; } todayHtml+=row(f,true); });
   if(!placed) todayHtml+=nowRow;
-  const flow=`<div class="w-grp">${monthDay(today)} ${DOW[now.getDay()]}요일 <span>${todayItems.length}건</span></div>${todayHtml}`;
 
-  // 스티커 큐카드
+  // 다음 촬영까지 남은 시간
   let countdown='';
   if(next){ const diff=Math.max(0,startMs(next)-nowMs); const dd=Math.floor(diff/86400000),hh=Math.floor(diff/3600000)%24,mm=Math.floor(diff/60000)%60;
     countdown=diff===0?'곧 시작':(dd>0?dd+'일 ':'')+pad2(hh)+':'+pad2(mm); }
-  const sticker=next?`<button class="w-sticker" data-detail="${esc(next.id)}"><span class="w-tape" aria-hidden="true"></span>
-      <span class="w-st-lab"><i aria-hidden="true"></i>다음 촬영 · ${esc(next.title)}</span><b class="hn-num">${countdown}</b>
-      <small>${monthDay(next.date)} (${dowOf(next.date)}) ${esc(hourLabel(next.startH))} · ${esc(next.place||'장소 미정')} · ${next.people.length}명</small></button>`
-    :`<div class="w-sticker is-empty"><span class="w-st-lab">다음 촬영</span><b>아직 없어요</b><small>일정 등록으로 새 촬영을 준비해요</small></div>`;
-
   // 아래 두 칸
   const avs=people.slice().sort((a,b)=>availableNow.includes(b)-availableNow.includes(a)).slice(0,9).map((p,k)=>
     `<button class="w-pv${availableNow.includes(p)?'':' is-off'}" data-person="${esc(p[7])}" title="${esc(p[0])} · ${availableNow.includes(p)?'가능':'개인 일정'}" style="background:${AV[k%4][0]};color:${AV[k%4][1]}">${esc(initial(p[0]))}</button>`).join('')
@@ -401,28 +395,39 @@ function homeView() {
       return `<button class="h-notice" data-notice="${esc(n.id)}"><span class="h-chip" style="background:${bg};color:${fg}">${esc(n.tag)}</span><span><strong>${esc(n.title)}</strong><small>${esc(n.author||'운영진')} · ${esc(noticeDate(n))}</small></span></button>`; }).join('')
     :`<div class="w-empty-art"><img src="./assets/art/empty-notice.svg" alt="" width="84" height="60"><p>아직 올라온 공지가 없어요<br><button class="hn-link" data-action="new-notice">첫 공지 쓰기</button></p></div>`;
 
+  const projectEntries=Object.entries(projects);
+  const production=projectEntries.slice(0,3).map(([id,p],k)=>{
+    const shoots=schedules.filter(s=>s.raw?.projectId===id), done=shoots.filter(s=>s.status==='완료').length;
+    const pct=shoots.length?Math.round(done/shoots.length*100):0;
+    return `<button class="ld-progress-row" data-route="projects"><img src="./assets/art/cover-${projectArt(p,k)}.svg" alt="" width="48" height="42"><span><span class="ld-progress-label"><strong>${esc(p.name||id)}</strong><b>${shoots.length?pct+'%':'촬영 없음'}</b></span><span class="ld-progress-track"><i style="width:${pct}%"></i></span><small>${shoots.length?`${shoots.length}건 중 ${done}건 완료`:'촬영 일정 등록 전'}</small></span></button>`;
+  }).join('')||'<p class="ld-empty">등록된 프로젝트가 없어요.</p>';
+  const radioToday=todayItems.filter(f=>f.kind==='radio');
+  const radioRowsHtml=radioToday.map(f=>`<button class="ld-radio-row" data-route="radio"><span class="ld-assigned${f.who?' is-assigned':''}" aria-hidden="true">${icon(f.who?'check':'user')}</span><span><strong>${esc(f.title)}</strong><small>${esc(f.time)} · ${esc(f.who||'담당 미정')}</small></span>${icon('chevron-right')}</button>`).join('')||'<p class="ld-empty">오늘은 라디오 방송이 없어요.</p>';
+  const upcomingHtml=upcoming.slice(0,3).map(s=>`<button class="ld-upcoming-row" data-detail="${esc(s.id)}"><span class="ld-date-tile"><b>${new Date(s.date+'T00:00:00').getDate()}</b><small>${dowOf(s.date)}</small></span><span><strong>${esc(s.title)}</strong><small>${monthDay(s.date)} · ${esc(hourLabel(s.startH))} · ${esc(s.place||'장소 미정')}</small></span>${icon('chevron-right')}</button>`).join('')||'<p class="ld-empty">예정된 촬영이 없어요.</p>';
+  const stat=(label,value,name,route)=>`<button class="ld-stat" data-route="${route}"><span class="ld-stat-icon">${icon(name)}</span><span><small>${label}</small><strong>${value}</strong></span>${icon('chevron-right')}</button>`;
+  const cardHead=(title,name,route,action='전체보기')=>`<div class="ld-card-head"><h2>${icon(name)}${title}</h2><button class="ld-more" data-route="${route}">${action}${icon('chevron-right')}</button></div>`;
   return `
-  <div class="studio-home">
-  <section class="studio-welcome" aria-label="오늘의 워크스페이스">
-    <div class="studio-intro">
-      <p class="studio-date">${now.getMonth()+1}월 ${now.getDate()}일 ${DOW[now.getDay()]}요일</p>
-      <h1>${greet},<br><span>HNUBS.</span></h1>
-      <p class="studio-summary">${todayItems.filter(f=>f.kind==='shoot').length?`오늘 촬영 ${todayItems.filter(f=>f.kind==='shoot').length}건`:'오늘 촬영 없음'} · 라디오 ${todayItems.filter(f=>f.kind==='radio').length}회</p>
-      <div class="studio-actions"><button class="a-btn" data-action="new-shoot"><span data-icon="plus"></span>일정 등록</button><button class="studio-text-link" data-route="maker">메이커스페이스 <span data-icon="arrow-right"></span></button></div>
+  <div class="ld-dashboard">
+    <section class="ld-hero" aria-labelledby="ld-greeting">
+      <div class="ld-hero-copy"><p>방송국 대시보드</p><h1 id="ld-greeting">안녕하세요, HNUBS!</h1><span>오늘도 좋은 콘텐츠를 만들어가요.</span></div>
+      <img class="ld-hero-art" src="./assets/art/cover-dashboard.svg" alt="" width="1200" height="300">
+    </section>
+    <section class="ld-stats" aria-label="워크스페이스 현황">
+      ${stat('등록된 프로젝트',projectEntries.length+'건','film','projects')}
+      ${stat('지금 참여 가능',availableNow.length+'명','users','people')}
+      ${stat('오늘 일정',todayItems.length+'건','calendar','weekly')}
+      ${stat('공지사항',notices.length+'건','bell','notices')}
+    </section>
+    <div class="ld-grid">
+      <section class="ld-card ld-today" aria-labelledby="ld-today-title"><div class="ld-card-head"><h2 id="ld-today-title">${icon('calendar')}오늘의 일정</h2><span class="ld-today-date">${now.getMonth()+1}월 ${now.getDate()}일 (${DOW[now.getDay()]})</span><button class="ld-add" data-action="new-shoot">${icon('plus')}일정 추가</button></div><div class="ld-timeline">${todayHtml}</div><button class="ld-bottom-link" data-route="weekly">주간 일정표 보기 ${icon('chevron-right')}</button></section>
+      <section class="ld-card">${cardHead('라디오 담당','radio','radio')}<div class="ld-radio-list">${radioRowsHtml}</div><div class="ld-available"><span>지금 참여 가능 <strong>${availableNow.length} / ${people.length}명</strong></span><span class="w-avs">${avs}</span></div></section>
+      <section class="ld-card">${cardHead('제작 진행 현황','film','projects')}<div class="ld-progress-list">${production}</div></section>
+      <section class="ld-card">${cardHead('다가오는 촬영','clock','shoots')}<div class="ld-upcoming-list">${upcomingHtml}</div>${next?`<p class="ld-countdown">다음 촬영까지 <strong class="hn-num">${countdown}</strong></p>`:''}</section>
+      <section class="ld-card">${cardHead('공지사항','radio','notices')}<div class="ld-notices">${noticeBox}</div></section>
+      <section class="ld-card">${cardHead('바로가기','star','maker','도구 보기')}<div class="ld-shortcuts"><button data-action="new-shoot">${icon('camera')}<span>촬영 등록</span></button><button data-route="script">${icon('file')}<span>대본 분석</span></button><button data-route="drive">${icon('folder')}<span>공유 자료</span></button><button data-route="people">${icon('users')}<span>국원 명단</span></button></div></section>
     </div>
-    <img class="studio-illustration" src="./assets/art/cover-home.svg" alt="" width="1200" height="300">
-  </section>
-  <section class="w-flow" aria-labelledby="w-flow-h">
-    <div class="w-flow-h"><h2 id="w-flow-h">오늘 일정</h2><button class="hn-link" data-route="weekly">주간 일정표 →</button></div>
-    ${flow}
-  </section>
-  <div class="studio-next">${sticker}</div>
-  <div class="w-duo">
-    <section aria-labelledby="w-team"><div class="h-side-h"><h2 id="w-team">지금 참여 가능</h2><button class="hn-link" data-route="people">전체</button></div>
-      <div class="w-who-row"><p class="h-big"><strong class="hn-num">${availableNow.length}</strong><span>/ ${people.length}명 · ${pad2(hour)}:00 기준</span></p><span class="w-avs">${avs}</span></div></section>
-    <section aria-labelledby="w-notice"><div class="h-side-h"><h2 id="w-notice">공지</h2><button class="hn-link" data-route="notices">전체</button></div>${noticeBox}</section>
-  </div>
   </div>`;
+
 }
 
 
@@ -2038,7 +2043,7 @@ function render(){
   const sub = state.route==='schedule' ? state.scheduleTab : state.route==='maker' ? state.makerTab : '';
   $$('[data-route]').forEach(b=>{ const r=b.dataset.route;
     const on = r===sub || r===state.route;
-    b.classList.toggle('active',on); if(b.closest('.rail')) b.toggleAttribute('aria-current', on); });
+    b.classList.toggle('active',on); if(b.closest('.ld-sidebar')) { if(on)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current'); } });
   renderShell();
   document.body.classList.toggle('hn-shorts', state.route==='maker' && state.makerTab==='shorts');
   renderTally();
@@ -2174,7 +2179,7 @@ document.addEventListener('click',e=>{
     return;
   }
   const routeTarget=e.target.closest('[data-route]');const route=routeTarget?.dataset.route;if(route){if(routeTarget.dataset.settingsTarget)state.settingsSection=routeTarget.dataset.settingsTarget;navigate(route);return;}
-  const action=e.target.closest('[data-action]')?.dataset.action;if(action==='new-shoot')openShootDrawer();if(action==='new-personal')openPersonalDrawer();if(action==='new-person')openPersonDrawer();if(action==='new-notice')openNoticeDrawer();if(action==='close-drawer')closeDrawer();if(action==='close-popover')closePopovers();if(action==='close-mobile-menu')closeMobileMenu();
+  const action=e.target.closest('[data-action]')?.dataset.action;if(action==='open-air')$('#air-button').click();if(action==='new-shoot')openShootDrawer();if(action==='new-personal')openPersonalDrawer();if(action==='new-person')openPersonDrawer();if(action==='new-notice')openNoticeDrawer();if(action==='close-drawer')closeDrawer();if(action==='close-popover')closePopovers();if(action==='close-mobile-menu')closeMobileMenu();
   const detail=e.target.closest('[data-detail]')?.dataset.detail;if(detail)openScheduleDetail(detail);
   const notice=e.target.closest('[data-notice]')?.dataset.notice;if(notice)openNoticeDetail(notice);
   const person=e.target.closest('[data-person]')?.dataset.person;if(person!==undefined)openPersonDetail(person);
